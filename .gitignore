@@ -1,0 +1,32 @@
+# Temporary and binary files
+*~
+*.py[cod]
+*.so
+__pycache__/*
+__pycache__
+.cache/*
+**/.ipynb_checkpoints
+
+# OS generated files
+.DS_Store*
+
+# Project files
+.project
+.pydevproject
+.settings
+.idea
+.vscode
+.spyproject
+
+# Test, linter, coverage
+htmlcov/*
+.coverage
+.mypy_cache
+.ruff_cache
+.pytest_cache
+
+# Build and docs folder/files
+build/*
+dist/*
+sdist/*
+doc/_build

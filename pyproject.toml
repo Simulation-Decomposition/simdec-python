@@ -1,0 +1,59 @@
+[build-system]
+requires = ["hatchling>=1.14.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "simdec"
+version = "0.0.1"
+description = "Sensitivity analysis using simulation decomposition"
+readme = "README.md"
+requires-python = ">=3.9"
+authors = [
+  { name = "Pamphile Roy" },
+]
+maintainers = [
+  { name = "simdec contributors" },
+]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Intended Audience :: End Users/Desktop",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Science/Research",
+  "Operating System :: OS Independent",
+]
+
+dependencies = [
+  "numpy",
+  "pandas",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "pytest-cov",
+]
+
+doc = [
+    "sphinx",
+    "pydata-sphinx-theme"
+]
+
+dev = [
+    "simdec[test]",
+    "simdec[doc]",
+    "pre-commit",
+    "hatch",
+]
+
+[project.urls]
+Documentation = "https://simdec.readthedocs.io"
+"Source code" = "https://github.com/Simulation-Decomposition/simdec-python"
+
+[tool.pytest.ini_options]
+addopts = "--durations 10"
+testpaths = [
+    "tests",
+]
