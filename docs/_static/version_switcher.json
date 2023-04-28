@@ -1,0 +1,12 @@
+[
+    {
+        "name": "dev",
+        "version": "dev",
+        "url": "https://simdec.readthedocs.io/en/latest/"
+    },
+    {
+        "name": "1.0.0 (stable)",
+        "version":"1.0.0",
+        "url": "https://simdec.readthedocs.io/en/stable/"
+    }
+]
