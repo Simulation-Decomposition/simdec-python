@@ -1,0 +1,18 @@
+name: simdec
+channels:
+  - conda-forge
+dependencies:
+  # required
+  - python>=3.9
+  - numpy
+  - pandas
+  - salib
+  # tests
+  - pytest
+  - pytest-cov
+  # dev
+  - pre-commit
+  - hatch
+  # doc
+  - sphinx
+  - pydata-sphinx-theme
