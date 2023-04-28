@@ -3,4 +3,4 @@ from simdec.decomposition import *
 from simdec.significance import *
 from simdec.visualization import *
 
-__all__ = []
+__all__ = ["significance", "decomposition"]
