@@ -1,11 +1,10 @@
 from typing import Literal
 
 import numpy as np
+from scipy import stats
 
 
 __all__ = ["significance"]
-
-from numpy import ndarray
 
 
 def number_of_bins(n_runs: int, n_factors: int) -> tuple[int, int]:
@@ -24,22 +23,6 @@ def number_of_bins(n_runs: int, n_factors: int) -> tuple[int, int]:
     n_bins_soe = max(4, np.round(np.sqrt(n_bins_foe)))
 
     return n_bins_foe, n_bins_soe
-
-
-def bin_data_1D(
-    xi: np.ndarray, output: np.ndarray, bins: np.ndarray, dx: float
-) -> tuple[ndarray, ndarray]:
-    """Compute averages and counts of Y in bins of X."""
-    bin_avg = np.empty(len(bins))
-    bin_count = np.empty(len(bins))
-
-    for i, bin_ in enumerate(bins):
-        idx = np.where((bin_ <= xi) & (xi <= bin_ + dx))
-        y_ = output[idx]
-        bin_avg[i] = np.mean(y_)
-        bin_count[i] = len(y_)
-
-    return bin_avg, bin_count
 
 
 def significance(
@@ -73,9 +56,6 @@ def significance(
     n_runs, n_factors = inputs.shape
     n_bins_foe, n_bins_soe = number_of_bins(n_runs, n_factors)
 
-    bins = np.linspace(np.min(output), np.max(output), num=n_bins_foe, endpoint=False)
-    dx = bins[1] - bins[0]
-
     # Overall variance of the output
     # var_y = np.var(output)
 
@@ -85,7 +65,8 @@ def significance(
 
     for i in range(n_factors):
         xi = inputs[:, i]
-        bin_avg, bin_count = bin_data_1D(xi, output, bins, dx)
+
+        bin_avg, _, bin_count = stats.binned_statistic(xi, output, bins=n_bins_foe)
 
         # weighted variance and divide by the overall variance of the output
         avg = np.average(bin_avg, weights=bin_count)
