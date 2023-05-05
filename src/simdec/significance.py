@@ -73,12 +73,13 @@ def significance(
     for i in range(n_factors):
         xi = inputs[:, i]
 
-        bin_avg, _, bin_count = stats.binned_statistic(
+        bin_avg, _, binnumber = stats.binned_statistic(
             x=xi, values=output, bins=n_bins_foe
         )
+        bin_counts = np.unique(binnumber, return_counts=True)[1]
 
         # weighted variance and divide by the overall variance of the output
-        foe[i] = _weighted_var(bin_avg, weights=bin_count)
+        foe[i] = _weighted_var(bin_avg, weights=bin_counts)
 
         # second order
         for j in range(n_factors):
@@ -86,11 +87,15 @@ def significance(
                 continue
 
             xj = inputs[:, i]
-            bin_avg, *_, bin_counts = stats.binned_statistic_2d(
-                x=xi, y=xj, values=output, bins=n_bins_soe, expand_binnumbers=True
-            )
 
-            var_ij = ...  # _weighted_var(bin_avg, weights=bin_counts)
+            bin_avg, *_, binnumber = stats.binned_statistic_2d(
+                x=xi, y=xj, values=output, bins=n_bins_soe, expand_binnumbers=False
+            )
+            bin_counts = np.unique(binnumber, return_counts=True)[1]
+            var_ij = _weighted_var(bin_avg, weights=bin_counts)
+
+            binnumber = np.asarray(np.unravel_index(binnumber, (n_runs, n_runs)))
+            bin_counts = np.unique(binnumber, return_counts=True)[1]
             var_i = _weighted_var(bin_avg, weights=bin_counts[0])
             var_j = _weighted_var(bin_avg, weights=bin_counts[1])
 
