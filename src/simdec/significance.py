@@ -28,7 +28,7 @@ def number_of_bins(n_runs: int, n_factors: int) -> tuple[int, int]:
 def _weighted_var(x: np.ndarray, weights: np.ndarray) -> np.ndarray:
     avg = np.average(x, weights=weights)
     variance = np.average((x - avg) ** 2, weights=weights)
-    return np.sqrt(variance)
+    return variance
 
 
 def significance(
