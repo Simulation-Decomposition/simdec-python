@@ -32,7 +32,7 @@ def _weighted_var(x: np.ndarray, weights: np.ndarray) -> np.ndarray:
 
 
 def significance(
-    inputs: np.ndarray, output: np.ndarray, method: Literal["simdec"]
+    inputs: np.ndarray, output: np.ndarray, *, method: Literal["simdec"] = "simdec"
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Significance indices.
 
@@ -58,7 +58,6 @@ def significance(
         Second-order effects (also called 'interaction').
 
     """
-    ...
     n_runs, n_factors = inputs.shape
     n_bins_foe, n_bins_soe = number_of_bins(n_runs, n_factors)
 
@@ -67,10 +66,10 @@ def significance(
 
     si = np.empty(n_factors)
     foe = np.empty(n_factors)
-    soe = np.empty((n_factors, n_factors))
+    soe = np.zeros((n_factors, n_factors))
 
-    # first order
     for i in range(n_factors):
+        # first order
         xi = inputs[:, i]
 
         bin_avg, _, binnumber = stats.binned_statistic(
@@ -79,26 +78,34 @@ def significance(
         bin_counts = np.unique(binnumber, return_counts=True)[1]
 
         # weighted variance and divide by the overall variance of the output
-        foe[i] = _weighted_var(bin_avg, weights=bin_counts)
+        foe[i] = _weighted_var(bin_avg, weights=bin_counts) / var_y
 
         # second order
         for j in range(n_factors):
-            if i == j and j < i:
+            if i == j or j < i:
                 continue
 
-            xj = inputs[:, i]
+            xj = inputs[:, j]
 
-            bin_avg, *_, binnumber = stats.binned_statistic_2d(
+            bin_avg, *edges, binnumber = stats.binned_statistic_2d(
                 x=xi, y=xj, values=output, bins=n_bins_soe, expand_binnumbers=False
             )
-            bin_counts = np.unique(binnumber, return_counts=True)[1]
-            var_ij = _weighted_var(bin_avg, weights=bin_counts)
 
-            binnumber = np.asarray(np.unravel_index(binnumber, (n_runs, n_runs)))
             bin_counts = np.unique(binnumber, return_counts=True)[1]
-            var_i = _weighted_var(bin_avg, weights=bin_counts[0])
-            var_j = _weighted_var(bin_avg, weights=bin_counts[1])
+            var_ij = _weighted_var(bin_avg.flatten(), weights=bin_counts)
+
+            # expand_binnumbers here
+            nbin = np.array([len(edges_) + 1 for edges_ in edges])
+            binnumbers = np.asarray(np.unravel_index(binnumber, nbin))
+
+            bin_counts_i = np.unique(binnumbers[0], return_counts=True)[1]
+            bin_counts_j = np.unique(binnumbers[1], return_counts=True)[1]
+            var_i = _weighted_var(np.mean(bin_avg, axis=1), weights=bin_counts_i)
+            var_j = _weighted_var(np.mean(bin_avg, axis=0), weights=bin_counts_j)
 
             soe[i, j] = (var_ij - var_i - var_j) / var_y
+
+        soe = np.where(soe == 0, soe.T, soe)
+        # SI(k) = FOE(k) + sum(SOE_full(:,k))/2;
 
     return si, foe, soe

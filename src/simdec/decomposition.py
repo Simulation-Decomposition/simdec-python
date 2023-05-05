@@ -1,9 +1,6 @@
-from typing import TYPE_CHECKING
+from typing import Literal
 
 import numpy as np
-
-if TYPE_CHECKING:
-    from typing import Literal
 
 
 __all__ = ["decomposition"]
