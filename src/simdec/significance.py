@@ -107,7 +107,6 @@ def significance(
 
         soe = np.clip(soe, a_min=0, a_max=None)
         soe = np.where(soe == 0, soe.T, soe)
-        # SI(k) = FOE(k) + sum(SOE_full(:,k))/2;
         si[i] = foe[i] + soe[:, i].sum() / 2
 
     return si, foe, soe

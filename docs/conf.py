@@ -36,9 +36,9 @@ html_static_path = ["_static"]
 
 html_theme_options = {
     "github_url": "https://github.com/Simulation-Decomposition/simdec-python",
-    "navbar_end": ["theme-switcher", "version-switcher", "navbar-icon-links"],
-    "switcher": {
-        "json_url": "https://simdec.readthedocs.io/en/latest/_static/version_switcher.json",  # noqa
-        "version_match": release,
-    },
+    # "navbar_end": ["theme-switcher", "version-switcher", "navbar-icon-links"],
+    # "switcher": {
+    #     "json_url": "https://simdec.readthedocs.io/en/latest/_static/version_switcher.json",  # noqa
+    #     "version_match": release,
+    # },
 }
