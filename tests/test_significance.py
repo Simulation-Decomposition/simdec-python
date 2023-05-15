@@ -1,4 +1,5 @@
 import numpy as np
+import numpy.testing as npt
 import pytest
 from scipy.stats import qmc
 
@@ -41,11 +42,11 @@ def ishigami_ref_indices():
     return s_first, s_second, s_total
 
 
-def test_significance():
+def test_significance(ishigami_ref_indices):
     rng = np.random.default_rng(1655943881803900660874135192647741156)
     n_dim = 3
 
-    inputs = qmc.Sobol(d=n_dim, seed=rng).random(1024)
+    inputs = qmc.Sobol(d=n_dim, seed=rng).random(2**18)
     inputs = qmc.scale(
         sample=inputs, l_bounds=[-np.pi, -np.pi, -np.pi], u_bounds=[np.pi, np.pi, np.pi]
     )
@@ -56,3 +57,11 @@ def test_significance():
     assert si.shape == (3,)
     assert foe.shape == (3,)
     assert soe.shape == (3, 3)
+
+    foe_ref = ishigami_ref_indices[0]
+    soe_ref = ishigami_ref_indices[1]
+    si_ref = ishigami_ref_indices[0] + np.sum(soe_ref / 2, axis=0)
+
+    npt.assert_allclose(foe, foe_ref, atol=1e-3)
+    npt.assert_allclose(soe, soe_ref, atol=1e-2)
+    npt.assert_allclose(si, si_ref, atol=1e-2)
