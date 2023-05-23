@@ -17,9 +17,6 @@ def number_of_bins(n_runs: int, n_factors: int) -> tuple[int, int]:
     if n_bins_foe <= 30:
         n_bins_foe = 10  # setting a limit to fit the experimental results
 
-    while (n_runs % n_bins_foe) != 0:
-        n_bins_foe = n_bins_foe + 1
-
     n_bins_soe = max(4, np.round(np.sqrt(n_bins_foe)))
 
     return n_bins_foe, n_bins_soe
