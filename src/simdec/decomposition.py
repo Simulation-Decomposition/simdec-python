@@ -18,7 +18,7 @@ def decomposition(
     dec_limit: float = 1,
     states: np.ndarray | None = None,
     threshold_type: Literal["percentile", "median"] | None = "median",
-) -> tuple[np.ndarray, pd.DataFrame]:
+) -> tuple[np.ndarray, pd.DataFrame, np.ndarray]:
     # 1. variables for decomposition
     var_order = np.argsort(significance)
     # TODO can use pandas or an index to select variable
@@ -53,4 +53,4 @@ def decomposition(
 
     bins = pd.DataFrame(bins[1:]).T
 
-    return res.statistic, bins
+    return res.statistic, bins, states
