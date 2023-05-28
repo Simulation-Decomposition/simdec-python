@@ -32,6 +32,7 @@ dependencies = [
     "numpy",
     "pandas",
     "SALib",
+    "seaborn",
 ]
 
 [project.optional-dependencies]
