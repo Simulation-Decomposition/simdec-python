@@ -52,16 +52,16 @@ def test_significance(ishigami_ref_indices):
     )
     output = f_ishigami(inputs.T)
 
-    si, foe, soe = significance(inputs=inputs, output=output)
+    res = significance(inputs=inputs, output=output)
 
-    assert si.shape == (3,)
-    assert foe.shape == (3,)
-    assert soe.shape == (3, 3)
+    assert res.si.shape == (3,)
+    assert res.first_order.shape == (3,)
+    assert res.second_order.shape == (3, 3)
 
     foe_ref = ishigami_ref_indices[0]
     soe_ref = ishigami_ref_indices[1]
     si_ref = ishigami_ref_indices[0] + np.sum(soe_ref / 2, axis=0)
 
-    npt.assert_allclose(foe, foe_ref, atol=1e-3)
-    npt.assert_allclose(soe, soe_ref, atol=1e-2)
-    npt.assert_allclose(si, si_ref, atol=1e-2)
+    npt.assert_allclose(res.first_order, foe_ref, atol=1e-3)
+    npt.assert_allclose(res.second_order, soe_ref, atol=1e-2)
+    npt.assert_allclose(res.si, si_ref, atol=1e-2)

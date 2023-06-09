@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import Literal
 
 import numpy as np
@@ -10,15 +11,22 @@ from scipy import stats
 __all__ = ["decomposition"]
 
 
+@dataclass
+class DecompositionResult:
+    statistic: np.ndarray
+    bins: pd.DataFrame
+    states: np.ndarray
+
+
 def decomposition(
     inputs: np.ndarray,
     output: np.ndarray,
     significance: np.ndarray,
-    var_names: str,
+    var_names: str = None,
     dec_limit: float = 1,
     states: np.ndarray | None = None,
     threshold_type: Literal["percentile", "median"] | None = "median",
-) -> tuple[np.ndarray, pd.DataFrame, np.ndarray]:
+) -> DecompositionResult:
     # 1. variables for decomposition
     var_order = np.argsort(significance)
     # TODO can use pandas or an index to select variable
@@ -53,4 +61,4 @@ def decomposition(
 
     bins = pd.DataFrame(bins[1:]).T
 
-    return res.statistic, bins, states
+    return DecompositionResult(res.statistic, bins, states)

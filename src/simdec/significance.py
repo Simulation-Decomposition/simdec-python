@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from typing import Literal
 
 import numpy as np
@@ -28,9 +29,16 @@ def _weighted_var(x: np.ndarray, weights: np.ndarray) -> np.ndarray:
     return variance
 
 
+@dataclass
+class SignificanceResult:
+    si: np.ndarray
+    first_order: np.ndarray
+    second_order: np.ndarray
+
+
 def significance(
     inputs: np.ndarray, output: np.ndarray, *, method: Literal["simdec"] = "simdec"
-) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+) -> SignificanceResult:
     """Significance indices.
 
     The significance express how much variability of the output is
@@ -116,4 +124,4 @@ def significance(
         soe = np.where(soe == 0, soe.T, soe)
         si[i] = foe[i] + soe[:, i].sum() / 2
 
-    return si, foe, soe
+    return SignificanceResult(si, foe, soe)
