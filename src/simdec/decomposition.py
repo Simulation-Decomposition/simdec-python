@@ -29,13 +29,16 @@ def decomposition(
 ) -> DecompositionResult:
     # 1. variables for decomposition
     var_order = np.argsort(significance)
-    # TODO can use pandas or an index to select variable
+
+    # TODO could use pandas or an index to select variable
     # var_names = var_names[var_order]
-    inputs = inputs[var_order]
 
     # only keep the explained variance corresponding to `dec_limit`
     significance = significance[var_order]
     n_var_dec = np.where(np.cumsum(significance) < dec_limit)[0].size
+
+    # var_names = var_names[var_order[:n_var_dec]]
+    inputs = inputs[:, var_order[:n_var_dec]]
 
     # 2. states formation
     if states is None:
