@@ -28,7 +28,7 @@ def decomposition(
     threshold_type: Literal["percentile", "median"] | None = "median",
 ) -> DecompositionResult:
     # 1. variables for decomposition
-    var_order = np.argsort(significance)
+    var_order = np.argsort(significance)[::-1]
 
     # TODO could use pandas or an index to select variable
     # var_names = var_names[var_order]
