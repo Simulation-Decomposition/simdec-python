@@ -72,6 +72,8 @@ def significance(
         bin_avg, _, binnumber = stats.binned_statistic(
             x=xi, values=output, bins=n_bins_foe
         )
+        # can have NaN in the average but no corresponding binnumber
+        bin_avg = bin_avg[~np.isnan(bin_avg)]
         bin_counts = np.unique(binnumber, return_counts=True)[1]
 
         # weighted variance and divide by the overall variance of the output
@@ -88,8 +90,9 @@ def significance(
                 x=xi, y=xj, values=output, bins=n_bins_soe, expand_binnumbers=False
             )
 
+            mean_ij = bin_avg[~np.isnan(bin_avg)]
             bin_counts = np.unique(binnumber, return_counts=True)[1]
-            var_ij = _weighted_var(bin_avg.flatten(), weights=bin_counts)
+            var_ij = _weighted_var(mean_ij, weights=bin_counts)
 
             # expand_binnumbers here
             nbin = np.array([len(edges_) + 1 for edges_ in edges])
@@ -97,8 +100,15 @@ def significance(
 
             bin_counts_i = np.unique(binnumbers[0], return_counts=True)[1]
             bin_counts_j = np.unique(binnumbers[1], return_counts=True)[1]
-            var_i = _weighted_var(np.mean(bin_avg, axis=1), weights=bin_counts_i)
-            var_j = _weighted_var(np.mean(bin_avg, axis=0), weights=bin_counts_j)
+
+            # handle NaNs
+            mean_i = np.nanmean(bin_avg, axis=1)
+            mean_i = mean_i[~np.isnan(mean_i)]
+            mean_j = np.nanmean(bin_avg, axis=0)
+            mean_j = mean_j[~np.isnan(mean_j)]
+
+            var_i = _weighted_var(mean_i, weights=bin_counts_i)
+            var_j = _weighted_var(mean_j, weights=bin_counts_j)
 
             soe[i, j] = (var_ij - var_i - var_j) / var_y
 
