@@ -19,7 +19,8 @@ def main():
     ax, palette = sd.visualization(bins=res.bins, states=res.states)
     plt.show()
 
-    table = sd.tableau(bins=res.bins, palette=palette)
+    # use a notebook to see the styling
+    table, styler = sd.tableau(bins=res.bins, palette=palette)
     print(table)
 
 

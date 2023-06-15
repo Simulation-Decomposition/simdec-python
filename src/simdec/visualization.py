@@ -3,8 +3,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 import pandas as pd
+from pandas.io.formats.style import Styler
 
 __all__ = ["visualization", "tableau"]
+
 
 sequential_palettes = [
     "Purples",
@@ -55,13 +57,14 @@ def visualization(
     return ax, palette
 
 
-def tableau(bins: pd.DataFrame, palette: np.ndarray) -> pd.DataFrame:
+def tableau(bins: pd.DataFrame, palette: np.ndarray) -> tuple[pd.DataFrame, Styler]:
     table = bins.describe().T
     table = table.reset_index()
     table.rename(columns={"index": "colour"}, inplace=True)
 
     cmap = mpl.colors.ListedColormap(palette)
-    table.style.hide(axis="index")
-    table.style.background_gradient(subset=["colour"], cmap=cmap)
+    styler = table.style.hide(axis="index").background_gradient(
+        subset=["colour"], cmap=cmap
+    )
 
-    return table
+    return table, styler
