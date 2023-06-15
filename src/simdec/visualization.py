@@ -1,9 +1,10 @@
 import matplotlib as mpl
+import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 import pandas as pd
 
-__all__ = ["visualization"]
+__all__ = ["visualization", "tableau"]
 
 sequential_palettes = [
     "Purples",
@@ -27,7 +28,9 @@ sequential_palettes = [
 ]
 
 
-def visualization(bins: pd.DataFrame, states: np.ndarray):
+def visualization(
+    bins: pd.DataFrame, states: np.ndarray
+) -> tuple[plt.Axes, np.ndarray]:
     colors = []
     # one palette per first level state
     n_shades = np.prod(states[1:])
@@ -50,3 +53,15 @@ def visualization(bins: pd.DataFrame, states: np.ndarray):
         legend=False,
     )
     return ax, palette
+
+
+def tableau(bins: pd.DataFrame, palette: np.ndarray) -> pd.DataFrame:
+    table = bins.describe().T
+    table = table.reset_index()
+    table.rename(columns={"index": "colour"}, inplace=True)
+
+    cmap = mpl.colors.ListedColormap(palette)
+    table.style.hide(axis="index")
+    table.style.background_gradient(subset=["colour"], cmap=cmap)
+
+    return table

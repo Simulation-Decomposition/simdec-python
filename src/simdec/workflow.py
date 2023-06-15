@@ -16,8 +16,11 @@ def main():
 
     res = sd.decomposition(inputs=inputs, output=output, significance=si)
 
-    sd.visualization(bins=res.bins, states=res.states)
+    ax, palette = sd.visualization(bins=res.bins, states=res.states)
     plt.show()
+
+    table = sd.tableau(bins=res.bins, palette=palette)
+    print(table)
 
 
 if __name__ == "__main__":
