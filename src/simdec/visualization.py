@@ -27,7 +27,7 @@ sequential_palettes = [
 ]
 
 
-def visualization(decomposition: np.ndarray, bins: pd.DataFrame, states: np.ndarray):
+def visualization(bins: pd.DataFrame, states: np.ndarray):
     colors = []
     # one palette per first level state
     n_shades = np.prod(states[1:])
@@ -38,6 +38,15 @@ def visualization(decomposition: np.ndarray, bins: pd.DataFrame, states: np.ndar
 
     palette = np.concatenate(colors)
 
-    sns.histplot(
-        bins, multiple="stack", palette=palette, common_bins=True, common_norm=True
+    # needed to get the correct stacking order
+    bins.columns = pd.RangeIndex(start=np.prod(states), stop=0, step=-1)
+
+    ax = sns.histplot(
+        bins,
+        multiple="stack",
+        palette=palette,
+        common_bins=True,
+        common_norm=True,
+        legend=False,
     )
+    return ax, palette
