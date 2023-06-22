@@ -34,9 +34,11 @@ autosummary_generate = True
 html_theme = "pydata_sphinx_theme"
 html_static_path = ["_static"]
 
+html_logo = "_static/logo.gif"
+html_favicon = "_static/favicon.png"
+
 html_theme_options = {
     "github_url": "https://github.com/Simulation-Decomposition/simdec-python",
-    # "navbar_end": ["theme-switcher", "version-switcher", "navbar-icon-links"],
     # "switcher": {
     #     "json_url": "https://simdec.readthedocs.io/en/latest/_static/version_switcher.json",  # noqa
     #     "version_match": release,
