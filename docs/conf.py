@@ -7,7 +7,7 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = "SimDec"
-copyright = "2023, Pamphile Roy"
+copyright = "2023, SimDec Developers"
 author = "Pamphile Roy"
 release = "1.0.0"
 
