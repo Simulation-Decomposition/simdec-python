@@ -55,12 +55,46 @@ def significance(
 
     Returns
     -------
-    si : ndarray of shape (n_factors, 1)
-        Significance index, combined effect of each input.
-    foe : ndarray of shape (n_factors, 1)
-        First-order effects (also called 'main' or 'individual').
-    soe : ndarray of shape (n_factors, 1)
-        Second-order effects (also called 'interaction').
+    res : SignificanceResult
+        An object with attributes:
+
+        si : ndarray of shape (n_factors, 1)
+            Significance index, combined effect of each input.
+        foe : ndarray of shape (n_factors, 1)
+            First-order effects (also called 'main' or 'individual').
+        soe : ndarray of shape (n_factors, 1)
+            Second-order effects (also called 'interaction').
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from scipy.stats import qmc
+    >>> import simdec as sd
+
+    We define first the function that we want to analyse. We use the
+    well studied Ishigami function:
+
+    >>> def f_ishigami(x):
+    ...     return (np.sin(x[0]) + 7 * np.sin(x[1]) ** 2
+    ...             + 0.1 * (x[2] ** 4) * np.sin(x[0]))
+
+    Then we generate inputs using the Quasi-Monte Carlo method of Sobol' in
+    order to cover uniformly our space. And we compute outputs of the function.
+
+    >>> rng = np.random.default_rng()
+    >>> inputs = qmc.Sobol(d=3, seed=rng).random(2**18)
+    >>> inputs = qmc.scale(
+    ...     sample=inputs,
+    ...     l_bounds=[-np.pi, -np.pi, -np.pi],
+    ...     u_bounds=[np.pi, np.pi, np.pi]
+    ... )
+    >>> output = f_ishigami(inputs.T)
+
+    We can now pass our inputs and outputs to the `significance` function:
+
+    >>> res = sd.significance(inputs=inputs, output=output)
+    >>> res.si
+    array([0.43157591, 0.44241433, 0.11767249])
 
     """
     n_runs, n_factors = inputs.shape
