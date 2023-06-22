@@ -17,4 +17,5 @@ dependencies:
   # doc
   - sphinx
   - pydata-sphinx-theme
+  - accessible-pygments
   - numpydoc

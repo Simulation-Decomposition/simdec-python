@@ -38,6 +38,8 @@ html_logo = "_static/logo.gif"
 html_favicon = "_static/favicon.png"
 
 html_theme_options = {
+    "pygment_light_style": "github-light-colorblind",
+    "pygment_dark_style": "pitaya-smoothie",
     "github_url": "https://github.com/Simulation-Decomposition/simdec-python",
     # "switcher": {
     #     "json_url": "https://simdec.readthedocs.io/en/latest/_static/version_switcher.json",  # noqa
