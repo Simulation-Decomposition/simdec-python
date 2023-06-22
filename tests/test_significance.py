@@ -1,9 +1,14 @@
+import pathlib
+
 import numpy as np
 import numpy.testing as npt
+import pandas as pd
 import pytest
 from scipy.stats import qmc
 
-from simdec import significance
+import simdec as sd
+
+path_data = pathlib.Path(__file__).parent / "data"
 
 
 def f_ishigami(x):
@@ -52,7 +57,7 @@ def test_significance(ishigami_ref_indices):
     )
     output = f_ishigami(inputs.T)
 
-    res = significance(inputs=inputs, output=output)
+    res = sd.significance(inputs=inputs, output=output)
 
     assert res.si.shape == (3,)
     assert res.first_order.shape == (3,)
@@ -65,3 +70,22 @@ def test_significance(ishigami_ref_indices):
     npt.assert_allclose(res.first_order, foe_ref, atol=1e-3)
     npt.assert_allclose(res.second_order, soe_ref, atol=1e-2)
     npt.assert_allclose(res.si, si_ref, atol=1e-2)
+
+
+@pytest.mark.parametrize(
+    "fname, foe_ref, si_ref",
+    [
+        (path_data / "stress.csv", [0.04, 0.50, 0.11, 0.28], [0.04, 0.51, 0.10, 0.35]),
+    ],
+)
+def test_significance_dataset(fname, foe_ref, si_ref):
+    data = pd.read_csv(fname, sep=";", decimal=",")
+    output_name, *v_names = list(data.columns)
+    inputs, output = data[v_names], data[output_name]
+    inputs = inputs.to_numpy()
+    output = output.to_numpy()
+
+    res = sd.significance(inputs=inputs, output=output)
+
+    npt.assert_allclose(res.first_order, foe_ref, atol=5e-3)
+    npt.assert_allclose(res.si, si_ref, atol=5e-2)
