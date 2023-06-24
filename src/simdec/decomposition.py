@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Literal
 
 import numpy as np
 import pandas as pd
@@ -13,31 +12,31 @@ __all__ = ["decomposition"]
 
 @dataclass
 class DecompositionResult:
+    var_names: list[str]
     statistic: np.ndarray
     bins: pd.DataFrame
     states: np.ndarray
 
 
 def decomposition(
-    inputs: np.ndarray,
-    output: np.ndarray,
+    inputs: pd.DataFrame,
+    output: pd.DataFrame,
     significance: np.ndarray,
-    var_names: str = None,
     dec_limit: float = 1,
-    states: np.ndarray | None = None,
-    threshold_type: Literal["percentile", "median"] | None = "median",
+    states: list[int] | None = None,
 ) -> DecompositionResult:
+    var_names = inputs.columns
+    inputs = inputs.to_numpy()
+    output = output.to_numpy()
+
     # 1. variables for decomposition
     var_order = np.argsort(significance)[::-1]
-
-    # TODO could use pandas or an index to select variable
-    # var_names = var_names[var_order]
 
     # only keep the explained variance corresponding to `dec_limit`
     significance = significance[var_order]
     n_var_dec = np.where(np.cumsum(significance) < dec_limit)[0].size
 
-    # var_names = var_names[var_order[:n_var_dec]]
+    var_names = var_names[var_order[:n_var_dec]]
     inputs = inputs[:, var_order[:n_var_dec]]
 
     # 2. states formation
@@ -64,4 +63,4 @@ def decomposition(
 
     bins = pd.DataFrame(bins[1:]).T
 
-    return DecompositionResult(res.statistic, bins, states)
+    return DecompositionResult(var_names, res.statistic, bins, states)

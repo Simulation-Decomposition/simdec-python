@@ -1,7 +1,7 @@
 from dataclasses import dataclass
-from typing import Literal
 
 import numpy as np
+import pandas as pd
 from scipy import stats
 
 
@@ -37,7 +37,7 @@ class SignificanceResult:
 
 
 def significance(
-    inputs: np.ndarray, output: np.ndarray, *, method: Literal["simdec"] = "simdec"
+    inputs: pd.DataFrame | np.ndarray, output: pd.DataFrame | np.ndarray
 ) -> SignificanceResult:
     """Significance indices.
 
@@ -50,8 +50,6 @@ def significance(
         Input variables.
     output : ndarray of shape (n_runs, 1)
         Target variable.
-    method : {'simdec'}
-        Formulation used to compute significance indices.
 
     Returns
     -------
@@ -97,6 +95,11 @@ def significance(
     array([0.43157591, 0.44241433, 0.11767249])
 
     """
+    if isinstance(inputs, pd.DataFrame):
+        inputs = inputs.to_numpy()
+    if isinstance(output, pd.DataFrame):
+        output = output.to_numpy()
+
     n_runs, n_factors = inputs.shape
     n_bins_foe, n_bins_soe = number_of_bins(n_runs, n_factors)
 

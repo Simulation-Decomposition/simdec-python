@@ -8,9 +8,6 @@ def main():
     output_name, *v_names = list(data.columns)
     inputs, output = data[v_names], data[output_name]
 
-    inputs = inputs.to_numpy()
-    output = output.to_numpy()
-
     res = sd.significance(inputs=inputs, output=output)
     si = res.si
 
