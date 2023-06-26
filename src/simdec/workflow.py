@@ -17,8 +17,10 @@ def main():
     plt.show()
 
     # use a notebook to see the styling
-    table, styler = sd.tableau(bins=res.bins, palette=palette)
-    print(table)
+    table, styler = sd.tableau(
+        var_names=res.var_names, states=res.states, bins=res.bins, palette=palette
+    )
+    print(table, res.var_names, res.states)
 
 
 if __name__ == "__main__":

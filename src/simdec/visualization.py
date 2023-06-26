@@ -1,3 +1,5 @@
+import itertools
+
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
@@ -57,14 +59,24 @@ def visualization(
     return ax, palette
 
 
-def tableau(bins: pd.DataFrame, palette: np.ndarray) -> tuple[pd.DataFrame, Styler]:
+def tableau(
+    var_names: list[str], states: np.ndarray, bins: pd.DataFrame, palette: np.ndarray
+) -> tuple[pd.DataFrame, Styler]:
     table = bins.describe().T
+
+    # add colour column
     table = table.reset_index()
     table.rename(columns={"index": "colour"}, inplace=True)
-
+    # style the colour background with palette
     cmap = mpl.colors.ListedColormap(palette)
     styler = table.style.hide(axis="index").background_gradient(
         subset=["colour"], cmap=cmap
     )
+
+    # get the list of states
+    gen_states = [range(x) if isinstance(x, int) else x for x in states]
+    states_ = np.asarray(list(itertools.product(*gen_states)))
+    for i, var_name in enumerate(var_names):
+        table.insert(loc=i + 1, column=var_name, value=states_[:, i])
 
     return table, styler
