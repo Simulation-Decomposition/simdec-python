@@ -1,7 +1,6 @@
 from pathlib import Path
 from typing_extensions import Annotated
 
-from bokeh.resources import INLINE
 import matplotlib.pyplot as plt
 import pandas as pd
 import panel as pn
@@ -48,7 +47,8 @@ def main(
     )
 
     # panel app
+    pn.extension(template="material")
     pn_fig = pn.pane.Matplotlib(fig, dpi=144)
     pn_table = pn.pane.DataFrame(styler)
     pn_app = pn.Column(pn_fig, pn_table)
-    pn_app.save("app.html", resources=INLINE)
+    pn_app.save("app.html")
