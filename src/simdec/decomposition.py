@@ -15,12 +15,13 @@ class DecompositionResult:
     var_names: list[str]
     statistic: np.ndarray
     bins: pd.DataFrame
-    states: np.ndarray
+    states: list[int]
 
 
 def decomposition(
     inputs: pd.DataFrame,
     output: pd.DataFrame,
+    *,
     significance: np.ndarray,
     dec_limit: float = 1,
     states: list[int] | None = None,
@@ -36,7 +37,7 @@ def decomposition(
     significance = significance[var_order]
     n_var_dec = np.where(np.cumsum(significance) < dec_limit)[0].size
 
-    var_names = var_names[var_order[:n_var_dec]]
+    var_names = var_names[var_order[:n_var_dec]].tolist()
     inputs = inputs[:, var_order[:n_var_dec]]
 
     # 2. states formation
