@@ -8,6 +8,9 @@ dependencies:
   - pandas
   - salib
   - seaborn
+  # CLI and Dashboard
+  - typer
+  - panel
   # tests
   - pytest
   - pytest-cov

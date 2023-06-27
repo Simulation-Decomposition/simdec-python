@@ -1,9 +1,10 @@
 from pathlib import Path
 from typing_extensions import Annotated
 
+from bokeh.resources import INLINE
 import matplotlib.pyplot as plt
 import pandas as pd
-from rich import print
+import panel as pn
 import typer
 
 import simdec as sd
@@ -34,7 +35,8 @@ def main(
 
     res = sd.decomposition(inputs=inputs, output=output, significance=si)
 
-    ax, palette = sd.visualization(bins=res.bins, states=res.states)
+    fig, ax = plt.subplots()
+    ax, palette = sd.visualization(bins=res.bins, states=res.states, ax=ax)
 
     # use a notebook to see the styling
     table, styler = sd.tableau(
@@ -44,5 +46,9 @@ def main(
         bins=res.bins,
         palette=palette,
     )
-    print(styler.to_html())
-    plt.show()
+
+    # panel app
+    pn_fig = pn.pane.Matplotlib(fig, dpi=144)
+    pn_table = pn.pane.DataFrame(styler)
+    pn_app = pn.Column(pn_fig, pn_table)
+    pn_app.save("app.html", resources=INLINE)

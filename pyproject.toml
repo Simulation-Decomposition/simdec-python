@@ -34,6 +34,7 @@ dependencies = [
     "SALib",
     "seaborn",
     "typer[all]",
+    "panel",
 ]
 
 [project.optional-dependencies]

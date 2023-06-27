@@ -33,7 +33,7 @@ sequential_palettes = [
 
 
 def visualization(
-    *, bins: pd.DataFrame, states: np.ndarray
+    *, bins: pd.DataFrame, states: np.ndarray, ax=None
 ) -> tuple[plt.Axes, np.ndarray]:
     """
 
@@ -43,6 +43,7 @@ def visualization(
         ...
     bins : ...
         ...
+    ax
 
     Returns
     -------
@@ -69,6 +70,7 @@ def visualization(
         common_bins=True,
         common_norm=True,
         legend=False,
+        ax=ax,
     )
     return ax, palette
 
