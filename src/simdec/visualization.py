@@ -127,12 +127,15 @@ def tableau(
     table["weighted mean"] = statistic.flatten()
 
     # only select/ordering interesting columns
-    table = table[["colour", "std", "min", "50%", "max", "probability"]]
+    table = table[
+        ["colour", "std", "min", "weighted mean", "50%", "max", "probability"]
+    ]
 
     # style the colour background with palette
     cmap = mpl.colors.ListedColormap(palette)
-    styler = table.style.format(precision=3).background_gradient(
-        subset=["colour"], cmap=cmap
-    )
+    styler = table.style
+    styler.format(precision=3)
+    styler.background_gradient(subset=["colour"], cmap=cmap)
+    styler.format(lambda x: "", subset=["colour"])
 
     return table, styler
