@@ -1,8 +1,9 @@
 from pathlib import Path
 from typing_extensions import Annotated
 
-
+import matplotlib.pyplot as plt
 import pandas as pd
+from rich import print
 import typer
 
 import simdec as sd
@@ -44,3 +45,4 @@ def main(
         palette=palette,
     )
     print(styler.to_html())
+    plt.show()

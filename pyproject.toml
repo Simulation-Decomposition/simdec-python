@@ -33,7 +33,7 @@ dependencies = [
     "pandas",
     "SALib",
     "seaborn",
-    "typer",
+    "typer[all]",
 ]
 
 [project.optional-dependencies]
