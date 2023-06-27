@@ -33,6 +33,7 @@ dependencies = [
     "pandas",
     "SALib",
     "seaborn",
+    "typer",
 ]
 
 [project.optional-dependencies]
@@ -55,7 +56,7 @@ dev = [
 ]
 
 [project.scripts]
-simdec = "simdec.workflow:main"
+simdec = "simdec.workflow:app"
 
 [project.urls]
 homepage = "https://www.simdec.fi/"
