@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+import warnings
 
 import numpy as np
 import pandas as pd
@@ -147,10 +148,12 @@ def significance(
             bin_counts_j = np.unique(binnumbers[1], return_counts=True)[1]
 
             # handle NaNs
-            mean_i = np.nanmean(bin_avg, axis=1)
-            mean_i = mean_i[~np.isnan(mean_i)]
-            mean_j = np.nanmean(bin_avg, axis=0)
-            mean_j = mean_j[~np.isnan(mean_j)]
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore", RuntimeWarning)
+                mean_i = np.nanmean(bin_avg, axis=1)
+                mean_i = mean_i[~np.isnan(mean_i)]
+                mean_j = np.nanmean(bin_avg, axis=0)
+                mean_j = mean_j[~np.isnan(mean_j)]
 
             var_i = _weighted_var(mean_i, weights=bin_counts_i)
             var_j = _weighted_var(mean_j, weights=bin_counts_j)
