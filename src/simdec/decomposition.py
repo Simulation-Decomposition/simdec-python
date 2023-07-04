@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Literal
 
 import numpy as np
 import pandas as pd
@@ -25,6 +26,7 @@ def decomposition(
     significance: np.ndarray,
     dec_limit: float = 1,
     states: list[int] | None = None,
+    statistic: Literal["mean", "median"] | None = "mean",
 ) -> DecompositionResult:
     var_names = inputs.columns
     inputs = inputs.to_numpy()
@@ -53,13 +55,23 @@ def decomposition(
     # 3. decomposition
     bins = []
 
-    def statistic(inputs):
+    statistic_methods = {
+        "mean": np.mean,
+        "median": np.median,
+    }
+    try:
+        statistic_method = statistic_methods[statistic]
+    except IndexError:
+        msg = f"'statistic' must be one of {statistic_methods.values()}"
+        raise ValueError(msg)
+
+    def statistic_(inputs):
         """Custom function to keep track of the content of bins."""
         bins.append(inputs)
-        return np.median(inputs)
+        return statistic_method(inputs)
 
     res = stats.binned_statistic_dd(
-        inputs, values=output, statistic=statistic, bins=states
+        inputs, values=output, statistic=statistic_, bins=states
     )
 
     bins = pd.DataFrame(bins[1:]).T
