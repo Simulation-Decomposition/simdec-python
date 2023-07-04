@@ -68,9 +68,29 @@ interactive_palette = pn.bind(palette, interactive_decomposition)
 interactive_figure = pn.bind(figure, interactive_decomposition, interactive_palette)
 interactive_tableau = pn.bind(tableau, interactive_decomposition, interactive_palette)
 
-pn_params = pn.WidgetBox("# Parameters", slider_dec_limit, text_fname).servable(
-    area="sidebar"
-)
+
+top_description = """
+# Parameters
+
+Select a CSV file:
+- comma delimited and with point decimal separator;
+- first column is the output of the model;
+- rest of the columns are the inputs.
+"""
+
+params_description = """
+The following parameters can be adjusted:
+"""
+
+pn_params = pn.layout.WidgetBox(
+    top_description,
+    text_fname,
+    params_description,
+    slider_dec_limit,
+    max_width=350,
+    sizing_mode="stretch_width",
+).servable(area="sidebar")
+
 pn_app = pn.Column(pn.Row(interactive_figure, interactive_tableau)).servable(
     title="Simulation Decomposition Dashboard"
 )
