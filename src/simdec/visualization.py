@@ -51,7 +51,7 @@ def visualization(
     """
     colors = []
     # one palette per first level state
-    n_shades = np.prod(states[1:])
+    n_shades = int(np.prod(states[1:]))
     for i in range(states[0]):
         palette = sequential_palettes[i]
         cmap = mpl.colormaps[palette].resampled(n_shades + 1)
