@@ -35,7 +35,10 @@ def main(
     res = sd.decomposition(inputs=inputs, output=output, significance=si)
 
     fig, ax = plt.subplots()
-    ax, palette = sd.visualization(bins=res.bins, states=res.states, ax=ax)
+    palette = sd.palette(states=res.states)
+    ax, palette = sd.visualization(
+        bins=res.bins, palette=palette, states=res.states, ax=ax
+    )
 
     # use a notebook to see the styling
     table, styler = sd.tableau(

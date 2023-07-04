@@ -7,7 +7,7 @@ import seaborn as sns
 import pandas as pd
 from pandas.io.formats.style import Styler
 
-__all__ = ["visualization", "tableau"]
+__all__ = ["visualization", "tableau", "palette"]
 
 
 sequential_palettes = [
@@ -32,9 +32,21 @@ sequential_palettes = [
 ]
 
 
+def palette(states: list[int]) -> list[list[float]]:
+    colors = []
+    # one palette per first level state
+    n_shades = int(np.prod(states[1:]))
+    for i in range(states[0]):
+        palette_ = sequential_palettes[i]
+        cmap = mpl.colormaps[palette_].resampled(n_shades + 1)
+        colors.append(cmap(range(1, n_shades + 1)))
+
+    return np.concatenate(colors).tolist()
+
+
 def visualization(
-    *, bins: pd.DataFrame, states: np.ndarray, ax=None
-) -> tuple[plt.Axes, np.ndarray]:
+    *, bins: pd.DataFrame, states: list[int], palette: list[list[float]], ax=None
+) -> plt.Axes:
     """
 
     Parameters
@@ -49,16 +61,6 @@ def visualization(
     -------
 
     """
-    colors = []
-    # one palette per first level state
-    n_shades = int(np.prod(states[1:]))
-    for i in range(states[0]):
-        palette = sequential_palettes[i]
-        cmap = mpl.colormaps[palette].resampled(n_shades + 1)
-        colors.append(cmap(range(1, n_shades + 1)))
-
-    palette = np.concatenate(colors).tolist()
-
     # needed to get the correct stacking order
     bins.columns = pd.RangeIndex(start=np.prod(states), stop=0, step=-1)
 
@@ -72,7 +74,7 @@ def visualization(
         legend=False,
         ax=ax,
     )
-    return ax, palette
+    return ax
 
 
 def tableau(
