@@ -33,6 +33,20 @@ sequential_palettes = [
 
 
 def palette(states: list[int]) -> list[list[float]]:
+    """Colour palette.
+
+    The product of the states gives the number of scenarios. For each
+    scenario, a colour is set.
+
+    Parameters
+    ----------
+    states : list of int
+        List of possible states for the considered parameter.
+    Returns
+    -------
+    palette : list of int of size (n, 4)
+        List of colours corresponding to scenarios.
+    """
     colors = []
     # one palette per first level state
     n_shades = int(np.prod(states[1:]))
@@ -47,18 +61,23 @@ def palette(states: list[int]) -> list[list[float]]:
 def visualization(
     *, bins: pd.DataFrame, states: list[int], palette: list[list[float]], ax=None
 ) -> plt.Axes:
-    """
+    """Histogram plot of scenarios.
 
     Parameters
     ----------
-    states : list of int or str
-        ...
-    bins : ...
-        ...
-    ax
+    bins : DataFrame
+        Multidimensional bins.
+    states : list of int
+        List of possible states for the considered parameter.
+    palette : list of int of size (n, 4)
+        List of colours corresponding to scenarios.
+    ax : Axes, optional
+        Matplotlib axis.
 
     Returns
     -------
+    ax : Axes
+        Matplotlib axis.
 
     """
     # needed to get the correct stacking order
@@ -97,13 +116,15 @@ def tableau(
         ``states=[2, 2]`` or ``states=[['a', 'b'], ['low', 'high']]``
     bins : DataFrame
         ...
-    palette : ndarray of shape (n_states, 3)
+    palette : list of int of size (n, 4)
         Ordered list of colours corresponding to each state.
 
     Returns
     -------
-    table : ...
-    styler : ...
+    table : DataFrame
+        Summary table of statistics for the scenarios.
+    styler : Styler
+        Object to style the table with colours and formatting.
     """
     table = bins.describe(percentiles=[0.5]).T
 

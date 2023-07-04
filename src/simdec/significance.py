@@ -47,9 +47,9 @@ def significance(
 
     Parameters
     ----------
-    inputs : ndarray of shape (n_runs, n_factors)
+    inputs : ndarray or DataFrame of shape (n_runs, n_factors)
         Input variables.
-    output : ndarray of shape (n_runs, 1)
+    output : ndarray or DataFrame of shape (n_runs, 1)
         Target variable.
 
     Returns
