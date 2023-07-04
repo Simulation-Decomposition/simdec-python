@@ -1,7 +1,7 @@
 [
     {
         "name": "dev",
-        "version": "dev",
+        "version": "latest",
         "url": "https://simdec.readthedocs.io/en/latest/"
     },
     {
