@@ -9,19 +9,22 @@ import simdec as sd
 
 # panel app
 pn.extension(template="material")
+pn.config.throttled = True
 
-text_fname = pn.widgets.FileInput()
+text_fname = pn.widgets.FileInput(sizing_mode="stretch_width")
 slider_dec_limit = pn.widgets.FloatSlider(
-    value=0.5, step=0.05, name="Decomposition limit"
+    value=1.0, step=0.05, name="Explained variance ratio"
 )
 
 
 @pn.cache
 def load_data(text_fname):
     if text_fname is None:
-        return
+        text_fname = "tests/data/stress.csv"
+    else:
+        text_fname = io.BytesIO(text_fname)
 
-    data = pd.read_csv(io.BytesIO(text_fname), sep=",", decimal=".")
+    data = pd.read_csv(text_fname)
     output_name, *v_names = list(data.columns)
     inputs, output = data[v_names], data[output_name]
 
@@ -31,8 +34,6 @@ def load_data(text_fname):
 
 
 def decomposition(dec_limit, data):
-    if data is None:
-        return
     si, inputs, output = data
     return sd.decomposition(
         inputs=inputs, output=output, significance=si, dec_limit=dec_limit
@@ -40,22 +41,16 @@ def decomposition(dec_limit, data):
 
 
 def palette(res):
-    if res is None:
-        return
     return sd.palette(res.states)
 
 
 def figure(res, palette):
-    if res is None:
-        return
     fig, ax = plt.subplots()
     _ = sd.visualization(bins=res.bins, palette=palette, states=res.states, ax=ax)
     return fig
 
 
 def tableau(res, palette):
-    if res is None:
-        return
     # use a notebook to see the styling
     _, styler = sd.tableau(
         statistic=res.statistic,
@@ -73,7 +68,9 @@ interactive_palette = pn.bind(palette, interactive_decomposition)
 interactive_figure = pn.bind(figure, interactive_decomposition, interactive_palette)
 interactive_tableau = pn.bind(tableau, interactive_decomposition, interactive_palette)
 
-pn_params = pn.WidgetBox("# Parameters", slider_dec_limit, text_fname)
-pn_app = pn.Column(
-    pn_params, pn.Row(interactive_figure, interactive_tableau)
-).servable()
+pn_params = pn.WidgetBox("# Parameters", slider_dec_limit, text_fname).servable(
+    area="sidebar"
+)
+pn_app = pn.Column(pn.Row(interactive_figure, interactive_tableau)).servable(
+    title="Simulation Decomposition Dashboard"
+)

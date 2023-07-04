@@ -25,7 +25,7 @@ def main(
         ),
     ]
 ):
-    data = pd.read_csv(data, sep=";", decimal=",")
+    data = pd.read_csv(data)
     output_name, *v_names = list(data.columns)
     inputs, output = data[v_names], data[output_name]
 
