@@ -79,7 +79,7 @@ def test_significance(ishigami_ref_indices):
     ],
 )
 def test_significance_dataset(fname, foe_ref, si_ref):
-    data = pd.read_csv(fname, sep=";", decimal=",")
+    data = pd.read_csv(fname)
     output_name, *v_names = list(data.columns)
     inputs, output = data[v_names], data[output_name]
     inputs = inputs.to_numpy()
