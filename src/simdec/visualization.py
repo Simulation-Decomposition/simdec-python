@@ -42,6 +42,7 @@ def palette(states: list[int]) -> list[list[float]]:
     ----------
     states : list of int
         List of possible states for the considered parameter.
+
     Returns
     -------
     palette : list of int of size (n, 4)
@@ -115,7 +116,7 @@ def tableau(
 
         ``states=[2, 2]`` or ``states=[['a', 'b'], ['low', 'high']]``
     bins : DataFrame
-        ...
+        Multidimensional bins.
     palette : list of int of size (n, 4)
         Ordered list of colours corresponding to each state.
 

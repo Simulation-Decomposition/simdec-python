@@ -22,7 +22,7 @@ Welcome to our community! Thank you for taking the time to read the following.
 After cloning the repository, install with:
 
 ```bash
-$ pip install -e .[dev]
+$ pip install -e ".[dev]"
 ```
 
 ### Building a local copy of the documentation
@@ -30,7 +30,7 @@ $ pip install -e .[dev]
 Assuming the current location is the project root (the `SALib` directory):
 
 ```bash
-$ pip install -e .[doc]
+$ pip install -e ".[doc]"
 $ sphinx-build -b html docs docs/html
 ```
 

@@ -16,4 +16,5 @@ See our `publications <https://www.simdec.fi/publications>`_ and join our
 .. toctree::
    :maxdepth: 2
 
+   getting-started
    API <api>
