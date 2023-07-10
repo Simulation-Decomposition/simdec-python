@@ -51,7 +51,7 @@ html_theme_options = {
     "pygment_light_style": "github-light-colorblind",
     "pygment_dark_style": "pitaya-smoothie",
     "external_links": [
-        {"name": "Official website", "url": "http://simdec.fi"},
+        {"name": "Official website", "url": "https://simdec.fi"},
     ],
     "icon_links": [
         {
