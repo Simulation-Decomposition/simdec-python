@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "simdec"
-version = "1.0.0dev0"
+version = "1.0.0"
 description = "Sensitivity analysis using simulation decomposition"
 readme = "README.md"
 requires-python = ">=3.9"
