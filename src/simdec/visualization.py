@@ -49,7 +49,8 @@ def palette(states: list[int]) -> list[list[float]]:
         List of colours corresponding to scenarios.
     """
     colors = []
-    # one palette per first level state
+    # one palette per first level state, could use more palette when there are
+    # many levels
     n_shades = int(np.prod(states[1:]))
     for i in range(states[0]):
         palette_ = sequential_palettes[i]

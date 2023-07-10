@@ -70,6 +70,8 @@ def decomposition(
     # only keep the explained variance corresponding to `dec_limit`
     significance = significance[var_order]
     n_var_dec = np.where(np.cumsum(significance) < dec_limit)[0].size
+    n_var_dec = max(1, n_var_dec)  # keep at least one variable
+    n_var_dec = min(5, n_var_dec)  # use at most 5 variables
 
     var_names = var_names[var_order[:n_var_dec]].tolist()
     inputs = inputs[:, var_order[:n_var_dec]]
