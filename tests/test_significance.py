@@ -76,14 +76,17 @@ def test_significance(ishigami_ref_indices):
     "fname, foe_ref, si_ref",
     [
         (path_data / "stress.csv", [0.04, 0.50, 0.11, 0.28], [0.04, 0.51, 0.10, 0.35]),
+        (
+            path_data / "crying.csv",
+            [0.25, 0.22, 0.0, 0.0, 0.01, 0.38],
+            [0.28, 0.25, 0.01, 0.01, 0.01, 0.44],
+        ),
     ],
 )
 def test_significance_dataset(fname, foe_ref, si_ref):
     data = pd.read_csv(fname)
     output_name, *v_names = list(data.columns)
     inputs, output = data[v_names], data[output_name]
-    inputs = inputs.to_numpy()
-    output = output.to_numpy()
 
     res = sd.significance(inputs=inputs, output=output)
 

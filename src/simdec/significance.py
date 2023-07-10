@@ -96,6 +96,11 @@ def significance(
     array([0.43157591, 0.44241433, 0.11767249])
 
     """
+    cat_columns = inputs.select_dtypes(["category", "O"]).columns
+    inputs[cat_columns] = inputs[cat_columns].apply(
+        lambda x: x.astype("category").cat.codes
+    )
+
     if isinstance(inputs, pd.DataFrame):
         inputs = inputs.to_numpy()
     if isinstance(output, pd.DataFrame):
