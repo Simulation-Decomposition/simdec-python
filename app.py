@@ -54,16 +54,18 @@ def significance_table(data):
     var_names = var_names[var_order].tolist()
 
     si = si[var_order]
-    cumsum = np.cumsum(si)
+    sum_si = sum(si)
 
-    d = {"Inputs": var_names, "Indices": si, "Cumulative Sum": cumsum}
+    d = {"Inputs": var_names, "Indices": si, "": si}
     df = pd.DataFrame(data=d)
     formatters = {
-        c: NumberFormatter(format="0.000")
-        for c in df.columns
-        if df[c].dtype == np.float64
+        "Indices": {"type": "progress", "max": sum_si},
+        "": NumberFormatter(format="0.00"),
     }
-    return pn.widgets.Tabulator(df, show_index=False, formatters=formatters)
+    widget = pn.widgets.Tabulator(
+        df, show_index=False, formatters=formatters, selectable="checkbox"
+    )
+    return widget
 
 
 @pn.cache
@@ -153,7 +155,7 @@ The following parameters can be adjusted:
 """
 
 si_description = """
-# Sensitivity Analysis
+# Decomposition
 The following parameters can be adjusted:
 """
 
