@@ -1,6 +1,7 @@
 import io
 
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 import panel as pn
 
@@ -9,6 +10,7 @@ import simdec as sd
 
 # panel app
 pn.extension(template="material")
+pn.extension("tabulator")
 pn.config.throttled = True
 
 
@@ -41,6 +43,20 @@ def significance(data, output_name=None, v_names=None):
 
     si = sd.significance(inputs=inputs, output=output).si
     return si, inputs, output
+
+
+def significance_table(data):
+    si, inputs, output = data
+
+    var_names = inputs.columns
+    var_order = np.argsort(si)[::-1]
+    var_names = var_names[var_order].tolist()
+
+    si = si[var_order]
+    cumsum = np.cumsum(si)
+
+    columns = ["Inputs", "Indices", "Cumulative Sum"]
+    return pd.DataFrame(np.asarray([var_names, si, cumsum]).T, columns=columns)
 
 
 @pn.cache
@@ -112,6 +128,8 @@ interactive_figure = pn.bind(
 )
 interactive_tableau = pn.bind(tableau, interactive_decomposition, interactive_palette)
 
+interactive_significance_table = pn.bind(significance_table, interactive_significance)
+
 # App layout
 
 top_description = """
@@ -140,6 +158,7 @@ pn_params = pn.layout.WidgetBox(
     selector_inputs,
     si_description,
     slider_dec_limit,
+    interactive_significance_table,
     max_width=350,
     sizing_mode="stretch_width",
 ).servable(area="sidebar")
