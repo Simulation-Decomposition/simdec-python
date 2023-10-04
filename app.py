@@ -11,11 +11,6 @@ import simdec as sd
 pn.extension(template="material")
 pn.config.throttled = True
 
-text_fname = pn.widgets.FileInput(sizing_mode="stretch_width")
-slider_dec_limit = pn.widgets.EditableFloatSlider(
-    start=0.0, value=1.0, step=0.1, end=1.0, name="Explained variance ratio"
-)
-
 
 @pn.cache
 def load_data(text_fname):
@@ -46,6 +41,12 @@ def significance(data, output_name=None, v_names=None):
 
     si = sd.significance(inputs=inputs, output=output).si
     return si, inputs, output
+
+
+@pn.cache
+def dec_limit(data):
+    si, *_ = data
+    return sum(si) * 1.01
 
 
 def decomposition(dec_limit, data):
@@ -79,6 +80,7 @@ def tableau(res, palette):
 
 
 # Bindings
+text_fname = pn.widgets.FileInput(sizing_mode="stretch_width")
 
 interactive_file = pn.bind(load_data, text_fname)
 
@@ -89,19 +91,31 @@ selector_inputs = pn.widgets.MultiSelect(
     name="Inputs", value=interactive_column_input, options=interactive_column_input
 )
 
-interactive_data = pn.bind(
+interactive_significance = pn.bind(
     significance, interactive_file, selector_output, selector_inputs
 )
-interactive_decomposition = pn.bind(decomposition, slider_dec_limit, interactive_data)
+interactive_dec_limit = pn.bind(dec_limit, interactive_significance)
+slider_dec_limit = pn.widgets.EditableFloatSlider(
+    start=0.0,
+    value=0.8,
+    step=0.1,
+    end=interactive_dec_limit,
+    name="Explained variance ratio",
+)
+
+interactive_decomposition = pn.bind(
+    decomposition, slider_dec_limit, interactive_significance
+)
 interactive_palette = pn.bind(palette, interactive_decomposition)
 interactive_figure = pn.bind(
     figure, interactive_decomposition, interactive_palette, selector_output
 )
 interactive_tableau = pn.bind(tableau, interactive_decomposition, interactive_palette)
 
+# App layout
 
 top_description = """
-# Parameters
+# Data
 
 Select a CSV file:
 - comma delimited and with point decimal separator;
@@ -113,13 +127,19 @@ params_description = """
 The following parameters can be adjusted:
 """
 
+si_description = """
+# Sensitivity Analysis
+The following parameters can be adjusted:
+"""
+
 pn_params = pn.layout.WidgetBox(
     top_description,
     text_fname,
     params_description,
-    slider_dec_limit,
     selector_output,
     selector_inputs,
+    si_description,
+    slider_dec_limit,
     max_width=350,
     sizing_mode="stretch_width",
 ).servable(area="sidebar")
