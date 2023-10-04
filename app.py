@@ -34,21 +34,28 @@ def column_inputs(data, output):
 
 
 @pn.cache
+def filtered_inputs(data, v_names):
+    return data[v_names]
+
+
+@pn.cache
 def column_output(data):
     return list(data.columns)
 
 
 @pn.cache
-def significance(data, output_name=None, v_names=None):
-    inputs, output = data[v_names], data[output_name]
+def filtered_output(data, output_name):
+    return data[output_name]
 
+
+@pn.cache
+def significance(inputs, output):
+    print(output)
     si = sd.significance(inputs=inputs, output=output).si
-    return si, inputs, output
+    return si
 
 
-def significance_table(data):
-    si, inputs, output = data
-
+def significance_table(si, inputs):
     var_names = inputs.columns
     var_order = np.argsort(si)[::-1]
     var_names = var_names[var_order].tolist()
@@ -69,13 +76,11 @@ def significance_table(data):
 
 
 @pn.cache
-def dec_limit(data):
-    si, *_ = data
+def dec_limit(si):
     return sum(si) * 1.01
 
 
-def decomposition(dec_limit, data):
-    si, inputs, output = data
+def decomposition(dec_limit, si, inputs, output):
     return sd.decomposition(
         inputs=inputs, output=output, significance=si, dec_limit=dec_limit
     )
@@ -111,14 +116,15 @@ interactive_file = pn.bind(load_data, text_fname)
 
 interactive_column_output = pn.bind(column_output, interactive_file)
 selector_output = pn.widgets.Select(name="Output", options=interactive_column_output)
+interactive_output = pn.bind(filtered_output, interactive_file, selector_output)
+
 interactive_column_input = pn.bind(column_inputs, interactive_file, selector_output)
 selector_inputs = pn.widgets.MultiSelect(
     name="Inputs", value=interactive_column_input, options=interactive_column_input
 )
+interactive_inputs = pn.bind(filtered_output, interactive_file, selector_inputs)
 
-interactive_significance = pn.bind(
-    significance, interactive_file, selector_output, selector_inputs
-)
+interactive_significance = pn.bind(significance, interactive_inputs, interactive_output)
 interactive_dec_limit = pn.bind(dec_limit, interactive_significance)
 slider_dec_limit = pn.widgets.EditableFloatSlider(
     start=0.0,
@@ -129,7 +135,11 @@ slider_dec_limit = pn.widgets.EditableFloatSlider(
 )
 
 interactive_decomposition = pn.bind(
-    decomposition, slider_dec_limit, interactive_significance
+    decomposition,
+    slider_dec_limit,
+    interactive_significance,
+    interactive_inputs,
+    interactive_output,
 )
 interactive_palette = pn.bind(palette, interactive_decomposition)
 interactive_figure = pn.bind(
@@ -137,7 +147,9 @@ interactive_figure = pn.bind(
 )
 interactive_tableau = pn.bind(tableau, interactive_decomposition, interactive_palette)
 
-interactive_significance_table = pn.bind(significance_table, interactive_significance)
+interactive_significance_table = pn.bind(
+    significance_table, interactive_significance, interactive_inputs
+)
 
 # App layout
 
