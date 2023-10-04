@@ -1,5 +1,6 @@
 import io
 
+from bokeh.models.widgets.tables import NumberFormatter
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -55,8 +56,14 @@ def significance_table(data):
     si = si[var_order]
     cumsum = np.cumsum(si)
 
-    columns = ["Inputs", "Indices", "Cumulative Sum"]
-    return pd.DataFrame(np.asarray([var_names, si, cumsum]).T, columns=columns)
+    d = {"Inputs": var_names, "Indices": si, "Cumulative Sum": cumsum}
+    df = pd.DataFrame(data=d)
+    formatters = {
+        c: NumberFormatter(format="0.000")
+        for c in df.columns
+        if df[c].dtype == np.float64
+    }
+    return pn.widgets.Tabulator(df, show_index=False, formatters=formatters)
 
 
 @pn.cache
