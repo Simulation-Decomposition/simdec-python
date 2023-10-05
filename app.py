@@ -13,6 +13,7 @@ import simdec as sd
 pn.extension(template="material")
 pn.extension("tabulator")
 pn.config.throttled = True
+font_size = "11pt"
 
 
 @pn.cache
@@ -50,7 +51,6 @@ def filtered_output(data, output_name):
 
 @pn.cache
 def significance(inputs, output):
-    print(output)
     si = sd.significance(inputs=inputs, output=output).si
     return si
 
@@ -69,15 +69,13 @@ def significance_table(si, inputs):
         "Indices": {"type": "progress", "max": sum_si},
         "": NumberFormatter(format="0.00"),
     }
-    widget = pn.widgets.Tabulator(
-        df, show_index=False, formatters=formatters, selectable="checkbox"
-    )
+    widget = pn.widgets.Tabulator(df, show_index=False, formatters=formatters)
     return widget
 
 
 @pn.cache
-def dec_limit(si):
-    return sum(si) * 1.01
+def explained_variance(si):
+    return sum(si)
 
 
 def decomposition(dec_limit, si, inputs, output):
@@ -119,26 +117,42 @@ selector_output = pn.widgets.Select(name="Output", options=interactive_column_ou
 interactive_output = pn.bind(filtered_output, interactive_file, selector_output)
 
 interactive_column_input = pn.bind(column_inputs, interactive_file, selector_output)
-selector_inputs = pn.widgets.MultiSelect(
+selector_inputs_sensitivity = pn.widgets.MultiSelect(
     name="Inputs", value=interactive_column_input, options=interactive_column_input
 )
-interactive_inputs = pn.bind(filtered_output, interactive_file, selector_inputs)
+interactive_inputs = pn.bind(
+    filtered_output, interactive_file, selector_inputs_sensitivity
+)
 
 interactive_significance = pn.bind(significance, interactive_inputs, interactive_output)
-interactive_dec_limit = pn.bind(dec_limit, interactive_significance)
-slider_dec_limit = pn.widgets.EditableFloatSlider(
-    start=0.0,
-    value=0.8,
-    step=0.1,
-    end=interactive_dec_limit,
-    name="Explained variance ratio",
+interactive_explained_variance = pn.bind(explained_variance, interactive_significance)
+indicator_explained_variance = pn.indicators.Number(
+    name="Explained variance ratio:",
+    value=interactive_explained_variance,
+    title_size=font_size,
+    font_size=font_size,
+    format="{value:.2f}",
+)
+
+interactive_significance_table = pn.bind(
+    significance_table, interactive_significance, interactive_inputs
+)
+
+selector_inputs_decomposition = pn.widgets.MultiChoice(
+    name="Select inputs for decomposition",
+    value=selector_inputs_sensitivity,
+    options=selector_inputs_sensitivity,
+    solid=False,
+)
+interactive_inputs_decomposition = pn.bind(
+    filtered_output, interactive_file, selector_inputs_decomposition
 )
 
 interactive_decomposition = pn.bind(
     decomposition,
-    slider_dec_limit,
+    10000,
     interactive_significance,
-    interactive_inputs,
+    interactive_inputs_decomposition,
     interactive_output,
 )
 interactive_palette = pn.bind(palette, interactive_decomposition)
@@ -146,10 +160,6 @@ interactive_figure = pn.bind(
     figure, interactive_decomposition, interactive_palette, selector_output
 )
 interactive_tableau = pn.bind(tableau, interactive_decomposition, interactive_palette)
-
-interactive_significance_table = pn.bind(
-    significance_table, interactive_significance, interactive_inputs
-)
 
 # App layout
 
@@ -167,8 +177,11 @@ The following parameters can be adjusted:
 """
 
 si_description = """
+# Sensitivity Indices
+"""
+
+decomposition_description = """
 # Decomposition
-The following parameters can be adjusted:
 """
 
 pn_params = pn.layout.WidgetBox(
@@ -176,10 +189,12 @@ pn_params = pn.layout.WidgetBox(
     text_fname,
     params_description,
     selector_output,
-    selector_inputs,
+    selector_inputs_sensitivity,
     si_description,
-    slider_dec_limit,
     interactive_significance_table,
+    indicator_explained_variance,
+    decomposition_description,
+    selector_inputs_decomposition,
     max_width=350,
     sizing_mode="stretch_width",
 ).servable(area="sidebar")
