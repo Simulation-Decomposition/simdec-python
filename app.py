@@ -66,7 +66,7 @@ def significance_table(si, inputs):
     d = {"Inputs": var_names, "Indices": si, "": si}
     df = pd.DataFrame(data=d)
     formatters = {
-        "Indices": {"type": "progress", "max": sum_si},
+        "Indices": {"type": "progress", "max": sum_si, "color": "#007eff"},
         "": NumberFormatter(format="0.00"),
     }
     widget = pn.widgets.Tabulator(df, show_index=False, formatters=formatters)
