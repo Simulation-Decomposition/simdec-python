@@ -1,3 +1,4 @@
+import bisect
 import io
 
 from bokeh.models.widgets.tables import NumberFormatter
@@ -94,6 +95,13 @@ def filtered_si(significance_table, input_names):
     return np.asarray(si).flatten()
 
 
+def explained_variance_80(significance_table):
+    si = significance_table.value["Indices"]
+    pos_80 = bisect.bisect_right(np.cumsum(si), 0.8)
+    input_names = significance_table.value["Inputs"]
+    return input_names.to_list()[: pos_80 + 1]
+
+
 def decomposition(dec_limit, si, inputs, output):
     return sd.decomposition(
         inputs=inputs, output=output, significance=si, dec_limit=dec_limit
@@ -147,9 +155,12 @@ interactive_significance_table = pn.bind(
     significance_table, interactive_significance, interactive_inputs
 )
 
+interactive_explained_variance_80 = pn.bind(
+    explained_variance_80, interactive_significance_table
+)
 selector_inputs_decomposition = pn.widgets.MultiChoice(
     name="Select inputs for decomposition",
-    value=selector_inputs_sensitivity,
+    value=interactive_explained_variance_80,
     options=selector_inputs_sensitivity,
     solid=False,
 )
