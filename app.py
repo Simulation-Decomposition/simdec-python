@@ -35,8 +35,8 @@ def column_inputs(data, output):
 
 
 @pn.cache
-def filtered_inputs(data, v_names):
-    return data[v_names]
+def filtered_inputs(data, input_names):
+    return data[input_names]
 
 
 @pn.cache
@@ -75,7 +75,15 @@ def significance_table(si, inputs):
 
 @pn.cache
 def explained_variance(si):
-    return sum(si)
+    return sum(si) + np.finfo(np.float64).eps
+
+
+def filtered_si(significance_table, input_names):
+    df = significance_table.value
+    si = []
+    for input_name in input_names:
+        si.append(df.loc[df["Inputs"] == input_name, "Indices"])
+    return np.asarray(si).flatten()
 
 
 def decomposition(dec_limit, si, inputs, output):
@@ -148,10 +156,14 @@ interactive_inputs_decomposition = pn.bind(
     filtered_output, interactive_file, selector_inputs_decomposition
 )
 
+interactive_filtered_si = pn.bind(
+    filtered_si, interactive_significance_table, selector_inputs_decomposition
+)
+
 interactive_decomposition = pn.bind(
     decomposition,
-    10000,
-    interactive_significance,
+    interactive_explained_variance,
+    interactive_filtered_si,
     interactive_inputs_decomposition,
     interactive_output,
 )
