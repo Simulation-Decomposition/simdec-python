@@ -142,13 +142,6 @@ interactive_inputs = pn.bind(
 
 interactive_significance = pn.bind(significance, interactive_inputs, interactive_output)
 interactive_explained_variance = pn.bind(explained_variance, interactive_significance)
-indicator_explained_variance = pn.indicators.Number(
-    name="Explained variance ratio:",
-    value=interactive_explained_variance,
-    title_size=font_size,
-    font_size=font_size,
-    format="{value:.2f}",
-)
 
 interactive_significance_table = pn.bind(
     significance_table, interactive_significance, interactive_inputs
@@ -167,6 +160,17 @@ interactive_inputs_decomposition = pn.bind(
 interactive_filtered_si = pn.bind(
     filtered_si, interactive_significance_table, selector_inputs_decomposition
 )
+interactive_filtered_explained_variance = pn.bind(
+    explained_variance, interactive_filtered_si
+)
+indicator_explained_variance = pn.indicators.Number(
+    name="Explained variance ratio from selected inputs:",
+    value=interactive_filtered_explained_variance,
+    title_size=font_size,
+    font_size=font_size,
+    format="{value:.2f}",
+)
+
 
 interactive_decomposition = pn.bind(
     decomposition,
@@ -212,9 +216,9 @@ pn_params = pn.layout.WidgetBox(
     selector_inputs_sensitivity,
     si_description,
     interactive_significance_table,
-    indicator_explained_variance,
     decomposition_description,
     selector_inputs_decomposition,
+    indicator_explained_variance,
     max_width=350,
     sizing_mode="stretch_width",
 ).servable(area="sidebar")
