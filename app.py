@@ -132,7 +132,7 @@ def tableau(res, palette):
 
 
 # Bindings
-text_fname = pn.widgets.FileInput(sizing_mode="stretch_width")
+text_fname = pn.widgets.FileInput(sizing_mode="stretch_width", accept=".csv")
 
 interactive_file = pn.bind(load_data, text_fname)
 
@@ -200,15 +200,6 @@ interactive_tableau = pn.bind(tableau, interactive_decomposition, interactive_pa
 
 top_description = """
 # Data
-
-Select a CSV file:
-- comma delimited and with point decimal separator;
-- first column is the output of the model;
-- rest of the columns are the inputs.
-"""
-
-params_description = """
-The following parameters can be adjusted:
 """
 
 si_description = """
@@ -222,7 +213,6 @@ decomposition_description = """
 pn_params = pn.layout.WidgetBox(
     top_description,
     text_fname,
-    params_description,
     selector_output,
     selector_inputs_sensitivity,
     si_description,
