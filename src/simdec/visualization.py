@@ -11,11 +11,11 @@ __all__ = ["visualization", "tableau", "palette"]
 
 
 sequential_palettes = [
+    "Oranges",
     "Purples",
+    "Reds",
     "Blues",
     "Greens",
-    "Oranges",
-    "Reds",
     "YlOrBr",
     "YlOrRd",
     "OrRd",
