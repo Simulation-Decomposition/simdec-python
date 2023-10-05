@@ -60,16 +60,24 @@ def significance_table(si, inputs):
     var_order = np.argsort(si)[::-1]
     var_names = var_names[var_order].tolist()
 
-    si = si[var_order]
+    si = list(si[var_order])
     sum_si = sum(si)
 
-    d = {"Inputs": var_names, "Indices": si, "": si}
+    var_names.append("Sum of Indices")
+    si_numerics = si.copy()
+    si.append(0)
+    si_numerics.append(sum_si)
+
+    d = {"Inputs": var_names, "Indices": si, "": si_numerics}
     df = pd.DataFrame(data=d)
     formatters = {
         "Indices": {"type": "progress", "max": sum_si, "color": "#007eff"},
         "": NumberFormatter(format="0.00"),
     }
     widget = pn.widgets.Tabulator(df, show_index=False, formatters=formatters)
+    widget.style.apply(
+        lambda x: ["font-style: italic"] * 3, axis=1, subset=df.index[-1]
+    )
     return widget
 
 
