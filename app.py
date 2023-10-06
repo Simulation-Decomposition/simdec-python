@@ -230,6 +230,9 @@ pn_params = pn.layout.WidgetBox(
     sizing_mode="stretch_width",
 ).servable(area="sidebar")
 
-pn_app = pn.Column(pn.Row(interactive_figure, interactive_tableau)).servable(
-    title="Simulation Decomposition Dashboard"
-)
+pn_app = pn.Column(
+    pn.Row(
+        pn.panel(interactive_figure, loading_indicator=True),
+        pn.panel(interactive_tableau, loading_indicator=True),
+    )
+).servable(title="Simulation Decomposition Dashboard")
