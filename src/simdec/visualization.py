@@ -168,7 +168,7 @@ def tableau(
     ]
 
     # style the colour background with palette
-    cmap = mpl.colors.ListedColormap(palette)
+    cmap = mpl.colors.ListedColormap(palette[::-1])
     styler = table.style
     styler.format(precision=2)
     styler.background_gradient(subset=["colour"], cmap=cmap)

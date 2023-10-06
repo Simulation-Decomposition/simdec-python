@@ -17,6 +17,7 @@ class DecompositionResult:
     statistic: np.ndarray
     bins: pd.DataFrame
     states: list[int]
+    bin_edges: np.ndarray
 
 
 def decomposition(
@@ -110,4 +111,4 @@ def decomposition(
 
     bins = pd.DataFrame(bins[1:]).T
 
-    return DecompositionResult(var_names, res.statistic, bins, states)
+    return DecompositionResult(var_names, res.statistic, bins, states, res.bin_edges)
