@@ -134,6 +134,15 @@ def tableau(
     table = table.reset_index()
     table.rename(columns={"index": "colour"}, inplace=True)
 
+    # Default states for 2 or 3
+    for i, state in enumerate(states):
+        if isinstance(state, int):
+            states: list
+            if state == 2:
+                states[i] = ["low", "high"]
+            elif state == 3:
+                states[i] = ["low", "medium", "high"]
+
     # get the list of states
     gen_states = [range(x) if isinstance(x, int) else x for x in states]
     states_ = np.asarray(list(itertools.product(*gen_states)))

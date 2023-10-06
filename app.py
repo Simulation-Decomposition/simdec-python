@@ -99,6 +99,10 @@ def filtered_si(significance_table, input_names):
 def explained_variance_80(significance_table):
     si = significance_table.value["Indices"]
     pos_80 = bisect.bisect_right(np.cumsum(si), 0.8)
+
+    # pos_80 = max(2, pos_80)
+    # pos_80 = min(len(si), pos_80)
+
     input_names = significance_table.value["Inputs"]
     return input_names.to_list()[: pos_80 + 1]
 
