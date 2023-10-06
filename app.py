@@ -25,6 +25,7 @@ def load_data(text_fname):
         text_fname = io.BytesIO(text_fname)
 
     data = pd.read_csv(text_fname)
+    pn.state.clear_caches()
     return data
 
 
@@ -113,6 +114,7 @@ def palette(res):
 
 
 def figure(res, palette, output_name):
+    plt.close("all")
     fig, ax = plt.subplots()
     _ = sd.visualization(bins=res.bins, palette=palette, states=res.states, ax=ax)
     ax.set(xlabel=output_name)
