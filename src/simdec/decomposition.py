@@ -26,6 +26,7 @@ def decomposition(
     *,
     significance: np.ndarray,
     dec_limit: float = 1,
+    auto_ordering: bool = True,
     states: list[int] | None = None,
     statistic: Literal["mean", "median"] | None = "mean",
 ) -> DecompositionResult:
@@ -41,6 +42,9 @@ def decomposition(
         Significance index, combined effect of each input.
     dec_limit : float
         Explained variance ratio to filter the number input variables.
+    auto_ordering : bool
+        Automatically order input columns based on the relative significance
+        or use the provided order.
     states : list of int, optional
         List of possible states for the considered parameter.
     statistic : {"mean", "median"}, optional
@@ -74,8 +78,9 @@ def decomposition(
     n_var_dec = max(1, n_var_dec)  # keep at least one variable
     n_var_dec = min(5, n_var_dec)  # use at most 5 variables
 
-    var_names = var_names[var_order[:n_var_dec]].tolist()
-    inputs = inputs[:, var_order[:n_var_dec]]
+    if auto_ordering:
+        var_names = var_names[var_order[:n_var_dec]].tolist()
+        inputs = inputs[:, var_order[:n_var_dec]]
 
     # 2. states formation
     if states is None:

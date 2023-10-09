@@ -118,7 +118,11 @@ def explained_variance_80(significance_table):
 
 def decomposition(dec_limit, si, inputs, output):
     return sd.decomposition(
-        inputs=inputs, output=output, significance=si, dec_limit=dec_limit
+        inputs=inputs,
+        output=output,
+        significance=si,
+        dec_limit=dec_limit,
+        auto_ordering=False,
     )
 
 
