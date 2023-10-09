@@ -174,4 +174,5 @@ def tableau(
     styler.background_gradient(subset=["colour"], cmap=cmap)
     styler.format(lambda x: "", subset=["colour"])
 
+    styler.set_table_styles([{"selector": "th", "props": [("text-align", "center")]}])
     return table, styler

@@ -157,7 +157,11 @@ def tableau_states(res):
     table = pd.DataFrame(data, columns=["variable", "state", "min", "max"])
     table.set_index(["variable", "state"], inplace=True)
 
-    return table
+    styler = table.style
+    styler.format(precision=2)
+    # styler.set_properties(**{'text-align': 'center'})
+    styler.set_table_styles([{"selector": "th", "props": [("text-align", "center")]}])
+    return styler
 
 
 # Bindings
@@ -240,6 +244,15 @@ decomposition_description = """
 # Decomposition
 """
 
+table_description = """
+## Scenario decomposition
+"""
+
+states_description = """
+## Details on states
+"""
+
+
 pn_params = pn.layout.WidgetBox(
     top_description,
     text_fname,
@@ -258,7 +271,10 @@ pn_app = pn.Column(
     pn.Row(
         pn.panel(interactive_figure, loading_indicator=True),
         pn.Column(
+            table_description,
             pn.panel(interactive_tableau, loading_indicator=True),
+            pn.Spacer(height=50),
+            states_description,
             pn.panel(interactive_tableau_states, loading_indicator=True),
         ),
     )
