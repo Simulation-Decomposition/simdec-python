@@ -13,6 +13,8 @@ import simdec as sd
 # panel app
 pn.extension(template="material")
 pn.extension("tabulator")
+pn.config.sizing_mode = "stretch_width"
+
 
 pn.config.throttled = True
 font_size = "12pt"
@@ -78,13 +80,15 @@ def significance_table(si, inputs):
         "": NumberFormatter(format="0.00"),
     }
     widget = pn.widgets.Tabulator(
-        df, show_index=False, formatters=formatters, theme="bulma"
+        df,
+        show_index=False,
+        formatters=formatters,
+        theme="bulma",
     )
     widget.style.apply(
         lambda x: ["font-style: italic"] * 3, axis=1, subset=df.index[-1]
     )
     widget.style.apply(lambda x: ["font-size: 11pt"] * len(si))
-
     return widget
 
 
