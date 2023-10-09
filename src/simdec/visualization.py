@@ -160,12 +160,10 @@ def tableau(
     proba = np.asarray(proba)
     table["probability"] = proba
 
-    table["weighted mean"] = statistic.flatten()
+    table["mean"] = statistic.flatten()
 
     # only select/ordering interesting columns
-    table = table[
-        ["colour", "std", "min", "weighted mean", "50%", "max", "probability"]
-    ]
+    table = table[["colour", "std", "min", "mean", "max", "probability"]]
 
     # style the colour background with palette
     cmap = mpl.colors.ListedColormap(palette[::-1])
