@@ -150,11 +150,7 @@ def tableau(
         table.insert(loc=i + 1, column=var_name, value=states_[:, i])
 
     # groupby on the variable names
-    table = (
-        table.groupby(var_names, group_keys=True, sort=False)
-        .apply(lambda x: x)
-        .droplevel(-1)
-    )
+    table.set_index(list(var_names), inplace=True)
 
     proba = table["count"] / sum(table["count"])
     proba = np.asarray(proba)
