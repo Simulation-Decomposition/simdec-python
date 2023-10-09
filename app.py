@@ -137,6 +137,29 @@ def tableau(res, palette):
     return styler
 
 
+def tableau_states(res):
+    # TODO re-use state formation default
+    # Default states for 2 or 3
+    states = res.states
+    for i, state in enumerate(states):
+        if isinstance(state, int):
+            states: list
+            if state == 2:
+                states[i] = ["low", "high"]
+            elif state == 3:
+                states[i] = ["low", "medium", "high"]
+
+    data = []
+    for var_name, states, bin_edges in zip(res.var_names, res.states, res.bin_edges):
+        for i, state in enumerate(states):
+            data.append([var_name, state, bin_edges[i], bin_edges[i + 1]])
+
+    table = pd.DataFrame(data, columns=["variable", "state", "min", "max"])
+    table.set_index(["variable", "state"], inplace=True)
+
+    return table
+
+
 # Bindings
 text_fname = pn.widgets.FileInput(sizing_mode="stretch_width", accept=".csv")
 
@@ -201,6 +224,7 @@ interactive_figure = pn.bind(
     figure, interactive_decomposition, interactive_palette, selector_output
 )
 interactive_tableau = pn.bind(tableau, interactive_decomposition, interactive_palette)
+interactive_tableau_states = pn.bind(tableau_states, interactive_decomposition)
 
 # App layout
 
@@ -233,6 +257,9 @@ pn_params = pn.layout.WidgetBox(
 pn_app = pn.Column(
     pn.Row(
         pn.panel(interactive_figure, loading_indicator=True),
-        pn.panel(interactive_tableau, loading_indicator=True),
+        pn.Column(
+            pn.panel(interactive_tableau, loading_indicator=True),
+            pn.panel(interactive_tableau_states, loading_indicator=True),
+        ),
     )
 ).servable(title="Simulation Decomposition Dashboard")
