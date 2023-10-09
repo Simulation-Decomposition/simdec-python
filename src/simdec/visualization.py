@@ -155,7 +155,6 @@ def tableau(
     proba = table["count"] / sum(table["count"])
     proba = np.asarray(proba)
     table["probability"] = proba
-
     table["mean"] = statistic.flatten()
 
     # only select/ordering interesting columns

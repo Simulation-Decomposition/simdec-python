@@ -116,4 +116,16 @@ def decomposition(
 
     bins = pd.DataFrame(bins[1:]).T
 
+    if len(bins.columns) != np.prod(states):
+        # mismatch with the number of states vs bins
+        # when it happens, we have NaNs in the statistic
+        # we can add empty columns with NaNs on these positions as bins
+        # then are not present for these states
+        nan_idx = np.argwhere(np.isnan(res.statistic).flatten()).flatten()
+
+        for idx in nan_idx:
+            bins = np.insert(bins, idx, np.nan, axis=1)
+
+        bins = pd.DataFrame(bins)
+
     return DecompositionResult(var_names, res.statistic, bins, states, res.bin_edges)
