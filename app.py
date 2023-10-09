@@ -13,8 +13,9 @@ import simdec as sd
 # panel app
 pn.extension(template="material")
 pn.extension("tabulator")
+
 pn.config.throttled = True
-font_size = "11pt"
+font_size = "12pt"
 
 
 @pn.cache
@@ -76,10 +77,14 @@ def significance_table(si, inputs):
         "Indices": {"type": "progress", "max": sum_si, "color": "#007eff"},
         "": NumberFormatter(format="0.00"),
     }
-    widget = pn.widgets.Tabulator(df, show_index=False, formatters=formatters)
+    widget = pn.widgets.Tabulator(
+        df, show_index=False, formatters=formatters, theme="bulma"
+    )
     widget.style.apply(
         lambda x: ["font-style: italic"] * 3, axis=1, subset=df.index[-1]
     )
+    widget.style.apply(lambda x: ["font-size: 11pt"] * len(si))
+
     return widget
 
 
@@ -159,7 +164,6 @@ def tableau_states(res):
 
     styler = table.style
     styler.format(precision=2)
-    # styler.set_properties(**{'text-align': 'center'})
     styler.set_table_styles([{"selector": "th", "props": [("text-align", "center")]}])
     return styler
 
@@ -233,15 +237,15 @@ interactive_tableau_states = pn.bind(tableau_states, interactive_decomposition)
 # App layout
 
 top_description = """
-# Data
+## Data
 """
 
 si_description = """
-# Sensitivity Indices
+## Sensitivity Indices
 """
 
 decomposition_description = """
-# Decomposition
+## Decomposition
 """
 
 table_description = """
