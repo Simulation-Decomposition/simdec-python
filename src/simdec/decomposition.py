@@ -8,7 +8,34 @@ import pandas as pd
 from scipy import stats
 
 
-__all__ = ["decomposition"]
+__all__ = ["decomposition", "states_expansion"]
+
+
+def states_expansion(states: list[int], inputs: pd.DataFrame) -> list[list[str]]:
+    """Expand states list to fully represent all scenarios."""
+    inputs = pd.DataFrame(inputs)
+    for i, state in enumerate(states):
+        if isinstance(state, int):
+            states: list
+            if state == 2:
+                states[i] = ["low", "high"]
+            elif state == 3:
+                states[i] = ["low", "medium", "high"]
+
+    # categorical for a given variable
+    cat_cols = inputs.select_dtypes(exclude=["number"])
+    cat_cols_idx = []
+    states_cat_ = []
+    for cat_col in cat_cols:
+        _, cats = pd.factorize(inputs[cat_col])
+        cat_cols_idx.append(inputs.columns.get_loc(cat_col))
+        states_cat_.append(cats)
+
+    for i in cat_cols_idx:
+        n_unique = np.unique(cat_cols.iloc[:, i]).size
+        states[i] = list(states_cat_[i]) if n_unique < 5 else states[i]
+
+    return states
 
 
 @dataclass
@@ -17,7 +44,6 @@ class DecompositionResult:
     statistic: np.ndarray
     bins: pd.DataFrame
     states: list[int]
-    states_cat: list[int | list[str]]
     bin_edges: np.ndarray
 
 
@@ -70,12 +96,10 @@ def decomposition(
 
     cat_cols = inputs.select_dtypes(exclude=["number"])
     cat_cols_idx = []
-    cat_states = []
     for cat_col in cat_cols:
         codes, cat_states_ = pd.factorize(inputs[cat_col])
         inputs[cat_col] = codes
         cat_cols_idx.append(inputs.columns.get_loc(cat_col))
-        cat_states.append(cat_states_)
 
     inputs = inputs.to_numpy()
     output = output.to_numpy()
@@ -98,15 +122,10 @@ def decomposition(
         states = 3 if n_var_dec < 3 else 2
         states = [states] * n_var_dec
 
-        states_cat = states.copy()
-
         # categorical for a given variable
         for i in cat_cols_idx:
             n_unique = np.unique(cat_cols.iloc[:, i]).size
-            states_cat[i] = list(cat_states[i]) if n_unique < 5 else states[i]
             states[i] = n_unique if n_unique < 5 else states[i]
-    else:
-        states_cat = states.copy()
 
     # 3. decomposition
     bins = []
@@ -149,6 +168,5 @@ def decomposition(
         statistic=res.statistic,
         bins=bins,
         states=states,
-        states_cat=states_cat,
         bin_edges=res.bin_edges,
     )

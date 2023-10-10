@@ -138,33 +138,26 @@ def figure(res, palette, output_name):
     return fig
 
 
-def tableau(res, palette):
+def states_from_data(res, inputs):
+    return sd.states_expansion(states=res.states, inputs=inputs)
+
+
+def tableau(res, states, palette):
     # use a notebook to see the styling
     _, styler = sd.tableau(
         statistic=res.statistic,
         var_names=res.var_names,
-        states=res.states_cat,
+        states=states,
         bins=res.bins,
         palette=palette,
     )
     return styler
 
 
-def tableau_states(res):
-    # TODO re-use state formation default
-    # Default states for 2 or 3
-    states = res.states
-    for i, state in enumerate(states):
-        if isinstance(state, int):
-            states: list
-            if state == 2:
-                states[i] = ["low", "high"]
-            elif state == 3:
-                states[i] = ["low", "medium", "high"]
-
+def tableau_states(res, states):
     data = []
-    for var_name, states, bin_edges in zip(res.var_names, res.states, res.bin_edges):
-        for i, state in enumerate(states):
+    for var_name, states_, bin_edges in zip(res.var_names, states, res.bin_edges):
+        for i, state in enumerate(states_):
             data.append([var_name, state, bin_edges[i], bin_edges[i + 1]])
 
     table = pd.DataFrame(data, columns=["variable", "state", "min", "max"])
@@ -239,8 +232,17 @@ interactive_palette = pn.bind(palette, interactive_decomposition)
 interactive_figure = pn.bind(
     figure, interactive_decomposition, interactive_palette, selector_output
 )
-interactive_tableau = pn.bind(tableau, interactive_decomposition, interactive_palette)
-interactive_tableau_states = pn.bind(tableau_states, interactive_decomposition)
+
+
+interactive_states = pn.bind(
+    states_from_data, interactive_decomposition, interactive_inputs_decomposition
+)
+interactive_tableau = pn.bind(
+    tableau, interactive_decomposition, interactive_states, interactive_palette
+)
+interactive_tableau_states = pn.bind(
+    tableau_states, interactive_decomposition, interactive_states
+)
 
 # App layout
 
