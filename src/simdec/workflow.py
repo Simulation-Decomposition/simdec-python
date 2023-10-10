@@ -36,9 +36,7 @@ def main(
 
     fig, ax = plt.subplots()
     palette = sd.palette(states=res.states)
-    ax, palette = sd.visualization(
-        bins=res.bins, palette=palette, states=res.states, ax=ax
-    )
+    ax, palette = sd.visualization(bins=res.bins, palette=palette, ax=ax)
 
     # use a notebook to see the styling
     table, styler = sd.tableau(

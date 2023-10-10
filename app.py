@@ -1,6 +1,7 @@
 import bisect
 import io
 
+from bokeh.models import PrintfTickFormatter
 from bokeh.models.widgets.tables import NumberFormatter
 import matplotlib.pyplot as plt
 import numpy as np
@@ -130,10 +131,16 @@ def palette(res):
     return sd.palette(res.states)
 
 
-def figure(res, palette, output_name):
+def n_bins_auto(res):
+    min_ = np.nanmin(res.bins)
+    max_ = np.nanmax(res.bins)
+    return len(np.histogram_bin_edges(res.bins, bins="auto", range=(min_, max_))) - 1
+
+
+def figure(res, palette, n_bins, output_name):
     plt.close("all")
     fig, ax = plt.subplots()
-    _ = sd.visualization(bins=res.bins, palette=palette, states=res.states, ax=ax)
+    _ = sd.visualization(bins=res.bins, palette=palette, n_bins=n_bins, ax=ax)
     ax.set(xlabel=output_name)
     return fig
 
@@ -229,8 +236,24 @@ interactive_decomposition = pn.bind(
     interactive_output,
 )
 interactive_palette = pn.bind(palette, interactive_decomposition)
+
+interactive_n_bins_auto = pn.bind(n_bins_auto, interactive_decomposition)
+selector_n_bins = pn.widgets.EditableIntSlider(
+    name="Number of bins",
+    start=0,
+    end=100,
+    value=interactive_n_bins_auto,
+    step=10,
+    # bar_color="#FFFFFF",  # does not work
+    format=PrintfTickFormatter(format="%d bins"),
+)
+
 interactive_figure = pn.bind(
-    figure, interactive_decomposition, interactive_palette, selector_output
+    figure,
+    interactive_decomposition,
+    interactive_palette,
+    selector_n_bins,
+    selector_output,
 )
 
 
@@ -283,13 +306,25 @@ pn_params = pn.layout.WidgetBox(
 
 pn_app = pn.Column(
     pn.Row(
-        pn.panel(interactive_figure, loading_indicator=True),
+        pn.Column(
+            pn.panel(
+                pn.pane.Matplotlib(
+                    interactive_figure,
+                    tight=True,
+                    format="svg",
+                    sizing_mode="stretch_both",
+                    max_height=500,
+                    height_policy="min",
+                )
+            ),
+            selector_n_bins,
+        ),
         pn.Column(
             table_description,
-            pn.panel(interactive_tableau, loading_indicator=True),
+            pn.panel(interactive_tableau),
             pn.Spacer(height=50),
             states_description,
-            pn.panel(interactive_tableau_states, loading_indicator=True),
+            pn.panel(interactive_tableau_states),
         ),
     )
 ).servable(title="Simulation Decomposition Dashboard")

@@ -61,7 +61,11 @@ def palette(states: list[int]) -> list[list[float]]:
 
 
 def visualization(
-    *, bins: pd.DataFrame, states: list[int], palette: list[list[float]], ax=None
+    *,
+    bins: pd.DataFrame,
+    palette: list[list[float]],
+    n_bins: str | int = "auto",
+    ax=None,
 ) -> plt.Axes:
     """Histogram plot of scenarios.
 
@@ -69,10 +73,10 @@ def visualization(
     ----------
     bins : DataFrame
         Multidimensional bins.
-    states : list of int
-        List of possible states for the considered parameter.
     palette : list of int of size (n, 4)
         List of colours corresponding to scenarios.
+    n_bins : str or int
+        Number of bins or method from `np.histogram_bin_edges`.
     ax : Axes, optional
         Matplotlib axis.
 
@@ -92,6 +96,7 @@ def visualization(
         palette=palette,
         common_bins=True,
         common_norm=True,
+        bins=n_bins,
         legend=False,
         ax=ax,
     )
