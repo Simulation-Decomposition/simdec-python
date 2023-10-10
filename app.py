@@ -143,7 +143,7 @@ def tableau(res, palette):
     _, styler = sd.tableau(
         statistic=res.statistic,
         var_names=res.var_names,
-        states=res.states,
+        states=res.states_cat,
         bins=res.bins,
         palette=palette,
     )

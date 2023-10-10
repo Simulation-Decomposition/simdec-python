@@ -17,6 +17,7 @@ class DecompositionResult:
     statistic: np.ndarray
     bins: pd.DataFrame
     states: list[int]
+    states_cat: list[int | list[str]]
     bin_edges: np.ndarray
 
 
@@ -97,11 +98,15 @@ def decomposition(
         states = 3 if n_var_dec < 3 else 2
         states = [states] * n_var_dec
 
+        states_cat = states.copy()
+
         # categorical for a given variable
         for i in cat_cols_idx:
             n_unique = np.unique(cat_cols.iloc[:, i]).size
-            # states[i] = list(cat_states[i]) if n_unique < 5 else states[i]
+            states_cat[i] = list(cat_states[i]) if n_unique < 5 else states[i]
             states[i] = n_unique if n_unique < 5 else states[i]
+    else:
+        states_cat = states.copy()
 
     # 3. decomposition
     bins = []
@@ -139,4 +144,11 @@ def decomposition(
 
         bins = pd.DataFrame(bins)
 
-    return DecompositionResult(var_names, res.statistic, bins, states, res.bin_edges)
+    return DecompositionResult(
+        var_names=var_names,
+        statistic=res.statistic,
+        bins=bins,
+        states=states,
+        states_cat=states_cat,
+        bin_edges=res.bin_edges,
+    )

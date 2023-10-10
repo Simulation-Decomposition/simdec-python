@@ -83,7 +83,7 @@ def visualization(
 
     """
     # needed to get the correct stacking order
-    bins.columns = pd.RangeIndex(start=np.prod(states), stop=0, step=-1)
+    bins.columns = pd.RangeIndex(start=len(bins.columns), stop=0, step=-1)
 
     ax = sns.histplot(
         bins,
@@ -102,7 +102,7 @@ def tableau(
     *,
     var_names: list[str],
     statistic: np.ndarray,
-    states: list[int | str],
+    states: list[int | list[str]],
     bins: pd.DataFrame,
     palette: np.ndarray,
 ) -> tuple[pd.DataFrame, Styler]:
@@ -112,7 +112,7 @@ def tableau(
     ----------
     var_names : list of str
         Variables name.
-    states : list of int or str
+    states : list of int or list of str
         For each variable, number of states. Can either be a scalar or a list.
 
         ``states=[2, 2]`` or ``states=[['a', 'b'], ['low', 'high']]``
