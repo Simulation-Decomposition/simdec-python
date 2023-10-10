@@ -25,15 +25,15 @@ def states_expansion(states: list[int], inputs: pd.DataFrame) -> list[list[str]]
     # categorical for a given variable
     cat_cols = inputs.select_dtypes(exclude=["number"])
     cat_cols_idx = []
-    states_cat_ = []
+    states_cats_ = []
     for cat_col in cat_cols:
         _, cats = pd.factorize(inputs[cat_col])
         cat_cols_idx.append(inputs.columns.get_loc(cat_col))
-        states_cat_.append(cats)
+        states_cats_.append(cats)
 
-    for i in cat_cols_idx:
-        n_unique = np.unique(cat_cols.iloc[:, i]).size
-        states[i] = list(states_cat_[i]) if n_unique < 5 else states[i]
+    for i, states_cat_ in zip(cat_cols_idx, states_cats_):
+        n_unique = np.unique(inputs.iloc[:, i]).size
+        states[i] = list(states_cat_) if n_unique < 5 else states[i]
 
     return states
 
@@ -113,10 +113,6 @@ def decomposition(
     n_var_dec = max(1, n_var_dec)  # keep at least one variable
     n_var_dec = min(5, n_var_dec)  # use at most 5 variables
 
-    if auto_ordering:
-        var_names = var_names[var_order[:n_var_dec]].tolist()
-        inputs = inputs[:, var_order[:n_var_dec]]
-
     # 2. states formation
     if states is None:
         states = 3 if n_var_dec < 3 else 2
@@ -124,8 +120,12 @@ def decomposition(
 
         # categorical for a given variable
         for i in cat_cols_idx:
-            n_unique = np.unique(cat_cols.iloc[:, i]).size
+            n_unique = np.unique(inputs[:, i]).size
             states[i] = n_unique if n_unique < 5 else states[i]
+
+    if auto_ordering:
+        var_names = var_names[var_order[:n_var_dec]].tolist()
+        inputs = inputs[:, var_order[:n_var_dec]]
 
     # 3. decomposition
     bins = []
