@@ -165,6 +165,8 @@ def tableau(
     # only select/ordering interesting columns
     table = table[["colour", "std", "min", "mean", "max", "probability"]]
 
+    table.insert(loc=0, column="N°", value=np.arange(1, stop=len(table) + 1))
+
     # style the colour background with palette
     cmap = mpl.colors.ListedColormap(palette[::-1])
     styler = table.style
