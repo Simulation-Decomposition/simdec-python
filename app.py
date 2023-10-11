@@ -137,10 +137,13 @@ def n_bins_auto(res):
     return len(np.histogram_bin_edges(res.bins, bins="auto", range=(min_, max_))) - 1
 
 
-def figure(res, palette, n_bins, output_name):
+def figure(res, palette, n_bins, kind, output_name):
+    kind = "histogram" if kind == "Stacked histogram" else "boxplot"
     plt.close("all")
     fig, ax = plt.subplots()
-    _ = sd.visualization(bins=res.bins, palette=palette, n_bins=n_bins, ax=ax)
+    _ = sd.visualization(
+        bins=res.bins, palette=palette, n_bins=n_bins, kind=kind, ax=ax
+    )
     ax.set(xlabel=output_name)
     return fig
 
@@ -248,11 +251,19 @@ selector_n_bins = pn.widgets.EditableIntSlider(
     format=PrintfTickFormatter(format="%d bins"),
 )
 
+switch_histogram_boxplot = pn.widgets.RadioButtonGroup(
+    name="Switch histogram - boxplot",
+    options=["Stacked histogram", "Boxplot"],
+    inline=False,
+    width=400,
+)
+
 interactive_figure = pn.bind(
     figure,
     interactive_decomposition,
     interactive_palette,
     selector_n_bins,
+    switch_histogram_boxplot,
     selector_output,
 )
 
@@ -317,6 +328,9 @@ pn_app = pn.Column(
                     height_policy="min",
                 )
             ),
+            pn.Spacer(height=50),
+            switch_histogram_boxplot,
+            pn.Spacer(height=50),
             selector_n_bins,
         ),
         pn.Column(
