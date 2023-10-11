@@ -247,6 +247,12 @@ interactive_decomposition = pn.bind(
 )
 interactive_palette = pn.bind(palette, interactive_decomposition)
 
+switch_histogram_boxplot = pn.widgets.RadioButtonGroup(
+    name="Switch histogram - boxplot",
+    options=["Stacked histogram", "Boxplot"],
+    inline=False,
+)
+
 interactive_n_bins_auto = pn.bind(n_bins_auto, interactive_decomposition)
 selector_n_bins = pn.widgets.EditableIntSlider(
     name="Number of bins",
@@ -257,13 +263,8 @@ selector_n_bins = pn.widgets.EditableIntSlider(
     # bar_color="#FFFFFF",  # does not work
     format=PrintfTickFormatter(format="%d bins"),
 )
+conditional_selector_n_bins = pn.bind(display_n_bins, switch_histogram_boxplot)
 
-switch_histogram_boxplot = pn.widgets.RadioButtonGroup(
-    name="Switch histogram - boxplot",
-    options=["Stacked histogram", "Boxplot"],
-    inline=False,
-    width=400,
-)
 
 interactive_figure = pn.bind(
     figure,
@@ -313,11 +314,12 @@ pn_params = pn.layout.WidgetBox(
     text_fname,
     selector_output,
     selector_inputs_sensitivity,
-    si_description,
-    interactive_significance_table,
     decomposition_description,
     selector_inputs_decomposition,
     indicator_explained_variance,
+    "## Visualization",
+    switch_histogram_boxplot,
+    conditional_selector_n_bins,
     max_width=350,
     sizing_mode="stretch_width",
 ).servable(area="sidebar")
@@ -336,9 +338,8 @@ pn_app = pn.Column(
                 )
             ),
             pn.Spacer(height=50),
-            switch_histogram_boxplot,
-            pn.Spacer(height=50),
-            selector_n_bins,
+            si_description,
+            pn.Column(interactive_significance_table, width=400),
         ),
         pn.Column(
             table_description,
