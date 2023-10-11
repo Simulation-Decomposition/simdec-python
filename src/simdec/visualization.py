@@ -1,4 +1,5 @@
 import itertools
+from typing import Literal
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -65,6 +66,7 @@ def visualization(
     bins: pd.DataFrame,
     palette: list[list[float]],
     n_bins: str | int = "auto",
+    kind: Literal["histogram", "boxplot"] = "histogram",
     ax=None,
 ) -> plt.Axes:
     """Histogram plot of scenarios.
@@ -77,6 +79,8 @@ def visualization(
         List of colours corresponding to scenarios.
     n_bins : str or int
         Number of bins or method from `np.histogram_bin_edges`.
+    kind: {"histogram", "boxplot"}
+        Histogram or Box Plot.
     ax : Axes, optional
         Matplotlib axis.
 
@@ -89,17 +93,28 @@ def visualization(
     # needed to get the correct stacking order
     bins.columns = pd.RangeIndex(start=len(bins.columns), stop=0, step=-1)
 
-    ax = sns.histplot(
-        bins,
-        multiple="stack",
-        stat="probability",
-        palette=palette,
-        common_bins=True,
-        common_norm=True,
-        bins=n_bins,
-        legend=False,
-        ax=ax,
-    )
+    if kind == "histogram":
+        ax = sns.histplot(
+            bins,
+            multiple="stack",
+            stat="probability",
+            palette=palette,
+            common_bins=True,
+            common_norm=True,
+            bins=n_bins,
+            legend=False,
+            ax=ax,
+        )
+    elif kind == "boxplot":
+        ax = sns.boxplot(
+            bins,
+            palette=palette[::-1],
+            orient="h",
+            order=list(bins.columns)[::-1],
+            ax=ax,
+        )
+    else:
+        raise ValueError("'kind' can only be 'histogram' or 'boxplot'")
     return ax
 
 
