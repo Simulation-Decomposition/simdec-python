@@ -137,6 +137,13 @@ def n_bins_auto(res):
     return len(np.histogram_bin_edges(res.bins, bins="auto", range=(min_, max_))) - 1
 
 
+def display_n_bins(kind):
+    if kind != "Stacked histogram":
+        return
+
+    return selector_n_bins
+
+
 def figure(res, palette, n_bins, kind, output_name):
     kind = "histogram" if kind == "Stacked histogram" else "boxplot"
     plt.close("all")
