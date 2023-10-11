@@ -56,12 +56,12 @@ def filtered_output(data, output_name):
 
 
 @pn.cache
-def significance(inputs, output):
-    si = sd.significance(inputs=inputs, output=output).si
+def sensitivity_indices(inputs, output):
+    si = sd.sensitivity_indices(inputs=inputs, output=output).si
     return si
 
 
-def significance_table(si, inputs):
+def sensitivity_indices_table(si, inputs):
     var_names = inputs.columns
     var_order = np.argsort(si)[::-1]
     var_names = var_names[var_order].tolist()
@@ -98,22 +98,22 @@ def explained_variance(si):
     return sum(si) + np.finfo(np.float64).eps
 
 
-def filtered_si(significance_table, input_names):
-    df = significance_table.value
+def filtered_si(sensitivity_indices_table, input_names):
+    df = sensitivity_indices_table.value
     si = []
     for input_name in input_names:
         si.append(df.loc[df["Inputs"] == input_name, "Indices"])
     return np.asarray(si).flatten()
 
 
-def explained_variance_80(significance_table):
-    si = significance_table.value["Indices"]
+def explained_variance_80(sensitivity_indices_table):
+    si = sensitivity_indices_table.value["Indices"]
     pos_80 = bisect.bisect_right(np.cumsum(si), 0.8)
 
     # pos_80 = max(2, pos_80)
     # pos_80 = min(len(si), pos_80)
 
-    input_names = significance_table.value["Inputs"]
+    input_names = sensitivity_indices_table.value["Inputs"]
     return input_names.to_list()[: pos_80 + 1]
 
 
@@ -121,7 +121,7 @@ def decomposition(dec_limit, si, inputs, output):
     return sd.decomposition(
         inputs=inputs,
         output=output,
-        significance=si,
+        sensitivity_indices=si,
         dec_limit=dec_limit,
         auto_ordering=False,
     )
@@ -203,15 +203,19 @@ interactive_inputs = pn.bind(
     filtered_output, interactive_file, selector_inputs_sensitivity
 )
 
-interactive_significance = pn.bind(significance, interactive_inputs, interactive_output)
-interactive_explained_variance = pn.bind(explained_variance, interactive_significance)
+interactive_sensitivity_indices = pn.bind(
+    sensitivity_indices, interactive_inputs, interactive_output
+)
+interactive_explained_variance = pn.bind(
+    explained_variance, interactive_sensitivity_indices
+)
 
-interactive_significance_table = pn.bind(
-    significance_table, interactive_significance, interactive_inputs
+interactive_sensitivity_indices_table = pn.bind(
+    sensitivity_indices_table, interactive_sensitivity_indices, interactive_inputs
 )
 
 interactive_explained_variance_80 = pn.bind(
-    explained_variance_80, interactive_significance_table
+    explained_variance_80, interactive_sensitivity_indices_table
 )
 selector_inputs_decomposition = pn.widgets.MultiChoice(
     name="Select inputs for decomposition",
@@ -224,7 +228,7 @@ interactive_inputs_decomposition = pn.bind(
 )
 
 interactive_filtered_si = pn.bind(
-    filtered_si, interactive_significance_table, selector_inputs_decomposition
+    filtered_si, interactive_sensitivity_indices_table, selector_inputs_decomposition
 )
 interactive_filtered_explained_variance = pn.bind(
     explained_variance, interactive_filtered_si
@@ -339,7 +343,7 @@ pn_app = pn.Column(
             ),
             pn.Spacer(height=50),
             pn.pane.Markdown(si_description, styles={"color": "#0072b5"}),
-            pn.Column(interactive_significance_table, width=400),
+            pn.Column(interactive_sensitivity_indices_table, width=400),
         ),
         pn.Column(
             pn.pane.Markdown(table_description, styles={"color": "#0072b5"}),

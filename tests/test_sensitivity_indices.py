@@ -47,7 +47,7 @@ def ishigami_ref_indices():
     return s_first, s_second, s_total
 
 
-def test_significance(ishigami_ref_indices):
+def test_sensitivity_indices(ishigami_ref_indices):
     rng = np.random.default_rng(1655943881803900660874135192647741156)
     n_dim = 3
 
@@ -57,7 +57,7 @@ def test_significance(ishigami_ref_indices):
     )
     output = f_ishigami(inputs.T)
 
-    res = sd.significance(inputs=inputs, output=output)
+    res = sd.sensitivity_indices(inputs=inputs, output=output)
 
     assert res.si.shape == (3,)
     assert res.first_order.shape == (3,)
@@ -83,12 +83,12 @@ def test_significance(ishigami_ref_indices):
         ),
     ],
 )
-def test_significance_dataset(fname, foe_ref, si_ref):
+def test_sensitivity_indices_dataset(fname, foe_ref, si_ref):
     data = pd.read_csv(fname)
     output_name, *v_names = list(data.columns)
     inputs, output = data[v_names], data[output_name]
 
-    res = sd.significance(inputs=inputs, output=output)
+    res = sd.sensitivity_indices(inputs=inputs, output=output)
 
     npt.assert_allclose(res.first_order, foe_ref, atol=5e-3)
     npt.assert_allclose(res.si, si_ref, atol=5e-2)

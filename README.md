@@ -14,7 +14,7 @@ When public
 analysis method, which is based on Monte Carlo simulation. SimDec consists of
 three major parts:
 
-1. computing significance indices,
+1. computing sensitivity indices,
 2. creating multi-variable scenarios and mapping the output values to them, and
 3. visualizing the scenarios on the output distribution by color-coding its segments.
 

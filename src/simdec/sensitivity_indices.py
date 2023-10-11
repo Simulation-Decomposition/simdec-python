@@ -6,11 +6,11 @@ import pandas as pd
 from scipy import stats
 
 
-__all__ = ["significance"]
+__all__ = ["sensitivity_indices"]
 
 
 def number_of_bins(n_runs: int, n_factors: int) -> tuple[int, int]:
-    """Optimal number of bins for first & second-order significance indices.
+    """Optimal number of bins for first & second-order sensitivity_indices indices.
 
     Linear approximation of experimental results from (Marzban & Lahmer, 2016).
     """
@@ -31,18 +31,18 @@ def _weighted_var(x: np.ndarray, weights: np.ndarray) -> np.ndarray:
 
 
 @dataclass
-class SignificanceResult:
+class SensitivityAnalysisResult:
     si: np.ndarray
     first_order: np.ndarray
     second_order: np.ndarray
 
 
-def significance(
+def sensitivity_indices(
     inputs: pd.DataFrame | np.ndarray, output: pd.DataFrame | np.ndarray
-) -> SignificanceResult:
-    """Significance indices.
+) -> SensitivityAnalysisResult:
+    """Sensitivity indices.
 
-    The significance express how much variability of the output is
+    The sensitivity_indices express how much variability of the output is
     explained by the inputs.
 
     Parameters
@@ -54,11 +54,11 @@ def significance(
 
     Returns
     -------
-    res : SignificanceResult
+    res : SensitivityAnalysisResult
         An object with attributes:
 
         si : ndarray of shape (n_factors, 1)
-            Significance index, combined effect of each input.
+            Sensitivity indices, combined effect of each input.
         foe : ndarray of shape (n_factors, 1)
             First-order effects (also called 'main' or 'individual').
         soe : ndarray of shape (n_factors, 1)
@@ -89,9 +89,9 @@ def significance(
     ... )
     >>> output = f_ishigami(inputs.T)
 
-    We can now pass our inputs and outputs to the `significance` function:
+    We can now pass our inputs and outputs to the `sensitivity_indices` function:
 
-    >>> res = sd.significance(inputs=inputs, output=output)
+    >>> res = sd.sensitivity_indices(inputs=inputs, output=output)
     >>> res.si
     array([0.43157591, 0.44241433, 0.11767249])
 
@@ -168,4 +168,4 @@ def significance(
         soe = np.where(soe == 0, soe.T, soe)
         si[i] = foe[i] + soe[:, i].sum() / 2
 
-    return SignificanceResult(si, foe, soe)
+    return SensitivityAnalysisResult(si, foe, soe)

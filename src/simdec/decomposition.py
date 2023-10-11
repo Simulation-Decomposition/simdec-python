@@ -51,7 +51,7 @@ def decomposition(
     inputs: pd.DataFrame,
     output: pd.DataFrame,
     *,
-    significance: np.ndarray,
+    sensitivity_indices: np.ndarray,
     dec_limit: float = 1,
     auto_ordering: bool = True,
     states: list[int] | None = None,
@@ -65,12 +65,12 @@ def decomposition(
         Input variables.
     output : DataFrame of shape (n_runs, 1)
         Target variable.
-    significance : ndarray of shape (n_factors, 1)
-        Significance index, combined effect of each input.
+    sensitivity_indices : ndarray of shape (n_factors, 1)
+        Sensitivity indices, combined effect of each input.
     dec_limit : float
         Explained variance ratio to filter the number input variables.
     auto_ordering : bool
-        Automatically order input columns based on the relative significance
+        Automatically order input columns based on the relative sensitivity_indices
         or use the provided order.
     states : list of int, optional
         List of possible states for the considered parameter.
@@ -105,11 +105,11 @@ def decomposition(
     output = output.to_numpy()
 
     # 1. variables for decomposition
-    var_order = np.argsort(significance)[::-1]
+    var_order = np.argsort(sensitivity_indices)[::-1]
 
     # only keep the explained variance corresponding to `dec_limit`
-    significance = significance[var_order]
-    n_var_dec = np.where(np.cumsum(significance) < dec_limit)[0].size
+    sensitivity_indices = sensitivity_indices[var_order]
+    n_var_dec = np.where(np.cumsum(sensitivity_indices) < dec_limit)[0].size
     n_var_dec = max(1, n_var_dec)  # keep at least one variable
     n_var_dec = min(5, n_var_dec)  # use at most 5 variables
 

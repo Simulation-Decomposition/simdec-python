@@ -16,7 +16,7 @@ def test_decomposition():
     output_name, *v_names = list(data.columns)
     inputs, output = data[v_names], data[output_name]
     si = np.array([0.04, 0.50, 0.11, 0.28])
-    res = sd.decomposition(inputs=inputs, output=output, significance=si)
+    res = sd.decomposition(inputs=inputs, output=output, sensitivity_indices=si)
 
     assert res.var_names == ["sigma_res", "R", "Rp0.2", "Kf"]
     assert res.states == [2, 2, 2, 2]
