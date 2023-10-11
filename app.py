@@ -301,23 +301,23 @@ decomposition_description = """
 """
 
 table_description = """
-## Scenario decomposition
+## Scenarios
 """
 
 states_description = """
-## Details on states
+## Details on inputs' states
 """
 
 
 pn_params = pn.layout.WidgetBox(
-    top_description,
+    pn.pane.Markdown(top_description, styles={"color": "#0072b5"}),
     text_fname,
     selector_output,
     selector_inputs_sensitivity,
-    decomposition_description,
+    pn.pane.Markdown(decomposition_description, styles={"color": "#0072b5"}),
     selector_inputs_decomposition,
     indicator_explained_variance,
-    "## Visualization",
+    pn.pane.Markdown("## Visualization", styles={"color": "#0072b5"}),
     switch_histogram_boxplot,
     conditional_selector_n_bins,
     max_width=350,
@@ -338,14 +338,14 @@ pn_app = pn.Column(
                 )
             ),
             pn.Spacer(height=50),
-            si_description,
+            pn.pane.Markdown(si_description, styles={"color": "#0072b5"}),
             pn.Column(interactive_significance_table, width=400),
         ),
         pn.Column(
-            table_description,
+            pn.pane.Markdown(table_description, styles={"color": "#0072b5"}),
             pn.panel(interactive_tableau),
-            pn.Spacer(height=50),
-            states_description,
+            pn.Spacer(height=125),
+            pn.pane.Markdown(states_description, styles={"color": "#0072b5"}),
             pn.panel(interactive_tableau_states),
         ),
     )
