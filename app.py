@@ -57,8 +57,12 @@ def filtered_output(data, output_name):
 
 @pn.cache
 def sensitivity_indices(inputs, output):
-    si = sd.sensitivity_indices(inputs=inputs, output=output).si
-    return si
+    sensitivity_indices = sd.sensitivity_indices(inputs=inputs, output=output)
+    if 0.01 < sum(sensitivity_indices.si) < 2.0:
+        indices = sensitivity_indices.si
+    else:
+        indices = sensitivity_indices.first_order
+    return indices
 
 
 def sensitivity_indices_table(si, inputs):
