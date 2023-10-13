@@ -14,9 +14,8 @@ import simdec as sd
 # panel app
 pn.extension(template="material")
 pn.extension("tabulator")
+
 pn.config.sizing_mode = "stretch_width"
-
-
 pn.config.throttled = True
 font_size = "12pt"
 
@@ -258,7 +257,6 @@ interactive_palette = pn.bind(palette, interactive_decomposition)
 switch_histogram_boxplot = pn.widgets.RadioButtonGroup(
     name="Switch histogram - boxplot",
     options=["Stacked histogram", "Boxplot"],
-    inline=False,
 )
 
 interactive_n_bins_auto = pn.bind(n_bins_auto, interactive_decomposition)

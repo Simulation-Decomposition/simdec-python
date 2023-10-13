@@ -44,6 +44,22 @@ serve-dev:  ## Serve Panel dashboard - Dev mode
 serve:  ## Serve Panel dashboard - Prod mode
 	panel serve app.py
 
+build-local:
+	docker build -f ./Dockerfile \
+		--build-arg PANEL_TOKEN=$(PANEL_TOKEN) \
+		--tag simdec-panel:$(version) \
+	    --pull \
+	    ./.
+
+run-local: build-local
+	docker run --rm -it \
+    --name=simdec-panel \
+	--memory=1g \
+	--cpuset-cpus=0 \
+	-e ENV=development \
+	-p "8080:8080" \
+	simdec-panel:$(version)
+
 build:
 	docker build -f ./Dockerfile \
 		--platform linux/amd64 \
@@ -54,6 +70,7 @@ build:
 
 run: build
 	docker run --rm -it \
+    --name=simdec-panel \
 	--memory=1g \
 	--cpuset-cpus=0 \
 	-e ENV=development \
@@ -73,6 +90,6 @@ production: publish-production
 	                  --port=8080 \
 	                  --set-env-vars ENV=production \
 	                  --allow-unauthenticated \
-	                  --timeout=10 \
+	                  --timeout=600 \
 	                  --image=$(region)-docker.pkg.dev/$(project)/simdec-panel/simdec-panel:$(version) \
 	                  --memory 1Gi

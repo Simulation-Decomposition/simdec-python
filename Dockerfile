@@ -20,6 +20,8 @@ RUN --mount=type=cache,mode=0777,target=/root/.cache/pip \
 COPY tests/data /app/tests/data
 COPY src/simdec /app/src/simdec
 COPY app.py /app/app.py
+# matplotlib cache
+RUN mkdir -p /app/.config/matplotlib
 
 # Step 3/3: Image
 FROM  base as panel
@@ -42,4 +44,4 @@ WORKDIR /app
 RUN useradd app && usermod -a -G app app
 USER app
 # Run the web service on container startup.
-CMD panel serve app.py --address 0.0.0.0 --port 8080 --allow-websocket-origin="*" --basic-auth PANEL_TOKEN --num-procs 2 --cookie-secret my_super_safe_cookie_secret
+CMD panel serve app.py --address 0.0.0.0 --port $PORT --allow-websocket-origin="*" --basic-auth=$PANEL_TOKEN --num-procs 2 --cookie-secret my_super_safe_cookie_secret
