@@ -30,3 +30,4 @@ build/*
 dist/*
 sdist/*
 docs/_build
+app.html
