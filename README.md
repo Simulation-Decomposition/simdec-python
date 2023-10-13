@@ -27,29 +27,10 @@ The library is distributed on PyPi and can be installed with:
 
     pip install simdec
 
-To install the development version, download the source and from the root of
-the repository:
-
-    pip install -e .[dev]
-
 ## Dashboard
 A live dashboard is available at:
 
 https://simdec.io
-
-### Local use
-
-The dashboard can be run locally using:
-
-    make serve
-
-### Deployment
-
-The live version of the dashboard is hosted on GCP. To deploy a new version:
-
-    PANEL_TOKEN=... make production
-
-###
 
 ## Citations
 

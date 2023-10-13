@@ -30,7 +30,7 @@ prepare:  ## Install dependencies and pre-commit hook
 	pip install -e ".[dev]"
 	pre-commit install
 	gcloud init
-	gcloud auth configure-docker
+	gcloud auth configure-docker europe-north1-docker.pkg.dev
 
 doc:  ## Build Sphinx documentation
 	sphinx-build -b html docs docs/html

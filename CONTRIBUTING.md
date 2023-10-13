@@ -161,3 +161,27 @@ a release:
 5. Check that release has been deployed to PyPI
 6. Check documentation is built and deployed to readthedocs
 7. Check that auto-generated PR is auto-merged on the conda-forge feedstock repo
+
+## Dashboard
+A live dashboard is available at:
+
+https://simdec.io
+
+The DNS records are available on CPanel and the rest is hosted on Google Cloud
+Platform.
+
+Developing locally requires the installation of GCP CLI and Docker engine.
+
+A few helper commands are provided in the Makefile.
+
+### Local use
+
+The dashboard can be run locally using:
+
+    make serve
+
+### Deployment
+
+To deploy a new version:
+
+    PANEL_TOKEN=... make production
