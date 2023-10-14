@@ -68,10 +68,13 @@ source = "https://github.com/Simulation-Decomposition/simdec-python"
 build.targets.sdist.exclude = [
   ".github",
   "docs",
+  "panel",
   "tests",
   "*.rst",
   "*.yml",
   ".*",
+  "Makefile",
+  "Dockerfile",
 ]
 
 [tool.pytest.ini_options]

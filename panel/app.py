@@ -314,6 +314,8 @@ states_description = """
 ## Details on inputs' states
 """
 
+logout = pn.widgets.Button(name="Log out")
+logout.js_on_click(code="""window.location.href = './logout'""")
 
 pn_params = pn.layout.WidgetBox(
     pn.pane.Markdown(top_description, styles={"color": "#0072b5"}),
@@ -326,9 +328,11 @@ pn_params = pn.layout.WidgetBox(
     pn.pane.Markdown("## Visualization", styles={"color": "#0072b5"}),
     switch_histogram_boxplot,
     conditional_selector_n_bins,
+    # pn.Row(logout),
     max_width=350,
     sizing_mode="stretch_width",
 ).servable(area="sidebar")
+
 
 pn_app = pn.Column(
     pn.Row(
@@ -354,5 +358,5 @@ pn_app = pn.Column(
             pn.pane.Markdown(states_description, styles={"color": "#0072b5"}),
             pn.panel(interactive_tableau_states),
         ),
-    )
+    ),
 ).servable(title="Simulation Decomposition Dashboard")

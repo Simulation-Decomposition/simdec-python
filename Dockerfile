@@ -17,11 +17,10 @@ RUN --mount=type=cache,mode=0777,target=/root/.cache/pip \
     pip install -e .  && \
     mkdir -p /app/src
 
+COPY src /app/src
 COPY tests/data /app/tests/data
-COPY src/simdec /app/src/simdec
-COPY app.py /app/app.py
-# matplotlib cache
-RUN mkdir -p /app/.config/matplotlib
+COPY panel /app/panel
+COPY docs/_static /app/_static
 
 # Step 3/3: Image
 FROM  base as panel
@@ -30,18 +29,24 @@ ENV PYTHONUNBUFFERED True
 ENV PYTHONPATH=/app/src
 ENV PYTHONIOENCODING=utf-8
 ENV ENV=production
-ENV PORT=8080
+ENV MPLCONFIGDIR=/tmp/matplotlib
+EXPOSE 8080
 
 ARG PANEL_TOKEN
+ENV PANEL_BASIC_AUTH=$PANEL_TOKEN
 
 COPY --from=builder /usr/local/lib/python3.11/site-packages/ /usr/local/lib/python3.11/site-packages/
 COPY --from=builder /usr/local/bin/panel /usr/local/bin/panel
-COPY --from=builder /app/src /app/src
-COPY --from=builder /app/tests/data /app/tests/data
-COPY --from=builder /app/app.py /app/app.py
+COPY --from=builder /app /app
 
-WORKDIR /app
 RUN useradd app && usermod -a -G app app
 USER app
+WORKDIR /app
+
 # Run the web service on container startup.
-CMD panel serve app.py --address 0.0.0.0 --port $PORT --allow-websocket-origin="*" --basic-auth=$PANEL_TOKEN --num-procs 2 --cookie-secret my_super_safe_cookie_secret
+CMD ["panel", "serve", "panel/app.py", \
+     "--address", "0.0.0.0", "--port", "8080", "--num-procs", "1", "--allow-websocket-origin", "*", \
+     "--cookie-secret", "panel_cookie_secret", \
+     "--basic-login-template", "panel/login.html", \
+     "--logout-template", "panel/logout.html", \
+     "--static-dirs", "_static=_static"]

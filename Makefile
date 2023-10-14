@@ -39,10 +39,10 @@ test:  ## Run tests with coverage
 	pytest --cov simdec --cov-report term-missing
 
 serve-dev:  ## Serve Panel dashboard - Dev mode
-	panel serve app.py --show --autoreload
+	panel serve panel/app.py --show --autoreload
 
 serve:  ## Serve Panel dashboard - Prod mode
-	panel serve app.py
+	panel serve panel/app.py --basic-auth $(PANEL_TOKEN) --cookie-secret panel_cookie_secret --basic-login-template panel/login.html --logout-template panel/logout.html --static-dirs _static=docs/_static
 
 build-local:
 	docker build -f ./Dockerfile \
