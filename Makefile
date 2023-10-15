@@ -42,7 +42,11 @@ serve-dev:  ## Serve Panel dashboard - Dev mode
 	panel serve panel/app.py --show --autoreload
 
 serve:  ## Serve Panel dashboard - Prod mode
-	panel serve panel/app.py --basic-auth $(PANEL_TOKEN) --cookie-secret panel_cookie_secret --basic-login-template panel/login.html --logout-template panel/logout.html --static-dirs _static=docs/_static
+	PANEL_BASIC_AUTH=$(PANEL_TOKEN) panel serve panel/app.py \
+		--cookie-secret panel_cookie_secret \
+		--basic-login-template panel/login.html \
+		--logout-template panel/logout.html \
+		--static-dirs _static=docs/_static
 
 build-local:
 	docker build -f ./Dockerfile \
@@ -89,6 +93,7 @@ production: publish-production
 	                  --region=$(region) \
 	                  --port=8080 \
 	                  --set-env-vars ENV=production \
+	                  --set-secrets=PANEL_BASIC_AUTH=PANEL_TOKEN:latest \
 	                  --allow-unauthenticated \
 	                  --timeout=600 \
 	                  --service-account simdec-panel@delta-entity-401706.iam.gserviceaccount.com \

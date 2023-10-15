@@ -32,9 +32,6 @@ ENV ENV=production
 ENV MPLCONFIGDIR=/tmp/matplotlib
 EXPOSE 8080
 
-ARG PANEL_TOKEN
-ENV PANEL_BASIC_AUTH=$PANEL_TOKEN
-
 COPY --from=builder /usr/local/lib/python3.11/site-packages/ /usr/local/lib/python3.11/site-packages/
 COPY --from=builder /usr/local/bin/panel /usr/local/bin/panel
 COPY --from=builder /app /app
