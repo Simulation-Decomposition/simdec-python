@@ -91,5 +91,6 @@ production: publish-production
 	                  --set-env-vars ENV=production \
 	                  --allow-unauthenticated \
 	                  --timeout=600 \
+	                  --service-account simdec-panel@delta-entity-401706.iam.gserviceaccount.com \
 	                  --image=$(region)-docker.pkg.dev/$(project)/simdec-panel/simdec-panel:$(version) \
 	                  --memory 1Gi
