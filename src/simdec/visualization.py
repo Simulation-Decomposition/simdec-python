@@ -1,6 +1,7 @@
 import itertools
 from typing import Literal
 
+import colorsys
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
@@ -11,7 +12,7 @@ from pandas.io.formats.style import Styler
 __all__ = ["visualization", "tableau", "palette"]
 
 
-sequential_palettes = [
+SEQUENTIAL_PALETTES = [
     "Oranges",
     "Purples",
     "Reds",
@@ -31,6 +32,37 @@ sequential_palettes = [
     "YlGn",
     "Greys",
 ]
+
+
+def colormap_from_single_color(rgba_color, *, factor=0.5):
+    """Create a linear colormap using a single color."""
+    # discard alpha channel
+    if len(rgba_color) == 4:
+        *rgb_color, alpha = rgba_color
+    else:
+        alpha = 1
+        rgb_color = rgba_color
+
+    # lighten and darken from factor around single color
+    hls_color = colorsys.rgb_to_hls(*rgb_color)
+
+    lightness = hls_color[1]
+    lightened_hls_color = (hls_color[0], lightness * (1 + factor), hls_color[2])
+    lightened_rgb_color = list(colorsys.hls_to_rgb(*lightened_hls_color))
+
+    darkened_hls_color = (hls_color[0], lightness * (1 - factor), hls_color[2])
+    darkened_rgb_color = list(colorsys.hls_to_rgb(*darkened_hls_color))
+
+    lightened_rgba_color = lightened_rgb_color + [alpha]
+    darkened_rgba_color = darkened_rgb_color + [alpha]
+
+    # convert to CMAP
+    cmap = mpl.colors.LinearSegmentedColormap.from_list(
+        "CustomSingleColor",
+        [lightened_rgba_color, rgba_color, darkened_rgba_color],
+        N=3,
+    )
+    return cmap
 
 
 def palette(states: list[int]) -> list[list[float]]:
@@ -54,7 +86,7 @@ def palette(states: list[int]) -> list[list[float]]:
     # many levels
     n_shades = int(np.prod(states[1:]))
     for i in range(states[0]):
-        palette_ = sequential_palettes[i]
+        palette_ = SEQUENTIAL_PALETTES[i]
         cmap = mpl.colormaps[palette_].resampled(n_shades + 1)
         colors.append(cmap(range(1, n_shades + 1)))
 
