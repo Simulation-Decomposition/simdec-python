@@ -147,10 +147,7 @@ def n_bins_auto(res):
 
 
 def display_n_bins(kind):
-    if kind != "Stacked histogram":
-        return
-
-    return selector_n_bins
+    return False if kind != "Stacked histogram" else True
 
 
 def figure(res, palette, n_bins, kind, output_name):
@@ -264,6 +261,7 @@ switch_histogram_boxplot = pn.widgets.RadioButtonGroup(
     name="Switch histogram - boxplot",
     options=["Stacked histogram", "Boxplot"],
 )
+show_n_bins = pn.bind(display_n_bins, switch_histogram_boxplot)
 
 interactive_n_bins_auto = pn.bind(n_bins_auto, interactive_decomposition)
 selector_n_bins = pn.widgets.EditableIntSlider(
@@ -274,8 +272,8 @@ selector_n_bins = pn.widgets.EditableIntSlider(
     step=10,
     # bar_color="#FFFFFF",  # does not work
     format=PrintfTickFormatter(format="%d bins"),
+    visible=show_n_bins,
 )
-conditional_selector_n_bins = pn.bind(display_n_bins, switch_histogram_boxplot)
 
 
 interactive_figure = pn.bind(
@@ -313,7 +311,7 @@ pn_params = pn.layout.WidgetBox(
     indicator_explained_variance,
     pn.pane.Markdown("## Visualization", styles={"color": blue_color}),
     switch_histogram_boxplot,
-    conditional_selector_n_bins,
+    selector_n_bins,
     # pn.Row(logout),
     max_width=350,
     sizing_mode="stretch_width",
