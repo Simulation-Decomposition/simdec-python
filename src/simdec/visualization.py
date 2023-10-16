@@ -94,9 +94,11 @@ def palette(
     if cmaps is None:
         cmaps = [mpl.colormaps[cmap] for cmap in SEQUENTIAL_PALETTES[:n_cmaps]]
     else:
+        cmaps = cmaps[:n_cmaps]
         if len(cmaps) != n_cmaps:
             raise ValueError(
-                "Must have the same number of cmaps as the number of first states"
+                f"Must have the same number of cmaps ({len(cmaps)}) as the "
+                f"number of first states ({n_cmaps})"
             )
 
     colors = []
