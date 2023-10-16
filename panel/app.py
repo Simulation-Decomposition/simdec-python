@@ -3,6 +3,7 @@ import io
 
 from bokeh.models import PrintfTickFormatter
 from bokeh.models.widgets.tables import NumberFormatter
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -10,6 +11,7 @@ import panel as pn
 from panel.layout.gridstack import GridStack
 
 import simdec as sd
+from simdec.visualization import colormap_from_single_color
 
 
 # panel app
@@ -136,8 +138,11 @@ def decomposition(dec_limit, si, inputs, output):
     )
 
 
-def palette(res):
-    return sd.palette(res.states)
+def palette(res, colors_picked):
+    cmaps = [
+        colormap_from_single_color(color_picked.value) for color_picked in colors_picked
+    ]
+    return sd.palette(res.states, cmaps=cmaps)
 
 
 def n_bins_auto(res):
@@ -255,7 +260,6 @@ interactive_decomposition = pn.bind(
     interactive_inputs_decomposition,
     interactive_output,
 )
-interactive_palette = pn.bind(palette, interactive_decomposition)
 
 switch_histogram_boxplot = pn.widgets.RadioButtonGroup(
     name="Switch histogram - boxplot",
@@ -275,6 +279,41 @@ selector_n_bins = pn.widgets.EditableIntSlider(
     visible=show_n_bins,
 )
 
+interactive_states = pn.bind(
+    states_from_data, interactive_decomposition, interactive_inputs_decomposition
+)
+
+
+def base_colors(res):
+    all_colors = sd.palette(res.states)
+    colors = all_colors[:: res.states[0]]
+    colors = [mpl.colors.rgb2hex(color, keep_alpha=False) for color in colors]
+    return colors
+
+
+def color_pickers(states, colors):
+    pickers = [
+        pn.widgets.ColorPicker(name=state, value=color)
+        for state, color in zip(states[0], colors)
+    ]
+    return pickers
+
+
+interactive_base_colors = pn.bind(base_colors, interactive_decomposition)
+interactive_color_pickers = pn.bind(
+    color_pickers, interactive_states, interactive_base_colors
+)
+
+
+def card_pickers_(pickers):
+    return pn.Card(*pickers)
+
+
+card_pickers = pn.bind(card_pickers_, interactive_color_pickers)
+
+interactive_palette = pn.bind(
+    palette, interactive_decomposition, interactive_color_pickers
+)
 
 interactive_figure = pn.bind(
     figure,
@@ -285,10 +324,6 @@ interactive_figure = pn.bind(
     selector_output,
 )
 
-
-interactive_states = pn.bind(
-    states_from_data, interactive_decomposition, interactive_inputs_decomposition
-)
 interactive_tableau = pn.bind(
     tableau, interactive_decomposition, interactive_states, interactive_palette
 )
@@ -312,6 +347,8 @@ pn_params = pn.layout.WidgetBox(
     pn.pane.Markdown("## Visualization", styles={"color": blue_color}),
     switch_histogram_boxplot,
     selector_n_bins,
+    # interactive_color_pickers,
+    card_pickers,
     # pn.Row(logout),
     max_width=350,
     sizing_mode="stretch_width",
