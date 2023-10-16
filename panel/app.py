@@ -20,6 +20,7 @@ pn.extension("gridstack")
 pn.config.sizing_mode = "stretch_width"
 pn.config.throttled = True
 font_size = "12pt"
+blue_color = "#0072b5"
 
 
 @pn.cache
@@ -299,38 +300,18 @@ interactive_tableau_states = pn.bind(
 
 # App layout
 
-top_description = """
-## Data
-"""
-
-si_description = """
-## Sensitivity Indices
-"""
-
-decomposition_description = """
-## Decomposition
-"""
-
-table_description = """
-## Scenarios
-"""
-
-states_description = """
-## Details on inputs' states
-"""
-
 logout = pn.widgets.Button(name="Log out")
 logout.js_on_click(code="""window.location.href = './logout'""")
 
 pn_params = pn.layout.WidgetBox(
-    pn.pane.Markdown(top_description, styles={"color": "#0072b5"}),
+    pn.pane.Markdown("## Data", styles={"color": blue_color}),
     text_fname,
     selector_output,
     selector_inputs_sensitivity,
-    pn.pane.Markdown(decomposition_description, styles={"color": "#0072b5"}),
+    pn.pane.Markdown("## Decomposition", styles={"color": blue_color}),
     selector_inputs_decomposition,
     indicator_explained_variance,
-    pn.pane.Markdown("## Visualization", styles={"color": "#0072b5"}),
+    pn.pane.Markdown("## Visualization", styles={"color": blue_color}),
     switch_histogram_boxplot,
     conditional_selector_n_bins,
     # pn.Row(logout),
@@ -348,18 +329,17 @@ gstack[0:3, 0:3] = pn.pane.Matplotlib(
 )
 
 gstack[0:2, 3:5] = pn.Column(
-    pn.pane.Markdown(table_description, styles={"color": "#0072b5"}),
+    pn.pane.Markdown("## Scenarios", styles={"color": blue_color}),
     interactive_tableau,
-    sizing_mode="stretch_both",
 )
 
 gstack[2:3, 3:5] = pn.Column(
-    pn.pane.Markdown(states_description, styles={"color": "#0072b5"}),
+    pn.pane.Markdown("## Details on inputs' states", styles={"color": blue_color}),
     interactive_tableau_states,
 )
 
 gstack[3:5, 0:2] = pn.Column(
-    pn.pane.Markdown(si_description, styles={"color": "#0072b5"}),
+    pn.pane.Markdown("## Sensitivity Indices", styles={"color": blue_color}),
     interactive_sensitivity_indices_table,
 )
 
