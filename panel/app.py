@@ -331,7 +331,7 @@ gstack[0:3, 3:5] = pn.Column(
     interactive_tableau,
 )
 
-gstack[3:4, 3:5] = pn.Column(
+gstack[3:5, 3:5] = pn.Column(
     pn.pane.Markdown("## Details on inputs' states", styles={"color": blue_color}),
     interactive_tableau_states,
 )
