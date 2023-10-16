@@ -138,6 +138,30 @@ def decomposition(dec_limit, si, inputs, output):
     )
 
 
+def base_colors(res):
+    all_colors = sd.palette(res.states)
+    colors = all_colors[:: res.states[0]]
+    colors = [mpl.colors.rgb2hex(color, keep_alpha=False) for color in colors]
+    return colors
+
+
+def update_colors_select(event):
+    colors = [color_picker.value for color_picker in color_pickers]
+    colors_select.param.update(
+        options=colors,
+        value=colors,
+    )
+
+
+def create_color_pickers(states, colors):
+    color_picker_list = []
+    for state, color in zip(states[0][::-1], colors):
+        color_picker = pn.widgets.ColorPicker(name=state, value=color)
+        color_picker.param.watch(update_colors_select, "value")
+        color_picker_list.append(color_picker)
+    color_pickers[:] = color_picker_list
+
+
 def palette(res, colors_picked):
     cmaps = [colormap_from_single_color(color_picked) for color_picked in colors_picked]
     return sd.palette(res.states, cmaps=cmaps)
@@ -282,46 +306,20 @@ interactive_states = pn.bind(
 )
 
 
-def base_colors(res):
-    all_colors = sd.palette(res.states)
-    colors = all_colors[:: res.states[0]]
-    colors = [mpl.colors.rgb2hex(color, keep_alpha=False) for color in colors]
-    return colors
-
-
 interactive_base_colors = pn.bind(base_colors, interactive_decomposition)
 
 
-def update_colors_select(event):
-    colors = [color_picker.value for color_picker in color_pickers]
-    colors_select.param.update(
-        options=colors,
-        value=colors,
-    )
-
-
-def create_color_pickers(states, colors):
-    color_picker_list = []
-    for state, color in zip(states[0], colors):
-        color_picker = pn.widgets.ColorPicker(name=state, value=color)
-        color_picker.param.watch(update_colors_select, "value")
-        color_picker_list.append(color_picker)
-    color_pickers[:] = color_picker_list
-
-
+color_pickers = pn.Card(title="Main color for states")
 colors_select = pn.widgets.MultiSelect(
     value=interactive_base_colors,
     options=interactive_base_colors,
     name="Colors",
-    visible=True,
+    visible=False,
 )
-color_pickers = pn.Card(title="Main color for states")
-# colors_select.param.update(
-#     value=['#fdb97d', '#c6c7e1', '#fca082'],
-#     options=['#fdb97d', '#c6c7e1', '#fca082'],
-# )
 
-pn.bind(create_color_pickers, interactive_states, colors_select.param.value, watch=True)
+dummy_color_pickers_bind = pn.bind(
+    create_color_pickers, interactive_states, colors_select.param.value, watch=True
+)
 
 interactive_palette = pn.bind(
     palette, interactive_decomposition, colors_select.param.value
@@ -359,7 +357,7 @@ pn_params = pn.layout.WidgetBox(
     pn.pane.Markdown("## Visualization", styles={"color": blue_color}),
     switch_histogram_boxplot,
     selector_n_bins,
-    colors_select,  # hidden
+    dummy_color_pickers_bind,
     color_pickers,
     # pn.Row(logout),
     max_width=350,
