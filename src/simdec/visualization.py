@@ -34,14 +34,19 @@ SEQUENTIAL_PALETTES = [
 ]
 
 
-def colormap_from_single_color(rgba_color, *, factor=0.5):
+def colormap_from_single_color(
+    rgba_color: list[float] | str, *, factor: float = 0.5
+) -> mpl.colors.LinearSegmentedColormap:
     """Create a linear colormap using a single color."""
+    if isinstance(rgba_color, str):
+        rgba_color = mpl.colors.hex2color(rgba_color)
     # discard alpha channel
     if len(rgba_color) == 4:
         *rgb_color, alpha = rgba_color
     else:
-        alpha = 1
+        alpha = 1.0
         rgb_color = rgba_color
+        rgba_color = list(rgba_color) + [1]
 
     # lighten and darken from factor around single color
     hls_color = colorsys.rgb_to_hls(*rgb_color)
