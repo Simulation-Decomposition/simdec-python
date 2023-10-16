@@ -88,6 +88,9 @@ def sensitivity_indices_table(si, inputs):
         show_index=False,
         formatters=formatters,
         theme="bulma",
+        frozen_rows=[-1],
+        # page_size=5,
+        # pagination='local',
     )
     widget.style.apply(
         lambda x: ["font-style: italic"] * 3, axis=1, subset=df.index[-1]
@@ -349,7 +352,12 @@ pn_app = pn.Column(
             ),
             pn.Spacer(height=50),
             pn.pane.Markdown(si_description, styles={"color": "#0072b5"}),
-            pn.Column(interactive_sensitivity_indices_table, width=400),
+            pn.Column(
+                interactive_sensitivity_indices_table,
+                width=400,
+                max_height=300,
+                height_policy="min",
+            ),
         ),
         pn.Column(
             pn.pane.Markdown(table_description, styles={"color": "#0072b5"}),
