@@ -70,7 +70,9 @@ def colormap_from_single_color(
     return cmap
 
 
-def palette(states: list[int]) -> list[list[float]]:
+def palette(
+    states: list[int], cmaps: list[mpl.colors.LinearSegmentedColormap] = None
+) -> list[list[float]]:
     """Colour palette.
 
     The product of the states gives the number of scenarios. For each
@@ -80,19 +82,29 @@ def palette(states: list[int]) -> list[list[float]]:
     ----------
     states : list of int
         List of possible states for the considered parameter.
-
+    cmaps : list of LinearSegmentedColormap
+        List of colormaps. Must have the same number of colormaps as the number
+        of first level of states.
     Returns
     -------
-    palette : list of int of size (n, 4)
-        List of colours corresponding to scenarios.
+    palette : list of float of size (n, 4)
+        List of colors corresponding to scenarios. RGBA formatted.
     """
+    n_cmaps = states[0]
+    if cmaps is None:
+        cmaps = [mpl.colormaps[cmap] for cmap in SEQUENTIAL_PALETTES[:n_cmaps]]
+    else:
+        if len(cmaps) != cmaps:
+            raise ValueError(
+                "Must have the same number of cmaps as the number of first states"
+            )
+
     colors = []
     # one palette per first level state, could use more palette when there are
     # many levels
     n_shades = int(np.prod(states[1:]))
-    for i in range(states[0]):
-        palette_ = SEQUENTIAL_PALETTES[i]
-        cmap = mpl.colormaps[palette_].resampled(n_shades + 1)
+    for i in range(n_cmaps):
+        cmap = cmaps[i].resampled(n_shades + 1)
         colors.append(cmap(range(1, n_shades + 1)))
 
     return np.concatenate(colors).tolist()
