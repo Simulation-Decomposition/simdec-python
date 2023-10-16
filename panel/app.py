@@ -326,12 +326,12 @@ gstack[0:3, 0:3] = pn.pane.Matplotlib(
     format="svg",
 )
 
-gstack[0:2, 3:5] = pn.Column(
+gstack[0:3, 3:5] = pn.Column(
     pn.pane.Markdown("## Scenarios", styles={"color": blue_color}),
     interactive_tableau,
 )
 
-gstack[2:3, 3:5] = pn.Column(
+gstack[3:4, 3:5] = pn.Column(
     pn.pane.Markdown("## Details on inputs' states", styles={"color": blue_color}),
     interactive_tableau_states,
 )
