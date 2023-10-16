@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import panel as pn
+from panel.layout.gridstack import GridStack
 
 import simdec as sd
 
@@ -14,6 +15,7 @@ import simdec as sd
 # panel app
 pn.extension(template="material")
 pn.extension("tabulator")
+pn.extension("gridstack")
 
 pn.config.sizing_mode = "stretch_width"
 pn.config.throttled = True
@@ -337,34 +339,28 @@ pn_params = pn.layout.WidgetBox(
 ).servable(area="sidebar")
 
 
-pn_app = pn.Column(
-    pn.Row(
-        pn.Column(
-            pn.panel(
-                pn.pane.Matplotlib(
-                    interactive_figure,
-                    tight=True,
-                    format="svg",
-                    sizing_mode="stretch_both",
-                    max_height=500,
-                    height_policy="min",
-                )
-            ),
-            pn.Spacer(height=50),
-            pn.pane.Markdown(si_description, styles={"color": "#0072b5"}),
-            pn.Column(
-                interactive_sensitivity_indices_table,
-                width=400,
-                max_height=300,
-                height_policy="min",
-            ),
-        ),
-        pn.Column(
-            pn.pane.Markdown(table_description, styles={"color": "#0072b5"}),
-            pn.panel(interactive_tableau),
-            pn.Spacer(height=125),
-            pn.pane.Markdown(states_description, styles={"color": "#0072b5"}),
-            pn.panel(interactive_tableau_states),
-        ),
-    ),
-).servable(title="Simulation Decomposition Dashboard")
+gstack = GridStack(sizing_mode="stretch_both", min_height=600)
+
+gstack[0:3, 0:3] = pn.pane.Matplotlib(
+    interactive_figure,
+    tight=True,
+    format="svg",
+)
+
+gstack[0:2, 3:5] = pn.Column(
+    pn.pane.Markdown(table_description, styles={"color": "#0072b5"}),
+    interactive_tableau,
+    sizing_mode="stretch_both",
+)
+
+gstack[2:3, 3:5] = pn.Column(
+    pn.pane.Markdown(states_description, styles={"color": "#0072b5"}),
+    interactive_tableau_states,
+)
+
+gstack[3:5, 0:2] = pn.Column(
+    pn.pane.Markdown(si_description, styles={"color": "#0072b5"}),
+    interactive_sensitivity_indices_table,
+)
+
+gstack.servable(title="Simulation Decomposition Dashboard")
