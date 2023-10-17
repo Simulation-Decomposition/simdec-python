@@ -157,7 +157,7 @@ def visualization(
     elif kind == "boxplot":
         ax = sns.boxplot(
             bins,
-            palette=palette[::-1],
+            palette=palette,
             orient="h",
             order=list(bins.columns)[::-1],
             ax=ax,
