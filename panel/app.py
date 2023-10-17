@@ -343,9 +343,7 @@ interactive_tableau_states = pn.bind(
 
 # App layout
 
-logout = pn.widgets.Button(name="Log out")
-logout.js_on_click(code="""window.location.href = './logout'""")
-
+# Sidebar
 pn_params = pn.layout.WidgetBox(
     pn.pane.Markdown("## Data", styles={"color": blue_color}),
     text_fname,
@@ -359,12 +357,11 @@ pn_params = pn.layout.WidgetBox(
     selector_n_bins,
     dummy_color_pickers_bind,
     color_pickers,
-    # pn.Row(logout),
     max_width=350,
     sizing_mode="stretch_width",
 ).servable(area="sidebar")
 
-
+# Main window
 gstack = GridStack(sizing_mode="stretch_both", min_height=600)
 
 gstack[0:3, 0:3] = pn.pane.Matplotlib(
@@ -389,3 +386,26 @@ gstack[3:5, 0:2] = pn.Column(
 )
 
 gstack.servable(title="Simulation Decomposition Dashboard")
+
+# Header
+info_button = pn.widgets.Button(
+    icon="info-circle", button_type="light", name="More info", width=150
+)
+info_button.js_on_click(code="""window.location.href = 'https://www.simdec.fi/'""")
+
+issue_button = pn.widgets.Button(
+    icon="bug", button_type="danger", name="Report an issue", width=200
+)
+issue_button.js_on_click(
+    code="""window.location.href = 'https://github.com/Simulation-Decomposition/simdec-python/issues'"""
+)
+
+logout_button = pn.widgets.Button(name="Log out", width=100)
+logout_button.js_on_click(code="""window.location.href = './logout'""")
+
+pn.Row(
+    pn.HSpacer(),
+    info_button,
+    issue_button,
+    # logout_button,
+).servable(area="header")
