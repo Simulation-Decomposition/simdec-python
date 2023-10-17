@@ -69,6 +69,7 @@ def sensitivity_indices(inputs, output):
     return indices
 
 
+@pn.cache
 def sensitivity_indices_table(si, inputs):
     var_names = inputs.columns
     var_order = np.argsort(si)[::-1]
@@ -128,6 +129,7 @@ def explained_variance_80(sensitivity_indices_table):
     return input_names.to_list()[: pos_80 + 1]
 
 
+@pn.cache
 def decomposition(dec_limit, si, inputs, output):
     return sd.decomposition(
         inputs=inputs,
@@ -138,6 +140,7 @@ def decomposition(dec_limit, si, inputs, output):
     )
 
 
+@pn.cache
 def base_colors(res):
     all_colors = sd.palette(res.states)
     colors = all_colors[:: res.states[0]]
@@ -162,11 +165,13 @@ def create_color_pickers(states, colors):
     color_pickers[:] = color_picker_list
 
 
+@pn.cache
 def palette(res, colors_picked):
     cmaps = [colormap_from_single_color(color_picked) for color_picked in colors_picked]
     return sd.palette(res.states, cmaps=cmaps)
 
 
+@pn.cache
 def n_bins_auto(res):
     min_ = np.nanmin(res.bins)
     max_ = np.nanmax(res.bins)
@@ -177,6 +182,7 @@ def display_n_bins(kind):
     return False if kind != "Stacked histogram" else True
 
 
+@pn.cache
 def figure(res, palette, n_bins, kind, output_name):
     kind = "histogram" if kind == "Stacked histogram" else "boxplot"
     plt.close("all")
@@ -188,10 +194,12 @@ def figure(res, palette, n_bins, kind, output_name):
     return fig
 
 
+@pn.cache
 def states_from_data(res, inputs):
     return sd.states_expansion(states=res.states, inputs=inputs)
 
 
+@pn.cache
 def tableau(res, states, palette):
     # use a notebook to see the styling
     _, styler = sd.tableau(
@@ -204,6 +212,7 @@ def tableau(res, states, palette):
     return styler
 
 
+@pn.cache
 def tableau_states(res, states):
     data = []
     for var_name, states_, bin_edges in zip(res.var_names, states, res.bin_edges):
