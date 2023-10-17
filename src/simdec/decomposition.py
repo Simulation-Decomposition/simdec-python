@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from hashlib import blake2b
 from typing import Literal
 
 import numpy as np
@@ -45,6 +46,17 @@ class DecompositionResult:
     bins: pd.DataFrame
     states: list[int]
     bin_edges: np.ndarray
+
+    def __reduce__(self):
+        h = blake2b(key=b"result hashing", digest_size=20)
+
+        h.update(str(self.var_names).encode())
+        h.update(str(self.statistic).encode())
+        h.update(str(self.bins).encode())
+        h.update(str(self.states).encode())
+        h.update(str(self.bin_edges).encode())
+
+        return [h.hexdigest()]
 
 
 def decomposition(
