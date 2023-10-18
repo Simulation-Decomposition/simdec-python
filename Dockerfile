@@ -46,4 +46,5 @@ CMD ["panel", "serve", "panel/app.py", \
      "--cookie-secret", "panel_cookie_secret", \
      "--basic-login-template", "panel/login.html", \
      "--logout-template", "panel/logout.html", \
-     "--static-dirs", "_static=_static"]
+     "--static-dirs", "_static=_static", \
+     "--reuse-sessions", "--global-loading-spinner"]

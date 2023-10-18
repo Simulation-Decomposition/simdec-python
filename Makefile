@@ -39,14 +39,15 @@ test:  ## Run tests with coverage
 	pytest --cov simdec --cov-report term-missing
 
 serve-dev:  ## Serve Panel dashboard - Dev mode
-	panel serve panel/app.py --show --autoreload
+	panel serve panel/app.py --show --autoreload --reuse-sessions --global-loading-spinner
 
 serve:  ## Serve Panel dashboard - Prod mode
 	PANEL_BASIC_AUTH=$(PANEL_TOKEN) panel serve panel/app.py \
 		--cookie-secret panel_cookie_secret \
 		--basic-login-template panel/login.html \
 		--logout-template panel/logout.html \
-		--static-dirs _static=docs/_static
+		--static-dirs _static=docs/_static \
+		--reuse-sessions --global-loading-spinner
 
 build-local:
 	docker build -f ./Dockerfile \
