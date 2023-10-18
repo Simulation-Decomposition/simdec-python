@@ -89,8 +89,10 @@ publish-production: build
 production: publish-production
 	@echo "Deploying '$(version)'."
 	gcloud run deploy simdec-panel \
-	                  --concurrency=10 \
-	                  --max-instances=1 \
+					  --cpu=2 \
+	                  --concurrency=5 \
+	                  --min-instances=0 \
+	                  --max-instances=2 \
 	                  --region=$(region) \
 	                  --port=8080 \
 	                  --set-env-vars ENV=production \
@@ -99,4 +101,4 @@ production: publish-production
 	                  --timeout=600 \
 	                  --service-account simdec-panel@delta-entity-401706.iam.gserviceaccount.com \
 	                  --image=$(region)-docker.pkg.dev/$(project)/simdec-panel/simdec-panel:$(version) \
-	                  --memory 1Gi
+	                  --memory 2Gi

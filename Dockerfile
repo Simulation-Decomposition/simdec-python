@@ -42,7 +42,7 @@ WORKDIR /app
 
 # Run the web service on container startup.
 CMD ["panel", "serve", "panel/app.py", \
-     "--address", "0.0.0.0", "--port", "8080", "--num-procs", "1", "--allow-websocket-origin", "*", \
+     "--address", "0.0.0.0", "--port", "8080", "--num-procs", "2", "--allow-websocket-origin", "*", \
      "--cookie-secret", "panel_cookie_secret", \
      "--basic-login-template", "panel/login.html", \
      "--logout-template", "panel/logout.html", \
