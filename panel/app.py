@@ -439,7 +439,7 @@ info_button = pn.widgets.Button(
     width=150,
     align="center",
 )
-info_button.js_on_click(code="""window.location.href = 'https://www.simdec.fi/'""")
+info_button.js_on_click(code="""window.open('https://www.simdec.fi/')""")
 
 issue_button = pn.widgets.Button(
     icon="bug",
@@ -450,7 +450,7 @@ issue_button = pn.widgets.Button(
     align="center",
 )
 issue_button.js_on_click(
-    code="""window.location.href = 'https://github.com/Simulation-Decomposition/simdec-python/issues'"""
+    code="""window.open('https://github.com/Simulation-Decomposition/simdec-python/issues')"""
 )
 
 logout_button = pn.widgets.Button(name="Log out", width=100)
