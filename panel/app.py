@@ -234,7 +234,9 @@ def csv_data(
 ) -> io.StringIO:
     sio = io.StringIO()
 
-    sensitivity_indices.value.to_csv(sio)
+    si_table = sensitivity_indices.value[["Inputs", ""]]
+    si_table.rename(columns={"": "Indices"}, inplace=True)
+    si_table.to_csv(sio, index=False)
     scenario.data.to_csv(sio)
     states.data.to_csv(sio)
 
