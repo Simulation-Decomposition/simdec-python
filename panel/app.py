@@ -7,6 +7,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from pandas.io.formats.style import Styler
 import panel as pn
 from panel.layout.gridstack import GridStack
 
@@ -228,6 +229,19 @@ def tableau_states(res, states):
     return styler
 
 
+def csv_data(
+    sensitivity_indices: pn.widgets.Tabulator, scenario: Styler, states: Styler
+) -> io.StringIO:
+    sio = io.StringIO()
+
+    sensitivity_indices.value.to_csv(sio)
+    scenario.data.to_csv(sio)
+    states.data.to_csv(sio)
+
+    sio.seek(0)
+    return sio
+
+
 # Bindings
 text_fname = pn.widgets.FileInput(sizing_mode="stretch_width", accept=".csv")
 
@@ -397,13 +411,43 @@ gstack[3:5, 0:2] = pn.Column(
 gstack.servable(title="Simulation Decomposition Dashboard")
 
 # Header
+icon_size = "1.5em"
+
+download_file_button = pn.widgets.FileDownload(
+    callback=pn.bind(
+        csv_data,
+        interactive_sensitivity_indices_table,
+        interactive_tableau,
+        interactive_tableau_states,
+    ),
+    icon="file-download",
+    icon_size=icon_size,
+    button_type="success",
+    filename="simdec.csv",
+    width=150,
+    height_policy="min",
+    label="Download",
+    styles={"margin-top": "0"},
+    # align="center"  # does not work
+)
+
 info_button = pn.widgets.Button(
-    icon="info-circle", button_type="light", name="More info", width=150
+    icon="info-circle",
+    icon_size=icon_size,
+    button_type="light",
+    name="More info",
+    width=150,
+    align="center",
 )
 info_button.js_on_click(code="""window.location.href = 'https://www.simdec.fi/'""")
 
 issue_button = pn.widgets.Button(
-    icon="bug", button_type="danger", name="Report an issue", width=200
+    icon="bug",
+    icon_size=icon_size,
+    button_type="danger",
+    name="Report an issue",
+    width=200,
+    align="center",
 )
 issue_button.js_on_click(
     code="""window.location.href = 'https://github.com/Simulation-Decomposition/simdec-python/issues'"""
@@ -414,6 +458,7 @@ logout_button.js_on_click(code="""window.location.href = './logout'""")
 
 pn.Row(
     pn.HSpacer(),
+    download_file_button,
     info_button,
     issue_button,
     # logout_button,
