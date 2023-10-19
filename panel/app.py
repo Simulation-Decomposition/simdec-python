@@ -16,9 +16,19 @@ from simdec.visualization import colormap_from_single_color
 
 
 # panel app
-pn.extension(template="material")
 pn.extension("tabulator")
 pn.extension("gridstack")
+
+template = pn.template.MaterialTemplate(
+    title="Simulation Decomposition Dashboard",
+    # logo="_static/logo.gif",
+    favicon="_static/favicon.png",
+    meta_description="Simulation Decomposition",
+    meta_keywords=(
+        "Sensitivity Analysis, Visualization, Data Analysis, Auditing, "
+        "Factors priorization, Colorization, Histogram"
+    ),
+)
 
 pn.config.sizing_mode = "stretch_width"
 pn.config.throttled = True
@@ -369,7 +379,7 @@ interactive_tableau_states = pn.bind(
 # App layout
 
 # Sidebar
-pn_params = pn.layout.WidgetBox(
+sidebar_area = pn.layout.WidgetBox(
     pn.pane.Markdown("## Data", styles={"color": blue_color}),
     text_fname,
     selector_output,
@@ -384,33 +394,37 @@ pn_params = pn.layout.WidgetBox(
     color_pickers,
     max_width=350,
     sizing_mode="stretch_width",
-).servable(area="sidebar")
+)
+
+template.sidebar.append(sidebar_area)
 
 # Main window
-gstack = GridStack(name="SimDec Analysis", sizing_mode="stretch_both", min_height=600)
+main_area = GridStack(
+    name="SimDec Analysis", sizing_mode="stretch_both", min_height=600
+)
 
-gstack[0:3, 0:3] = pn.pane.Matplotlib(
+main_area[0:3, 0:3] = pn.pane.Matplotlib(
     interactive_figure,
     tight=True,
     format="svg",
 )
 
-gstack[0:3, 3:5] = pn.Column(
+main_area[0:3, 3:5] = pn.Column(
     pn.pane.Markdown("## Scenarios", styles={"color": blue_color}),
     interactive_tableau,
 )
 
-gstack[3:5, 3:5] = pn.Column(
+main_area[3:5, 3:5] = pn.Column(
     pn.pane.Markdown("## Details on inputs' states", styles={"color": blue_color}),
     interactive_tableau_states,
 )
 
-gstack[3:5, 0:2] = pn.Column(
+main_area[3:5, 0:2] = pn.Column(
     pn.pane.Markdown("## Sensitivity Indices", styles={"color": blue_color}),
     interactive_sensitivity_indices_table,
 )
 
-gstack.servable(title="Simulation Decomposition Dashboard")
+template.main.append(main_area)
 
 # Header
 icon_size = "1.5em"
@@ -458,10 +472,15 @@ issue_button.js_on_click(
 logout_button = pn.widgets.Button(name="Log out", width=100)
 logout_button.js_on_click(code="""window.location.href = './logout'""")
 
-pn.Row(
+header_area = pn.Row(
     pn.HSpacer(),
     download_file_button,
     info_button,
     issue_button,
     # logout_button,
-).servable(area="header")
+)
+
+template.header.append(header_area)
+
+# serve the template
+template.servable()

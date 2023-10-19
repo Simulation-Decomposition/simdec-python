@@ -39,7 +39,10 @@ test:  ## Run tests with coverage
 	pytest --cov simdec --cov-report term-missing
 
 serve-dev:  ## Serve Panel dashboard - Dev mode
-	panel serve panel/app.py --show --autoreload --reuse-sessions --global-loading-spinner
+	panel serve panel/app.py \
+ 		--show --autoreload \
+ 		--static-dirs _static=docs/_static \
+ 		--reuse-sessions --global-loading-spinner
 
 serve:  ## Serve Panel dashboard - Prod mode
 	PANEL_BASIC_AUTH=$(PANEL_TOKEN) panel serve panel/app.py \
