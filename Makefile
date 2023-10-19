@@ -42,7 +42,7 @@ serve-dev:  ## Serve Panel dashboard - Dev mode
 	panel serve panel/app.py \
  		--show --autoreload \
  		--static-dirs _static=docs/_static \
- 		--reuse-sessions --global-loading-spinner
+ 		--reuse-sessions --warm
 
 serve:  ## Serve Panel dashboard - Prod mode
 	PANEL_BASIC_AUTH=$(PANEL_TOKEN) panel serve panel/app.py \
@@ -50,7 +50,7 @@ serve:  ## Serve Panel dashboard - Prod mode
 		--basic-login-template panel/login.html \
 		--logout-template panel/logout.html \
 		--static-dirs _static=docs/_static \
-		--reuse-sessions --global-loading-spinner
+		--reuse-sessions --warm
 
 build-local:
 	docker build -f ./Dockerfile \
