@@ -169,7 +169,7 @@ def update_colors_select(event):
 
 def create_color_pickers(states, colors):
     color_picker_list = []
-    for state, color in zip(states[0][::-1], colors):
+    for state, color in zip(states[0], colors):
         color_picker = pn.widgets.ColorPicker(name=state, value=color)
         color_picker.param.watch(update_colors_select, "value")
         color_picker_list.append(color_picker)
@@ -179,7 +179,7 @@ def create_color_pickers(states, colors):
 @pn.cache
 def palette(res, colors_picked):
     cmaps = [colormap_from_single_color(color_picked) for color_picked in colors_picked]
-    return sd.palette(res.states, cmaps=cmaps)
+    return sd.palette(res.states[::-1], cmaps=cmaps[::-1])
 
 
 @pn.cache
