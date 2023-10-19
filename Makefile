@@ -98,6 +98,7 @@ production: publish-production
 	                  --set-env-vars ENV=production \
 	                  --set-secrets=PANEL_BASIC_AUTH=PANEL_TOKEN:latest \
 	                  --allow-unauthenticated \
+	                  --session-affinity \
 	                  --timeout=600 \
 	                  --service-account simdec-panel@delta-entity-401706.iam.gserviceaccount.com \
 	                  --image=$(region)-docker.pkg.dev/$(project)/simdec-panel/simdec-panel:$(version) \
