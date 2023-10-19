@@ -156,7 +156,7 @@ def base_colors(res):
     all_colors = sd.palette(res.states)
     colors = all_colors[:: res.states[0]]
     colors = [mpl.colors.rgb2hex(color, keep_alpha=False) for color in colors]
-    return colors
+    return colors[: res.states[0]]  # ensure not more colors than states
 
 
 def update_colors_select(event):
