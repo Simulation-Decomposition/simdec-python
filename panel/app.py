@@ -12,7 +12,7 @@ import panel as pn
 from panel.layout.gridstack import GridStack
 
 import simdec as sd
-from simdec.visualization import colormap_from_single_color
+from simdec.visualization import single_color_to_colormap
 
 
 # panel app
@@ -178,7 +178,7 @@ def create_color_pickers(states, colors):
 
 @pn.cache
 def palette(res, colors_picked):
-    cmaps = [colormap_from_single_color(color_picked) for color_picked in colors_picked]
+    cmaps = [single_color_to_colormap(color_picked) for color_picked in colors_picked]
     return sd.palette(res.states[::-1], cmaps=cmaps[::-1])
 
 

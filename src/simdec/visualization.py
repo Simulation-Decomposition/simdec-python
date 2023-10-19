@@ -1,3 +1,4 @@
+import functools
 import itertools
 from typing import Literal
 
@@ -13,6 +14,11 @@ __all__ = ["visualization", "tableau", "palette"]
 
 
 SEQUENTIAL_PALETTES = [
+    "#DC267F",
+    "#E8EA2F",
+    "#26DCD1",
+    "#C552E4",
+    "#3F45D0",
     "Oranges",
     "Purples",
     "Reds",
@@ -34,7 +40,20 @@ SEQUENTIAL_PALETTES = [
 ]
 
 
-def colormap_from_single_color(
+@functools.cache
+def sequential_cmaps():
+    cmaps = []
+    for cmap in SEQUENTIAL_PALETTES:
+        try:
+            cmap_ = mpl.colormaps[cmap]
+        except KeyError:
+            color = mpl.colors.hex2color(cmap)
+            cmap_ = single_color_to_colormap(color)
+        cmaps.append(cmap_)
+    return cmaps
+
+
+def single_color_to_colormap(
     rgba_color: list[float] | str, *, factor: float = 0.5
 ) -> mpl.colors.LinearSegmentedColormap:
     """Create a linear colormap using a single color."""
@@ -92,7 +111,7 @@ def palette(
     """
     n_cmaps = states[0]
     if cmaps is None:
-        cmaps = [mpl.colormaps[cmap] for cmap in SEQUENTIAL_PALETTES[:n_cmaps]]
+        cmaps = sequential_cmaps()[:n_cmaps]
     else:
         cmaps = cmaps[:n_cmaps]
         if len(cmaps) != n_cmaps:
