@@ -353,7 +353,9 @@ colors_select = pn.widgets.MultiSelect(
 )
 
 dummy_color_pickers_bind = pn.bind(
-    create_color_pickers, interactive_states, colors_select.param.value, watch=True
+    create_color_pickers,
+    interactive_states,
+    colors_select.param.value,
 )
 
 interactive_palette = pn.bind(
