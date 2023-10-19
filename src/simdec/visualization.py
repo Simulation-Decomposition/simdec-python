@@ -48,7 +48,7 @@ def sequential_cmaps():
             cmap_ = mpl.colormaps[cmap]
         except KeyError:
             color = mpl.colors.hex2color(cmap)
-            cmap_ = single_color_to_colormap(color)
+            cmap_ = single_color_to_colormap(color, factor=0.0)
         cmaps.append(cmap_)
     return cmaps
 

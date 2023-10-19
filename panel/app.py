@@ -12,7 +12,7 @@ import panel as pn
 from panel.layout.gridstack import GridStack
 
 import simdec as sd
-from simdec.visualization import single_color_to_colormap
+from simdec.visualization import sequential_cmaps, single_color_to_colormap
 
 
 # panel app
@@ -153,10 +153,14 @@ def decomposition(dec_limit, si, inputs, output):
 
 @pn.cache
 def base_colors(res):
-    all_colors = sd.palette(res.states)
-    colors = all_colors[:: res.states[0]]
-    colors = [mpl.colors.rgb2hex(color, keep_alpha=False) for color in colors]
-    return colors[: res.states[0]]  # ensure not more colors than states
+    colors = []
+    # ensure not more colors than states
+    for cmap in sequential_cmaps()[: res.states[0]]:
+        color = cmap.resampled(1)(1)
+        color = mpl.colors.rgb2hex(color, keep_alpha=False)
+        colors.append(color)
+
+    return colors
 
 
 def update_colors_select(event):
