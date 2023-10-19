@@ -387,7 +387,7 @@ pn_params = pn.layout.WidgetBox(
 ).servable(area="sidebar")
 
 # Main window
-gstack = GridStack(sizing_mode="stretch_both", min_height=600)
+gstack = GridStack(name="SimDec Analysis", sizing_mode="stretch_both", min_height=600)
 
 gstack[0:3, 0:3] = pn.pane.Matplotlib(
     interactive_figure,
