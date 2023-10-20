@@ -14,11 +14,6 @@ ifndef project
    override project = delta-entity-401706
 endif
 
-ifndef PANEL_TOKEN
-   # only for local dev, another token is used for deployment
-   override PANEL_TOKEN = e41ea4c145bf13a60c8779c24356
-endif
-
 
 # Add help text after each target name starting with '\#\#'
 help:   ## show this help
@@ -44,11 +39,19 @@ serve-dev:  ## Serve Panel dashboard - Dev mode
  		--static-dirs _static=docs/_static \
  		--reuse-sessions --warm
 
-serve:  ## Serve Panel dashboard - Prod mode
-	PANEL_BASIC_AUTH=$(PANEL_TOKEN) panel serve panel/app.py \
+serve:  ## Serve Panel dashboard - Prod mode with basic auth
+	panel serve panel/app.py \
 		--cookie-secret panel_cookie_secret \
 		--basic-login-template panel/login.html \
 		--logout-template panel/logout.html \
+		--static-dirs _static=docs/_static \
+		--reuse-sessions --warm
+
+serve-oauth:  ## Serve Panel dashboard - Prod mode with OAuth2
+	panel serve panel/app.py \
+		--cookie-secret panel_cookie_secret \
+		--logout-template panel/logout.html \
+		--oauth-provider google \
 		--static-dirs _static=docs/_static \
 		--reuse-sessions --warm
 
@@ -99,7 +102,9 @@ production: publish-production
 	                  --region=$(region) \
 	                  --port=8080 \
 	                  --set-env-vars ENV=production \
-	                  --set-secrets=PANEL_BASIC_AUTH=PANEL_TOKEN:latest \
+	                  --set-secrets=PANEL_OAUTH_REDIRECT_URI=PANEL_OAUTH_REDIRECT_URI:latest \
+	                  --set-secrets=PANEL_OAUTH_KEY=PANEL_OAUTH_KEY:latest \
+	                  --set-secrets=PANEL_OAUTH_SECRET=PANEL_OAUTH_SECRET:latest \
 	                  --allow-unauthenticated \
 	                  --session-affinity \
 	                  --timeout=600 \

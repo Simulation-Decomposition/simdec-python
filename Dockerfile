@@ -44,7 +44,7 @@ WORKDIR /app
 CMD ["panel", "serve", "panel/app.py", \
      "--address", "0.0.0.0", "--port", "8080", "--num-procs", "2", "--allow-websocket-origin", "*", \
      "--cookie-secret", "panel_cookie_secret", \
-     "--basic-login-template", "panel/login.html", \
      "--logout-template", "panel/logout.html", \
+     "--oauth-provider", "google", \
      "--static-dirs", "_static=_static", \
-     "--reuse-sessions", "--global-loading-spinner"]
+     "--reuse-sessions", "--warm"]
