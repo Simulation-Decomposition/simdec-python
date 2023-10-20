@@ -56,17 +56,12 @@ def column_inputs(data, output):
 
 
 @pn.cache
-def filtered_inputs(data, input_names):
-    return data[input_names]
-
-
-@pn.cache
 def column_output(data):
     return list(data.columns)
 
 
 @pn.cache
-def filtered_output(data, output_name):
+def filtered_data(data, output_name):
     return data[output_name]
 
 
@@ -271,14 +266,14 @@ interactive_output_ = pn.bind(lambda x: x[0], interactive_column_output)
 selector_output = pn.widgets.Select(
     name="Output", value=interactive_output_, options=interactive_column_output
 )
-interactive_output = pn.bind(filtered_output, interactive_file, selector_output)
+interactive_output = pn.bind(filtered_data, interactive_file, selector_output)
 
 interactive_column_input = pn.bind(column_inputs, interactive_file, selector_output)
 selector_inputs_sensitivity = pn.widgets.MultiSelect(
     name="Inputs", value=interactive_column_input, options=interactive_column_input
 )
 interactive_inputs = pn.bind(
-    filtered_inputs, interactive_file, selector_inputs_sensitivity
+    filtered_data, interactive_file, selector_inputs_sensitivity
 )
 
 interactive_sensitivity_indices = pn.bind(
@@ -302,7 +297,7 @@ selector_inputs_decomposition = pn.widgets.MultiChoice(
     solid=False,
 )
 interactive_inputs_decomposition = pn.bind(
-    filtered_output, interactive_file, selector_inputs_decomposition
+    filtered_data, interactive_file, selector_inputs_decomposition
 )
 
 interactive_filtered_si = pn.bind(
