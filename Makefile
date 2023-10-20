@@ -41,7 +41,7 @@ serve-dev:  ## Serve Panel dashboard - Dev mode
 
 serve:  ## Serve Panel dashboard - Prod mode with basic auth
 	panel serve panel/app.py \
-		--cookie-secret panel_cookie_secret \
+		--cookie-secret panel_cookie_secret_oauth \
 		--basic-login-template panel/login.html \
 		--logout-template panel/logout.html \
 		--static-dirs _static=docs/_static \
@@ -49,7 +49,7 @@ serve:  ## Serve Panel dashboard - Prod mode with basic auth
 
 serve-oauth:  ## Serve Panel dashboard - Prod mode with OAuth2
 	panel serve panel/app.py \
-		--cookie-secret panel_cookie_secret \
+		--cookie-secret panel_cookie_secret_oauth \
 		--logout-template panel/logout.html \
 		--oauth-provider google \
 		--static-dirs _static=docs/_static \
