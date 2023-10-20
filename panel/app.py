@@ -137,7 +137,9 @@ def explained_variance_80(sensitivity_indices_table):
     # pos_80 = min(len(si), pos_80)
 
     input_names = sensitivity_indices_table.value["Inputs"]
-    return input_names.to_list()[: pos_80 + 1]
+    input_names = input_names.to_list()
+    input_names.remove("Sum of Indices")
+    return input_names[: pos_80 + 1]
 
 
 @pn.cache
