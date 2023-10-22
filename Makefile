@@ -27,11 +27,15 @@ prepare:  ## Install dependencies and pre-commit hook
 	gcloud init
 	gcloud auth configure-docker europe-north1-docker.pkg.dev
 
+# Doc and tests
+
 doc:  ## Build Sphinx documentation
 	sphinx-build -b html docs docs/html
 
 test:  ## Run tests with coverage
 	pytest --cov simdec --cov-report term-missing
+
+# Dashboard commands
 
 serve-dev:  ## Serve Panel dashboard - Dev mode
 	panel serve panel/app.py \
@@ -39,7 +43,7 @@ serve-dev:  ## Serve Panel dashboard - Dev mode
  		--static-dirs _static=docs/_static \
  		--reuse-sessions --warm
 
-serve:  ## Serve Panel dashboard - Prod mode with basic auth
+serve:  ## Serve Panel dashboard - Prod mode with basic auth. Needs: PANEL_TOKEN
 	panel serve panel/app.py \
 		--show \
 		--cookie-secret panel_cookie_secret_oauth \
@@ -48,7 +52,7 @@ serve:  ## Serve Panel dashboard - Prod mode with basic auth
 		--static-dirs _static=docs/_static \
 		--reuse-sessions --warm
 
-serve-oauth:  ## Serve Panel dashboard - Prod mode with OAuth2
+serve-oauth:  ## Serve Panel dashboard - Prod mode with OAuth2. Needs: PANEL_OAUTH_REDIRECT_URI, PANEL_OAUTH_KEY, PANEL_OAUTH_SECRET
 	panel serve panel/app.py \
 		--show \
 		--cookie-secret panel_cookie_secret_oauth \
@@ -57,22 +61,25 @@ serve-oauth:  ## Serve Panel dashboard - Prod mode with OAuth2
 		--static-dirs _static=docs/_static \
 		--reuse-sessions --warm
 
+# Deployment commands
+
 build-local:
 	docker build -f ./Dockerfile \
 		--build-arg PANEL_TOKEN=$(PANEL_TOKEN) \
-		--tag simdec-panel:$(version) \
+		--tag simdec-panel-local:$(version) \
 	    --pull \
 	    ./.
 
 run-local: build-local
 	docker run --rm -it \
-    --name=simdec-panel \
+    --name=simdec-panel-local \
 	--memory=1g \
 	--cpuset-cpus=0 \
 	-e ENV=development \
 	-p "8080:8080" \
-	simdec-panel:$(version)
+	simdec-panel-local:$(version)
 
+# Need to specifically build on linux/amd64 to avoid issues on macOS M platform
 build:
 	docker build -f ./Dockerfile \
 		--platform linux/amd64 \
@@ -89,6 +96,8 @@ run: build
 	-e ENV=development \
 	-p "8080:8080" \
 	simdec-panel:$(version)
+
+# Ship
 
 publish-production: build
 	docker tag simdec-panel:$(version) $(region)-docker.pkg.dev/$(project)/simdec-panel/simdec-panel:$(version)

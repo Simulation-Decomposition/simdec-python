@@ -178,10 +178,21 @@ A few helper commands are provided in the Makefile.
 
 The dashboard can be run locally using:
 
-    make serve
+    make serve-dev
+
+If you want to test OAuth, you need to export the following env variables:
+
+    export PANEL_OAUTH_REDIRECT_URI=http://localhost:5006/app
+    export PANEL_OAUTH_KEY=[VALUE IN GCP]
+    export PANEL_OAUTH_SECRET=[VALUE IN GCP]
+
+Use the CLI tool `direnv` for convenience. Then you can serve with
+OAuth support:
+
+    make serve-oauth
 
 ### Deployment
 
-To deploy a new version:
+New version can either be deployed from the CI with `cloudbuild` or locally:
 
-    PANEL_TOKEN=... make production
+    make production
