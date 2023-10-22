@@ -42,7 +42,10 @@ WORKDIR /app
 
 # Run the web service on container startup.
 CMD ["panel", "serve", "panel/app.py", \
-     "--address", "0.0.0.0", "--port", "8080", "--num-procs", "2", "--allow-websocket-origin", "*", \
+     "--address", "0.0.0.0", "--port", "8080", \
+     "--num-procs", "2", \
+     "--allow-websocket-origin", "simdec.io", \
+     "--allow-websocket-origin", "www.simdec.io", \
      "--cookie-secret", "panel_cookie_secret_oauth", \
      "--logout-template", "panel/logout.html", \
      "--oauth-provider", "google", \
