@@ -41,6 +41,7 @@ serve-dev:  ## Serve Panel dashboard - Dev mode
 
 serve:  ## Serve Panel dashboard - Prod mode with basic auth
 	panel serve panel/app.py \
+		--show \
 		--cookie-secret panel_cookie_secret_oauth \
 		--basic-login-template panel/login.html \
 		--logout-template panel/logout.html \
@@ -49,6 +50,7 @@ serve:  ## Serve Panel dashboard - Prod mode with basic auth
 
 serve-oauth:  ## Serve Panel dashboard - Prod mode with OAuth2
 	panel serve panel/app.py \
+		--show \
 		--cookie-secret panel_cookie_secret_oauth \
 		--logout-template panel/logout.html \
 		--oauth-provider google \
@@ -107,7 +109,7 @@ production: publish-production
 	                  --set-secrets=PANEL_OAUTH_SECRET=PANEL_OAUTH_SECRET:latest \
 	                  --allow-unauthenticated \
 	                  --session-affinity \
-	                  --timeout=600 \
+	                  --timeout=60m \
 	                  --service-account simdec-panel@delta-entity-401706.iam.gserviceaccount.com \
 	                  --image=$(region)-docker.pkg.dev/$(project)/simdec-panel/simdec-panel:$(version) \
 	                  --memory 2Gi
