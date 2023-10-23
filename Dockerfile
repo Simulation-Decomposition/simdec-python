@@ -42,7 +42,7 @@ CMD ["panel", "serve", "panel/app.py", \
      "--num-procs", "2", \
      "--allow-websocket-origin", "simdec.io", \
      "--allow-websocket-origin", "www.simdec.io", \
-     "--allow-websocket-origin", "https://simdec-panel-h6musew72q-lz.a.run.app", \
+     "--allow-websocket-origin", "simdec-panel-h6musew72q-lz.a.run.app", \
      "--cookie-secret", "panel_cookie_secret_oauth", \
      "--logout-template", "panel/logout.html", \
      "--oauth-provider", "google", \
