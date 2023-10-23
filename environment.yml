@@ -3,14 +3,14 @@ channels:
   - conda-forge
 dependencies:
   # required
-  - python>=3.9
+  - python>=3.10
   - numpy
   - pandas
   - salib
   - seaborn
-  # CLI and Dashboard
-  - typer
+  # Dashboard
   - panel
+  - cryptography
   # tests
   - pytest
   - pytest-cov

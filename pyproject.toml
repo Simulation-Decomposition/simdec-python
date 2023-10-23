@@ -38,6 +38,7 @@ dependencies = [
 [project.optional-dependencies]
 dashboard = [
     "panel",
+    "cryptography",
 ]
 
 test = [
