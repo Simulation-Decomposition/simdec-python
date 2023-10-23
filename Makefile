@@ -120,6 +120,7 @@ production: publish-production
 	                  --set-secrets=PANEL_OAUTH_REDIRECT_URI=PANEL_OAUTH_REDIRECT_URI:latest \
 	                  --set-secrets=PANEL_OAUTH_KEY=PANEL_OAUTH_KEY:latest \
 	                  --set-secrets=PANEL_OAUTH_SECRET=PANEL_OAUTH_SECRET:latest \
+	                  --set-secrets=PANEL_OAUTH_ENCRYPTION=PANEL_OAUTH_ENCRYPTION:latest \
 	                  --allow-unauthenticated \
 	                  --session-affinity \
 	                  --timeout=60m \

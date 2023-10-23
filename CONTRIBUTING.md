@@ -183,8 +183,9 @@ The dashboard can be run locally using:
 If you want to test OAuth, you need to export the following env variables:
 
     export PANEL_OAUTH_REDIRECT_URI=http://localhost:5006/app
-    export PANEL_OAUTH_KEY=[VALUE IN GCP]
-    export PANEL_OAUTH_SECRET=[VALUE IN GCP]
+    export PANEL_OAUTH_KEY=[VALUE IN GCP Secret Manager]
+    export PANEL_OAUTH_SECRET=[VALUE IN GCP Secret Manager]
+    export PANEL_OAUTH_ENCRYPTION=[VALUE IN GCP Secret Manager]
 
 Use the CLI tool `direnv` for convenience. Then you can serve with
 OAuth support:
