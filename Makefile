@@ -76,7 +76,10 @@ run-local: build-local
 	--memory=1g \
 	--cpuset-cpus=0 \
 	-e ENV=development \
-	-p "8080:8080" \
+	-e PANEL_OAUTH_REDIRECT_URI=$(PANEL_OAUTH_REDIRECT_URI) \
+	-e PANEL_OAUTH_SECRET=$(PANEL_OAUTH_SECRET) \
+	-e PANEL_OAUTH_KEY=$(PANEL_OAUTH_KEY) \
+	-p "5006:8080" \
 	simdec-panel-local:$(version)
 
 # Need to specifically build on linux/amd64 to avoid issues on macOS M platform
@@ -94,7 +97,10 @@ run: build
 	--memory=1g \
 	--cpuset-cpus=0 \
 	-e ENV=development \
-	-p "8080:8080" \
+	-e PANEL_OAUTH_REDIRECT_URI=$(PANEL_OAUTH_REDIRECT_URI) \
+	-e PANEL_OAUTH_SECRET=$(PANEL_OAUTH_SECRET) \
+	-e PANEL_OAUTH_KEY=$(PANEL_OAUTH_KEY) \
+	-p "5006:8080" \
 	simdec-panel:$(version)
 
 # Ship
