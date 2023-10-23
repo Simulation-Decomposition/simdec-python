@@ -14,7 +14,7 @@ COPY pyproject.toml README.md /
 RUN --mount=type=cache,target=/var/cache/apt apt install -y gcc git
 RUN --mount=type=cache,mode=0777,target=/root/.cache/pip \
     pip install --upgrade pip setuptools wheel && \
-    pip install -e .  && \
+    pip install -e ".[dashboard]"  && \
     mkdir -p /app/src
 
 COPY src /app/src

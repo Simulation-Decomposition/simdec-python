@@ -7,7 +7,7 @@ name = "simdec"
 version = "1.2.0dev0"
 description = "Sensitivity analysis using simulation decomposition"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 license = "BSD-3-Clause"
 authors = [
     { name = "Pamphile Roy" },
@@ -23,9 +23,9 @@ classifiers = [
     "Operating System :: OS Independent",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
 ]
 
 dependencies = [
@@ -33,11 +33,13 @@ dependencies = [
     "pandas",
     "SALib",
     "seaborn",
-    "typer[all]",
-    "panel",
 ]
 
 [project.optional-dependencies]
+dashboard = [
+    "panel",
+]
+
 test = [
     "pytest",
     "pytest-cov",
@@ -51,13 +53,10 @@ doc = [
 ]
 
 dev = [
-    "simdec[doc,test]",
+    "simdec[doc,test,dashboard]",
     "pre-commit",
     "hatch",
 ]
-
-[project.scripts]
-simdec = "simdec.workflow:app"
 
 [project.urls]
 homepage = "https://www.simdec.fi/"
