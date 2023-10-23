@@ -65,7 +65,6 @@ serve-oauth:  ## Serve Panel dashboard - Prod mode with OAuth2. Needs: PANEL_OAU
 
 build-local:
 	docker build -f ./Dockerfile \
-		--build-arg PANEL_TOKEN=$(PANEL_TOKEN) \
 		--tag simdec-panel-local:$(version) \
 	    --pull \
 	    ./.
@@ -86,7 +85,6 @@ run-local: build-local
 build:
 	docker build -f ./Dockerfile \
 		--platform linux/amd64 \
-		--build-arg PANEL_TOKEN=$(PANEL_TOKEN) \
 		--tag simdec-panel:$(version) \
 	    --pull \
 	    ./.
