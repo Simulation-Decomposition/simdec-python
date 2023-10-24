@@ -47,4 +47,5 @@ CMD ["panel", "serve", "panel/app.py", \
      "--logout-template", "panel/logout.html", \
      "--oauth-provider", "google", \
      "--static-dirs", "_static=_static", \
-     "--reuse-sessions", "--warm"]
+     "--reuse-sessions", "--warm", \
+     "--global-loading-spinner"]

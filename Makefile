@@ -76,6 +76,7 @@ run-local: build-local
 	--memory=1g \
 	--cpuset-cpus=0 \
 	-e ENV=development \
+	-e PANEL_OAUTH_SCOPE=email \
 	-e PANEL_OAUTH_REDIRECT_URI=$(PANEL_OAUTH_REDIRECT_URI) \
 	-e PANEL_OAUTH_SECRET=$(PANEL_OAUTH_SECRET) \
 	-e PANEL_OAUTH_KEY=$(PANEL_OAUTH_KEY) \
@@ -96,6 +97,7 @@ run: build
 	--memory=1g \
 	--cpuset-cpus=0 \
 	-e ENV=development \
+	-e PANEL_OAUTH_SCOPE=email \
 	-e PANEL_OAUTH_REDIRECT_URI=$(PANEL_OAUTH_REDIRECT_URI) \
 	-e PANEL_OAUTH_SECRET=$(PANEL_OAUTH_SECRET) \
 	-e PANEL_OAUTH_KEY=$(PANEL_OAUTH_KEY) \

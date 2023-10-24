@@ -409,25 +409,21 @@ main_area = GridStack(
     name="SimDec Analysis", sizing_mode="stretch_both", min_height=600
 )
 
-main_area[0:3, 0:3] = pn.pane.Matplotlib(
-    interactive_figure,
-    tight=True,
-    format="svg",
-)
+main_area[0:3, 0:3] = pn.panel(interactive_figure, loading_indicator=True)
 
 main_area[0:3, 3:5] = pn.Column(
     pn.pane.Markdown("## Scenarios", styles={"color": blue_color}),
-    interactive_tableau,
+    pn.panel(interactive_tableau, loading_indicator=True),
 )
 
 main_area[3:5, 3:5] = pn.Column(
     pn.pane.Markdown("## Details on inputs' states", styles={"color": blue_color}),
-    interactive_tableau_states,
+    pn.panel(interactive_tableau_states, loading_indicator=True),
 )
 
 main_area[3:5, 0:2] = pn.Column(
     pn.pane.Markdown("## Sensitivity Indices", styles={"color": blue_color}),
-    interactive_sensitivity_indices_table,
+    pn.panel(interactive_sensitivity_indices_table, loading_indicator=True),
 )
 
 template.main.append(main_area)
