@@ -103,6 +103,7 @@ def sensitivity_indices_table(si, inputs):
         frozen_rows=[-1],
         # page_size=5,
         # pagination='local',
+        layout="fit_columns",
     )
     widget.style.apply(
         lambda x: ["font-style: italic"] * 3, axis=1, subset=df.index[-1]
@@ -412,14 +413,16 @@ template.main[0:4, 6:12] = pn.Column(
     pn.panel(interactive_tableau, loading_indicator=True),
 )
 
-template.main[4:7, 0:4] = pn.Column(
-    pn.pane.Markdown("## Sensitivity Indices", styles={"color": blue_color}),
-    pn.panel(interactive_sensitivity_indices_table, loading_indicator=True),
-)
-
 template.main[4:7, 6:12] = pn.Column(
     pn.pane.Markdown("## Details on inputs' states", styles={"color": blue_color}),
     pn.panel(interactive_tableau_states, loading_indicator=True),
+)
+
+template.main[4:7, 0:4] = pn.Column(
+    pn.pane.Markdown("## Sensitivity Indices", styles={"color": blue_color}),
+    pn.panel(interactive_sensitivity_indices_table, loading_indicator=True),
+    width_policy="fit",
+    max_width=500,
 )
 
 # Header
