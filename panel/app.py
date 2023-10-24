@@ -44,7 +44,6 @@ def load_data(text_fname):
         text_fname = io.BytesIO(text_fname)
 
     data = pd.read_csv(text_fname)
-    pn.state.clear_caches()
     return data
 
 
