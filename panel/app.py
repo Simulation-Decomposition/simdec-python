@@ -9,7 +9,6 @@ import numpy as np
 import pandas as pd
 from pandas.io.formats.style import Styler
 import panel as pn
-from panel.layout.gridstack import GridStack
 
 import simdec as sd
 from simdec.visualization import sequential_cmaps, single_color_to_colormap
@@ -17,9 +16,13 @@ from simdec.visualization import sequential_cmaps, single_color_to_colormap
 
 # panel app
 pn.extension("tabulator")
-pn.extension("gridstack")
 
-template = pn.template.MaterialTemplate(
+pn.config.sizing_mode = "stretch_width"
+pn.config.throttled = True
+font_size = "12pt"
+blue_color = "#4099da"
+
+template = pn.template.FastGridTemplate(
     title="Simulation Decomposition Dashboard",
     # logo="_static/logo.gif",
     favicon="_static/favicon.png",
@@ -28,12 +31,10 @@ template = pn.template.MaterialTemplate(
         "Sensitivity Analysis, Visualization, Data Analysis, Auditing, "
         "Factors priorization, Colorization, Histogram"
     ),
+    accent=blue_color,
+    shadow=False,
+    main_layout=None,
 )
-
-pn.config.sizing_mode = "stretch_width"
-pn.config.throttled = True
-font_size = "12pt"
-blue_color = "#0072b5"
 
 
 @pn.cache
@@ -398,35 +399,28 @@ sidebar_area = pn.layout.WidgetBox(
     selector_n_bins,
     dummy_color_pickers_bind,
     color_pickers,
-    max_width=350,
     sizing_mode="stretch_width",
 )
 
 template.sidebar.append(sidebar_area)
 
 # Main window
-main_area = GridStack(
-    name="SimDec Analysis", sizing_mode="stretch_both", min_height=600
-)
+template.main[0:4, 0:6] = pn.panel(interactive_figure, loading_indicator=True)
 
-main_area[0:3, 0:3] = pn.panel(interactive_figure, loading_indicator=True)
-
-main_area[0:3, 3:5] = pn.Column(
+template.main[0:4, 6:12] = pn.Column(
     pn.pane.Markdown("## Scenarios", styles={"color": blue_color}),
     pn.panel(interactive_tableau, loading_indicator=True),
 )
 
-main_area[3:5, 3:5] = pn.Column(
-    pn.pane.Markdown("## Details on inputs' states", styles={"color": blue_color}),
-    pn.panel(interactive_tableau_states, loading_indicator=True),
-)
-
-main_area[3:5, 0:2] = pn.Column(
+template.main[4:7, 0:4] = pn.Column(
     pn.pane.Markdown("## Sensitivity Indices", styles={"color": blue_color}),
     pn.panel(interactive_sensitivity_indices_table, loading_indicator=True),
 )
 
-template.main.append(main_area)
+template.main[4:7, 6:12] = pn.Column(
+    pn.pane.Markdown("## Details on inputs' states", styles={"color": blue_color}),
+    pn.panel(interactive_tableau_states, loading_indicator=True),
+)
 
 # Header
 icon_size = "1.5em"
