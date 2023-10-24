@@ -63,6 +63,7 @@ serve-oauth:  ## Serve Panel dashboard - Prod mode with OAuth2. Needs: PANEL_OAU
 		--reuse-sessions --warm
 
 # Deployment commands
+# --progress=plain
 
 build-local:
 	docker build -f ./Dockerfile \
@@ -80,6 +81,7 @@ run-local: build-local
 	-e PANEL_OAUTH_REDIRECT_URI=$(PANEL_OAUTH_REDIRECT_URI) \
 	-e PANEL_OAUTH_SECRET=$(PANEL_OAUTH_SECRET) \
 	-e PANEL_OAUTH_KEY=$(PANEL_OAUTH_KEY) \
+	-e PANEL_OAUTH_ENCRYPTION=$(PANEL_OAUTH_ENCRYPTION) \
 	-p "5006:8080" \
 	simdec-panel-local:$(version)
 
@@ -101,6 +103,7 @@ run: build
 	-e PANEL_OAUTH_REDIRECT_URI=$(PANEL_OAUTH_REDIRECT_URI) \
 	-e PANEL_OAUTH_SECRET=$(PANEL_OAUTH_SECRET) \
 	-e PANEL_OAUTH_KEY=$(PANEL_OAUTH_KEY) \
+	-e PANEL_OAUTH_ENCRYPTION=$(PANEL_OAUTH_ENCRYPTION) \
 	-p "5006:8080" \
 	simdec-panel:$(version)
 

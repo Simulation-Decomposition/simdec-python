@@ -5,14 +5,32 @@ FROM python:3.12-alpine as base
 FROM base as builder
 # Allow statements and log messages to immediately appear in the Knative logs
 ENV PYTHONUNBUFFERED=True
+ENV PYTHONDONTWRITEBYTECODE=true
 
 COPY pyproject.toml README.md /
 
 RUN --mount=type=cache,mode=0777,target=/root/.cache/pip \
     pip install --upgrade pip setuptools wheel && \
-    pip install -e ".[dashboard]"  && \
-    mkdir -p /app/src
+    pip install -e ".[dashboard]"
 
+RUN find /usr/local/lib/python3.12/site-packages -name "test" -depth -type d -exec rm -rf '{}' \;
+RUN find /usr/local/lib/python3.12/site-packages -name "tests" -depth -type d -exec rm -rf '{}' \;
+RUN find /usr/local/lib/python3.12/site-packages -name "docs" -depth -type d -exec rm -rf '{}' \;
+RUN find . -type f -name '*.py[co]' -delete -o -type d -name __pycache__ -delete
+
+RUN rm -rf /usr/local/lib/python3.12/site-packages/panel/dist/bundled/deckglplot
+RUN rm -rf /usr/local/lib/python3.12/site-packages/panel/dist/bundled/abstractvtkplot
+RUN rm -rf /usr/local/lib/python3.12/site-packages/panel/dist/bundled/aceplot
+RUN rm -rf /usr/local/lib/python3.12/site-packages/panel/dist/bundled/bootstrap5
+RUN rm -rf /usr/local/lib/python3.12/site-packages/panel/dist/bundled/plotlyplot
+RUN rm -rf /usr/local/lib/python3.12/site-packages/panel/dist/bundled/bootstrap4
+
+# stats depends on spatial, special, sparse, linalg, ndimage, fft
+RUN rm -rf /usr/local/lib/python3.12/site-packages/scipy/signal
+RUN rm -rf /usr/local/lib/python3.12/site-packages/scipy/misc
+RUN rm -rf /usr/local/lib/python3.12/site-packages/scipy/cluster
+
+RUN mkdir -p /app/src
 COPY src /app/src
 COPY tests/data /app/tests/data
 COPY panel /app/panel
@@ -22,6 +40,7 @@ COPY docs/_static /app/_static
 FROM  base as panel
 # Allow statements and log messages to immediately appear in the Knative logs
 ENV PYTHONUNBUFFERED=True
+ENV PYTHONDONTWRITEBYTECODE=true
 ENV PYTHONPATH=/app/src
 ENV PYTHONIOENCODING=utf-8
 ENV MPLCONFIGDIR=/tmp/matplotlib
@@ -30,6 +49,12 @@ EXPOSE 8080
 COPY --from=builder /usr/local/lib/python3.12/site-packages/ /usr/local/lib/python3.12/site-packages/
 COPY --from=builder /usr/local/bin/panel /usr/local/bin/panel
 COPY --from=builder /app /app
+
+# Basic security hardening
+RUN rm -rf /usr/local/lib/python3.12/site-packages/pip
+RUN rm -rf /usr/local/lib/python3.12/site-packages/wheel
+RUN rm -rf /usr/local/lib/python3.12/site-packages/setuptools
+RUN apk --purge del apk-tools
 
 RUN addgroup -S app && adduser -S app -G app
 
