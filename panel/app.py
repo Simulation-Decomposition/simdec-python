@@ -219,7 +219,7 @@ def tableau(res, states, palette):
         var_names=res.var_names,
         states=states,
         bins=res.bins,
-        palette=palette,
+        palette=palette[::-1],
     )
     return styler
 
