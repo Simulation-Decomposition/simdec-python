@@ -446,7 +446,7 @@ download_file_button = pn.widgets.FileDownload(
     icon_size=icon_size,
     button_type="success",
     filename="simdec.csv",
-    width=150,
+    width=200,
     label="Download",
     align="center",
 )
@@ -462,11 +462,11 @@ info_button = pn.widgets.Button(
 info_button.js_on_click(code="""window.open('https://www.simdec.fi/')""")
 
 issue_button = pn.widgets.Button(
-    icon="bug",
+    icon="message-report",
     icon_size=icon_size,
-    button_type="danger",
-    name="Report an issue",
-    width=200,
+    button_type="light",
+    name="Feedback",
+    width=150,
     align="center",
 )
 issue_button.js_on_click(
