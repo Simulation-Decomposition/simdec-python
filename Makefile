@@ -52,10 +52,11 @@ serve:  ## Serve Panel dashboard - Prod mode with basic auth. Needs: PANEL_TOKEN
 		--static-dirs _static=docs/_static \
 		--reuse-sessions --warm
 
-serve-oauth:  ## Serve Panel dashboard - Prod mode with OAuth2. Needs: PANEL_OAUTH_REDIRECT_URI, PANEL_OAUTH_KEY, PANEL_OAUTH_SECRET
-	panel serve panel/app.py \
+serve-oauth:  ## Serve Panel dashboard - Prod mode with OAuth2. Needs: PANEL_OAUTH_REDIRECT_URI, PANEL_OAUTH_KEY, PANEL_OAUTH_SECRET, PANEL_OAUTH_ENCRYPTION
+	PANEL_OAUTH_SCOPE=email panel serve panel/app.py \
 		--show \
 		--cookie-secret panel_cookie_secret_oauth \
+		--basic-login-template panel/login.html \
 		--logout-template panel/logout.html \
 		--oauth-provider google \
 		--static-dirs _static=docs/_static \
@@ -117,6 +118,7 @@ production: publish-production
 	                  --region=$(region) \
 	                  --port=8080 \
 	                  --set-env-vars ENV=production \
+	                  --set-env-vars PANEL_OAUTH_SCOPE=email \
 	                  --set-secrets=PANEL_OAUTH_REDIRECT_URI=PANEL_OAUTH_REDIRECT_URI:latest \
 	                  --set-secrets=PANEL_OAUTH_KEY=PANEL_OAUTH_KEY:latest \
 	                  --set-secrets=PANEL_OAUTH_SECRET=PANEL_OAUTH_SECRET:latest \
