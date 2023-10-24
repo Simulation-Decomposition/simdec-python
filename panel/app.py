@@ -448,10 +448,8 @@ download_file_button = pn.widgets.FileDownload(
     button_type="success",
     filename="simdec.csv",
     width=150,
-    height_policy="min",
     label="Download",
-    styles={"margin-top": "0"},
-    # align="center"  # does not work
+    align="center",
 )
 
 info_button = pn.widgets.Button(

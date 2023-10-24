@@ -37,7 +37,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dashboard = [
-    "panel",
+    "panel>=1.3.0",
     "cryptography",
 ]
 
