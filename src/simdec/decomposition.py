@@ -15,13 +15,15 @@ __all__ = ["decomposition", "states_expansion"]
 def states_expansion(states: list[int], inputs: pd.DataFrame) -> list[list[str]]:
     """Expand states list to fully represent all scenarios."""
     inputs = pd.DataFrame(inputs)
-    for i, state in enumerate(states):
+    expanded_states = []
+    for state in states:
         if isinstance(state, int):
-            states: list
             if state == 2:
-                states[i] = ["low", "high"]
+                expanded_states.append(["low", "high"])
             elif state == 3:
-                states[i] = ["low", "medium", "high"]
+                expanded_states.append(["low", "medium", "high"])
+        else:
+            expanded_states.append(state)
 
     # categorical for a given variable
     cat_cols = inputs.select_dtypes(exclude=["number"])
@@ -34,9 +36,9 @@ def states_expansion(states: list[int], inputs: pd.DataFrame) -> list[list[str]]
 
     for i, states_cat_ in zip(cat_cols_idx, states_cats_):
         n_unique = np.unique(inputs.iloc[:, i]).size
-        states[i] = list(states_cat_) if n_unique < 5 else states[i]
+        expanded_states[i] = list(states_cat_) if n_unique < 5 else expanded_states[i]
 
-    return states
+    return expanded_states
 
 
 @dataclass
