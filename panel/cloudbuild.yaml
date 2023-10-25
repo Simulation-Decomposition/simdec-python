@@ -54,7 +54,9 @@ steps:
       - run
       - services
       - update-traffic
-      - '--to-revisions=LATEST=100'
+      - $_SERVICE_NAME
+      - '--region=$_DEPLOY_REGION'
+      - '--to-latest'
     id: Serve
     entrypoint: gcloud
 images:
