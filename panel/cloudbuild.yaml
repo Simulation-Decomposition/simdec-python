@@ -10,7 +10,7 @@ steps:
         $_AR_HOSTNAME/$PROJECT_ID/cloud-run-source-deploy/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
       - .
       - '-f'
-      - Dockerfile
+      - panel/Dockerfile
     id: Build
   - name: gcr.io/cloud-builders/docker
     args:
@@ -21,16 +21,29 @@ steps:
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
     args:
       - run
-      - services
-      - update
+      - deploy
       - $_SERVICE_NAME
-      - '--platform=managed'
+      - '--cpu=2'
+      - '--memory 2Gi'
+      - '--concurrency=5'
+      - '--min-instances=0'
+      - '--max-instances=2'
+      - '--port=8080'
+      - '--set-env-vars ENV=production'
+      - '--set-env-vars PANEL_OAUTH_SCOPE=email'
+      - '--set-secrets=PANEL_OAUTH_REDIRECT_URI=PANEL_OAUTH_REDIRECT_URI:latest'
+      - '--set-secrets=PANEL_OAUTH_KEY=PANEL_OAUTH_KEY:latest'
+      - '--set-secrets=PANEL_OAUTH_SECRET=PANEL_OAUTH_SECRET:latest'
+      - '--set-secrets=PANEL_OAUTH_ENCRYPTION=PANEL_OAUTH_ENCRYPTION:latest'
+      - '--allow-unauthenticated'
+      - '--session-affinity'
+      - '--timeout=60m'
+      - '--service-account=simdec-panel@delta-entity-401706.iam.gserviceaccount.com'
       - >-
         --image=$_AR_HOSTNAME/$PROJECT_ID/cloud-run-source-deploy/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
       - >-
         --labels=managed-by=gcp-cloud-build-deploy-cloud-run,commit-sha=$COMMIT_SHA,gcb-build-id=$BUILD_ID,gcb-trigger-id=$_TRIGGER_ID
       - '--region=$_DEPLOY_REGION'
-      - '--quiet'
     id: Deploy
     entrypoint: gcloud
 images:
@@ -42,7 +55,6 @@ options:
 substitutions:
   _AR_HOSTNAME: europe-north1-docker.pkg.dev
   _TRIGGER_ID: 8ebd7eb7-1e16-4c90-a93d-ba76058df26d
-  _PLATFORM: managed
   _SERVICE_NAME: simdec-panel
   _DEPLOY_REGION: europe-north1
 tags:
