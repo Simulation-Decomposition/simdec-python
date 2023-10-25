@@ -77,6 +77,9 @@ build.targets.sdist.exclude = [
   "Dockerfile",
 ]
 
+[project.entry-points."panel.auth"]
+custom_google = "simdec.auth:CustomGoogleLoginHandler"
+
 [tool.pytest.ini_options]
 addopts = "--durations 10"
 testpaths = [

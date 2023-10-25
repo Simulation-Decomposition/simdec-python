@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="en" name="docsearch:language">
-    <title>Panel App | Login</title>
+    <title>SimDec App | Login</title>
     <link rel="icon" type="image/x-icon" href="_static/icon.png">
     <style>
     * {
@@ -40,16 +40,10 @@
       padding: 2em;
       width: 350px;
     }
-    .form-input {
-      background: #fafafa;
-      border: 1px solid #eeeeee;
-      padding: 12px;
-      width: 100%;
-    }
-    .form-group {
+    .group {
       margin-bottom: 1em;
     }
-    .form-button {
+    .button {
       background: #107bba;
       border: 1px solid #ddd;
       color: #ffffff;
@@ -57,47 +51,29 @@
       text-transform: uppercase;
       width: 100%;
     }
-    .form-button:hover {
+    .button:hover {
       background: #0072b5;
     }
-    .form-header {
-      text-align: center;
-    }
-    .form-footer {
+    .header {
       text-align: center;
     }
     #logo {
       margin-top: 2em;
-    }
-    #error-message {
-      text-align: center;
-      margin-bottom: 0em;
     }
     </style>
 </head>
 <body>
   <div class="wrap">
     <form class="login-form" action="./login" method="post">
-      <div class="form-header">
+      <div class="header">
         <h3><img id="logo" src="_static/logo.gif" width="150" height="150"></h3>
         <br>
-        <p> Login to access your application</p>
-      </div>
-      <div id="error-message" class="form-group">
-        <p style="color:rgb(255, 0, 0);font-weight:bold" class="errormessage">{{errormessage}}</p>
+        <p> Login to access SimDec App.</p>
       </div>
       <p></p>
-      <!--Email Input-->
-      <div class="form-group">
-        <input name="username" type="text" class="form-input" autocapitalize="off" autocorrect="off" placeholder="username">
-      </div>
-      <!--Password Input-->
-      <div class="form-group">
-        <input name="password" type="password" class="form-input" placeholder="password">
-      </div>
       <!--Login Button-->
-      <div class="form-group">
-        <button class="form-button" type="submit">Login</button>
+      <div class="group">
+        <button class="button" type="submit">Login</button>
       </div>
       <div><small></small></div>
     </form>

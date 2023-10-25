@@ -69,8 +69,9 @@ CMD ["panel", "serve", "panel/app.py", \
      "--allow-websocket-origin", "www.simdec.io", \
      "--allow-websocket-origin", "simdec-panel-h6musew72q-lz.a.run.app", \
      "--cookie-secret", "panel_cookie_secret_oauth", \
+     "--basic-login-template", "panel/login.html", \
      "--logout-template", "panel/logout.html", \
-     "--oauth-provider", "google", \
+     "--oauth-provider", "custom_google", \
      "--static-dirs", "_static=_static", \
      "--reuse-sessions", "--warm", \
      "--global-loading-spinner"]

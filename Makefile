@@ -43,22 +43,13 @@ serve-dev:  ## Serve Panel dashboard - Dev mode
  		--static-dirs _static=docs/_static \
  		--reuse-sessions --warm
 
-serve:  ## Serve Panel dashboard - Prod mode with basic auth. Needs: PANEL_TOKEN
-	panel serve panel/app.py \
-		--show \
-		--cookie-secret panel_cookie_secret_oauth \
-		--basic-login-template panel/login.html \
-		--logout-template panel/logout.html \
-		--static-dirs _static=docs/_static \
-		--reuse-sessions --warm
-
 serve-oauth:  ## Serve Panel dashboard - Prod mode with OAuth2. Needs: PANEL_OAUTH_REDIRECT_URI, PANEL_OAUTH_KEY, PANEL_OAUTH_SECRET, PANEL_OAUTH_ENCRYPTION
 	PANEL_OAUTH_SCOPE=email panel serve panel/app.py \
 		--show \
 		--cookie-secret panel_cookie_secret_oauth \
 		--basic-login-template panel/login.html \
 		--logout-template panel/logout.html \
-		--oauth-provider google \
+		--oauth-provider custom_google \
 		--static-dirs _static=docs/_static \
 		--reuse-sessions --warm
 
