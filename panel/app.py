@@ -16,6 +16,7 @@ from simdec.visualization import sequential_cmaps, single_color_to_colormap
 
 # panel app
 pn.extension("tabulator")
+pn.extension("floatpanel")
 
 pn.config.sizing_mode = "stretch_width"
 pn.config.throttled = True
@@ -34,6 +35,9 @@ template = pn.template.FastGridTemplate(
     accent=blue_color,
     shadow=False,
     main_layout=None,
+    theme_toggle=False,
+    corner_radius=3,
+    # save_layout=True,
 )
 
 
@@ -448,7 +452,7 @@ info_button = pn.widgets.Button(
     icon="info-circle",
     icon_size=icon_size,
     button_type="light",
-    name="More info",
+    name="About",
     width=150,
     align="center",
 )
@@ -469,9 +473,37 @@ issue_button.js_on_click(
 logout_button = pn.widgets.Button(name="Log out", width=100)
 logout_button.js_on_click(code="""window.location.href = './logout'""")
 
+docs_button = pn.widgets.Button(
+    icon="notes",
+    icon_size=icon_size,
+    button_type="light",
+    name="Docs",
+    width=150,
+    align="center",
+)
+docs = pn.Column(height=0, width=0)
+
+
+def callback_docs(event):
+    docs[:] = [
+        pn.layout.FloatPanel(
+            "This is some documentation",
+            name="SimDec documentation",
+            theme="info",
+            contained=False,
+            position="center",
+        )
+    ]
+
+
+docs_button.on_click(callback_docs)
+
+
 header_area = pn.Row(
     pn.HSpacer(),
     download_file_button,
+    docs,
+    docs_button,
     info_button,
     issue_button,
     # logout_button,
