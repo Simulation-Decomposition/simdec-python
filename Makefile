@@ -1,4 +1,4 @@
-.PHONY: help prepare doc test serve build publish-production
+.PHONY: help prepare doc test serve build publish-production deploy-production promote-production production
 .DEFAULT_GOAL := help
 SHELL:=/bin/bash
 
@@ -56,7 +56,7 @@ serve-oauth:  ## Serve Panel dashboard - Prod mode with OAuth2. Needs: PANEL_OAU
 # Deployment commands
 # --progress=plain
 
-build-local:
+build-local:  ## Build for local architecture
 	docker build -f ./panel/Dockerfile \
 		--tag simdec-panel-local:$(version) \
 	    --pull \
@@ -77,7 +77,7 @@ run-local: build-local
 	simdec-panel-local:$(version)
 
 # Need to specifically build on linux/amd64 to avoid issues on macOS M platform
-build:
+build:  ## Build for linux/amd64 (production)
 	docker build -f ./panel/Dockerfile \
 		--platform linux/amd64 \
 		--tag simdec-panel:$(version) \
@@ -100,11 +100,12 @@ run: build
 
 # Ship
 
-publish-production: build
+publish-production: build  ## Tag and push to GCP
 	docker tag simdec-panel:$(version) $(region)-docker.pkg.dev/$(project)/simdec-panel/simdec-panel:$(version)
 	docker push $(region)-docker.pkg.dev/$(project)/simdec-panel/simdec-panel:$(version)
 
-production: publish-production
+
+deploy-production: publish-production  ## Deploy new revision to GCP
 	@echo "Deploying '$(version)'."
 	gcloud run deploy simdec-panel \
 					  --cpu=2 \
@@ -124,4 +125,8 @@ production: publish-production
 	                  --timeout=60m \
 	                  --service-account simdec-panel@delta-entity-401706.iam.gserviceaccount.com \
 	                  --image=$(region)-docker.pkg.dev/$(project)/simdec-panel/simdec-panel:$(version) \
-	                  --memory 2Gi
+	                  --memory 2Gi \
+	                  --no-traffic
+
+promote-production:  ## Serve new revision to GCP
+	gcloud run services update-traffic simdec-panel --to-latest
