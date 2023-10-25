@@ -7,7 +7,7 @@ steps:
       - '--no-cache'
       - '-t'
       - >-
-        $_AR_HOSTNAME/$PROJECT_ID/cloud-run-source-deploy/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
+        $_AR_HOSTNAME/$PROJECT_ID/cloud-run-source-deploy/simdec-python/simdec-panel:$COMMIT_SHA
       - .
       - '-f'
       - panel/Dockerfile
@@ -16,13 +16,13 @@ steps:
     args:
       - push
       - >-
-        $_AR_HOSTNAME/$PROJECT_ID/cloud-run-source-deploy/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
+        $_AR_HOSTNAME/$PROJECT_ID/cloud-run-source-deploy/simdec-python/simdec-panel:$COMMIT_SHA
     id: Push
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
     args:
       - run
       - deploy
-      - $_SERVICE_NAME
+      - simdec-panel
       - '--cpu=2'
       - '--memory'
       - '2Gi'
@@ -43,7 +43,7 @@ steps:
       - '--timeout=60m'
       - '--service-account=simdec-panel@delta-entity-401706.iam.gserviceaccount.com'
       - >-
-        --image=$_AR_HOSTNAME/$PROJECT_ID/cloud-run-source-deploy/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
+        --image=$_AR_HOSTNAME/$PROJECT_ID/cloud-run-source-deploy/simdec-python/simdec-panel:$COMMIT_SHA
       - >-
         --labels=managed-by=gcp-cloud-build-deploy-cloud-run,commit-sha=$COMMIT_SHA,gcb-build-id=$BUILD_ID,gcb-trigger-id=$_TRIGGER_ID
       - '--region=$_DEPLOY_REGION'
@@ -54,21 +54,20 @@ steps:
       - run
       - services
       - update-traffic
-      - $_SERVICE_NAME
+      - simdec-panel
       - '--region=$_DEPLOY_REGION'
       - '--to-latest'
     id: Serve
     entrypoint: gcloud
 images:
   - >-
-    $_AR_HOSTNAME/$PROJECT_ID/cloud-run-source-deploy/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
+    $_AR_HOSTNAME/$PROJECT_ID/cloud-run-source-deploy/simdec-python/simdec-panel:$COMMIT_SHA
 options:
   substitutionOption: ALLOW_LOOSE
   logging: CLOUD_LOGGING_ONLY
 substitutions:
   _AR_HOSTNAME: europe-north1-docker.pkg.dev
   _TRIGGER_ID: 8ebd7eb7-1e16-4c90-a93d-ba76058df26d
-  _SERVICE_NAME: simdec-panel
   _DEPLOY_REGION: europe-north1
 tags:
   - gcp-cloud-build-deploy-cloud-run

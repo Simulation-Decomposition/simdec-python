@@ -130,3 +130,6 @@ deploy-production: publish-production  ## Deploy new revision to GCP
 
 promote-production:  ## Serve new revision to GCP
 	gcloud run services update-traffic simdec-panel --to-latest
+
+cloudbuild-production:  ## Build, Deploy and Serve new revision to GCP using cloudbuild
+	gcloud builds submit --config panel/cloudbuild.yaml --substitutions COMMIT_SHA=$(git rev-list --max-count=1 HEAD) .
