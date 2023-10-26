@@ -123,9 +123,13 @@ def decomposition(
 
     # only keep the explained variance corresponding to `dec_limit`
     sensitivity_indices = sensitivity_indices[var_order]
-    n_var_dec = np.where(np.cumsum(sensitivity_indices) < dec_limit)[0].size
-    n_var_dec = max(1, n_var_dec)  # keep at least one variable
-    n_var_dec = min(5, n_var_dec)  # use at most 5 variables
+
+    if auto_ordering:
+        n_var_dec = np.where(np.cumsum(sensitivity_indices) < dec_limit)[0].size
+        n_var_dec = max(1, n_var_dec)  # keep at least one variable
+        n_var_dec = min(5, n_var_dec)  # use at most 5 variables
+    else:
+        n_var_dec = inputs.shape[1]
 
     # 2. states formation
     if states is None:
