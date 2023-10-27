@@ -67,7 +67,6 @@ CMD ["panel", "serve", "panel/app.py", \
      "--num-procs", "2", \
      "--allow-websocket-origin", "simdec.io", \
      "--allow-websocket-origin", "www.simdec.io", \
-     "--allow-websocket-origin", "*", \
      "--allow-websocket-origin", "simdec-panel-h6musew72q-lz.a.run.app", \
      "--cookie-secret", "panel_cookie_secret_oauth", \
      "--basic-login-template", "panel/login.html", \
