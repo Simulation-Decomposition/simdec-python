@@ -38,7 +38,8 @@ test:  ## Run tests with coverage
 # Dashboard commands
 
 serve-dev:  ## Serve Panel dashboard - Dev mode
-	panel serve panel/app.py \
+	panel serve panel/app.py panel/sampling.py \
+		--index panel/index.html \
  		--show --autoreload \
  		--static-dirs _static=docs/_static \
  		--reuse-sessions --warm
