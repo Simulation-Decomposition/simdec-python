@@ -17,13 +17,12 @@ font_size = "12pt"
 blue_color = "#4099da"
 
 template = pn.template.FastGridTemplate(
-    title="Sampling App",
+    title="Data generation (sampling)",
     # logo="_static/logo.gif",
     favicon="_static/favicon.png",
-    meta_description="Sampling",
+    meta_description="Data generation (sampling)",
     meta_keywords=(
-        "Sensitivity Analysis, Visualization, Data Analysis, Auditing, "
-        "Factors priorization, Colorization, Histogram"
+        "Random Sampling, Monte Carlo, Quasi-Monte Carlo, " "Sobol', Halton, LHS"
     ),
     accent=blue_color,
     shadow=False,
