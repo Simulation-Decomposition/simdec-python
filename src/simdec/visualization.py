@@ -48,7 +48,7 @@ def sequential_cmaps():
             cmap_ = mpl.colormaps[cmap]
         except KeyError:
             color = mpl.colors.hex2color(cmap)
-            cmap_ = single_color_to_colormap(color, factor=0.0)
+            cmap_ = single_color_to_colormap(color)
         cmaps.append(cmap_)
     return cmaps
 
@@ -126,7 +126,7 @@ def palette(
     n_shades = int(np.prod(states[1:]))
     for i in range(n_cmaps):
         cmap = cmaps[i].resampled(n_shades + 1)
-        colors.append(cmap(range(1, n_shades + 1)))
+        colors.append(cmap(np.linspace(0, 1, n_shades)))
 
     return np.concatenate(colors).tolist()
 
