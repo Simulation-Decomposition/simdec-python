@@ -158,7 +158,7 @@ def base_colors(res):
     colors = []
     # ensure not more colors than states
     for cmap in sequential_cmaps()[: res.states[0]]:
-        color = cmap.resampled(1)(1)
+        color = cmap(0.5)
         color = mpl.colors.rgb2hex(color, keep_alpha=False)
         colors.append(color)
 
