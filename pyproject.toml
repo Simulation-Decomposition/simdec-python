@@ -65,6 +65,7 @@ documentation = "https://simdec.readthedocs.io"
 source = "https://github.com/Simulation-Decomposition/simdec-python"
 
 [tool.hatch]
+build.targets.wheel.packages = ["src/simdec"]
 build.targets.sdist.exclude = [
   ".github",
   "docs",

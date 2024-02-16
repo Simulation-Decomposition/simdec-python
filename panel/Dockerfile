@@ -10,7 +10,7 @@ ENV PYTHONDONTWRITEBYTECODE=true
 COPY pyproject.toml README.md /
 
 RUN --mount=type=cache,mode=0777,target=/root/.cache/pip \
-    pip install --upgrade pip setuptools wheel && \
+    pip install --upgrade pip && \
     pip install -e ".[dashboard]"
 
 RUN find /usr/local/lib/python3.12/site-packages -name "test" -depth -type d -exec rm -rf '{}' \;
