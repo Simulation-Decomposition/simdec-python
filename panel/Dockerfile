@@ -62,7 +62,7 @@ USER app
 WORKDIR /app
 
 # Run the web service on container startup.
-CMD ["panel", "serve", "panel/app.py", \
+CMD ["panel", "serve", "panel/simdec.py", "panel/sampling.py", \
      "--address", "0.0.0.0", "--port", "8080", \
      "--num-procs", "2", \
      "--allow-websocket-origin", "simdec.io", \
@@ -72,6 +72,7 @@ CMD ["panel", "serve", "panel/app.py", \
      "--basic-login-template", "panel/login.html", \
      "--logout-template", "panel/logout.html", \
      "--oauth-provider", "custom_google", \
+     "--index", "panel/index.html", \
      "--static-dirs", "_static=_static", \
      "--reuse-sessions", "--warm", \
      "--global-loading-spinner"]

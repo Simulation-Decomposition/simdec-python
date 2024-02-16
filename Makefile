@@ -38,14 +38,15 @@ test:  ## Run tests with coverage
 # Dashboard commands
 
 serve-dev:  ## Serve Panel dashboard - Dev mode
-	panel serve panel/app.py panel/sampling.py \
+	panel serve panel/simdec.py panel/sampling.py \
 		--index panel/index.html \
  		--show --autoreload \
  		--static-dirs _static=docs/_static \
  		--reuse-sessions --warm
 
 serve-oauth:  ## Serve Panel dashboard - Prod mode with OAuth2. Needs: PANEL_OAUTH_REDIRECT_URI, PANEL_OAUTH_KEY, PANEL_OAUTH_SECRET, PANEL_OAUTH_ENCRYPTION
-	PANEL_OAUTH_SCOPE=email panel serve panel/app.py \
+	PANEL_OAUTH_SCOPE=email panel serve panel/simdec.py panel/sampling.py \
+		--index panel/index.html \
 		--show \
 		--cookie-secret panel_cookie_secret_oauth \
 		--basic-login-template panel/login.html \
