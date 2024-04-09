@@ -32,13 +32,13 @@ influence the system. And you need a way to understand how these impact your
 results.
 
 SimDec offers a novel visual way to understand the intricate role that
-uncertainties play. Thanks to a clear API and our dashboard, we are making
-uncertainty analysis accessible to everyone.
+uncertainties play. Thanks to a clear Python API and an interactive web
+dashboard, making uncertainty analysis accessible to everyone.
 
 # Statement of need
 
 From real life experiments to numerical simulations, uncertainties play a
-crucial role in the system under study. With the avenment of Artificial
+crucial role in the system under study. With the advent of Artificial
 Intelligence and new regulations such as the AI Act or the
 *Better Regulation Guideline*, there is a growing need for explainability and
 impact assessments of systems under uncertainties.
