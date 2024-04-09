@@ -50,20 +50,20 @@ prominent example of such methods.
 
 Simulation Decomposition is a hybrid uncertainty-sensitivity analysis approach
 that reveals the critical behavior of a computational model or an empirical
-dataset. It decomposes the distribution of the output (target variable) by the
-multivariable scenarios, formed out of the most influential input variables.
-The resulting visualization shows how different output ranges can be achieved
-and what kind of critical interactions affect the output. The method has shown
-value for various computational models from different fields,
-including business, environment, and engineering, as well as an emerging
-evidence of use for empirical data and AI.
+dataset [@Kozlova2024]. It decomposes the distribution of the output
+(target variable) by the multivariable scenarios, formed out of the most
+influential input variables. The resulting visualization shows how different
+output ranges can be achieved and what kind of critical interactions affect
+the output. The method has shown value for various computational models from
+different fields, including business, environment, and engineering, as well as
+an emerging evidence of use for empirical data and AI.
 
 Besides proposing a comprehensive yet simple API through a Python packages
 available on PyPi, SimDec is also made available
 to practitioners through an online dashboard at https://simdec.io. The
 innovative methods of SimDec, the project relies on powerful methods
-from SALib [@Herman2017] and SciPy [@virtanen2020scipy, @Roy2023]-notably the QMC
-capabilities with `sp.stats.qmc` and sensitivity indices with
+from SALib [@Herman2017] and SciPy [@Virtanen2020, @Roy2023]-notably the
+QMC capabilities with `sp.stats.qmc` and sensitivity indices with
 `sp.stats.sensitivity_indices`. The dashboard is made possible thanks to Panel.
 
 # Acknowledgements
