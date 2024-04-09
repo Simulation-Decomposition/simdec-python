@@ -62,7 +62,7 @@ Besides proposing a comprehensive yet simple API through a Python packages
 available on PyPi, SimDec is also made available
 to practitioners through an online dashboard at https://simdec.io. The
 innovative methods of SimDec, the project relies on powerful methods
-from SALib [@Herman2017] and SciPy [@Virtanen2020, @Roy2023]-notably the
+from SALib [@Herman2017] and SciPy [@Virtanen2020,@Roy2023]-notably the
 QMC capabilities with `sp.stats.qmc` and sensitivity indices with
 `sp.stats.sensitivity_indices`. The dashboard is made possible thanks to Panel.
 
