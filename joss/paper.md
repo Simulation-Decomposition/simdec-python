@@ -45,7 +45,7 @@ impact assessments of systems under uncertainties.
 
 Traditional methods to analyse the uncertainties focus on quantitative methods
 to compare the importance of factors, there is a large body of literature and
-the field is know as: Sensitivity Analysis (SA). The indices of Sobol' are a
+the field is known as: Sensitivity Analysis (SA). The indices of Sobol' are a
 prominent example of such methods.
 
 Simulation Decomposition is a hybrid uncertainty-sensitivity analysis approach
@@ -58,13 +58,13 @@ value for various computational models from different fields,
 including business, environment, and engineering, as well as an emerging
 evidence of use for empirical data and AI.
 
-Besides proposing a comprehensive yet simple API, SimDec is also made available
+Besides proposing a comprehensive yet simple API through a Python packages
+available on PyPi, SimDec is also made available
 to practitioners through an online dashboard at https://simdec.io. The
 innovative methods of SimDec, the project relies on powerful methods
 from SALib [@salib2022qmc] and SciPy [@scipy2021qmc]-notably the QMC
 capabilities with `sp.stats.qmc` and sensitivity indices with
-`sp.stats.sensitivity_indices`-and the dashboard
-is made possible thanks to Panel.
+`sp.stats.sensitivity_indices`. The dashboard is made possible thanks to Panel.
 
 # Acknowledgements
 
