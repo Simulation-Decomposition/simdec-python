@@ -26,7 +26,7 @@ bibliography: paper.bib
 
 # Summary
 
-Uncertainties are everywhere! Whether you are developing a new AI system,
+Uncertainties are everywhere. Whether you are developing a new AI system,
 running complex simulations or making an experiment in a lab, uncertainties
 influence the system. And you need a way to understand how these impact your
 results.
@@ -34,6 +34,8 @@ results.
 SimDec offers a novel visual way to understand the intricate role that
 uncertainties play. Thanks to a clear Python API and an interactive web
 dashboard, making uncertainty analysis accessible to everyone.
+
+![SimDec: explanation of output by most important inputs. See [@Kozlova2024].](simdec_presentation.png)
 
 # Statement of need
 
@@ -60,14 +62,15 @@ an emerging evidence of use for empirical data and AI.
 
 Besides proposing a comprehensive yet simple API through a Python packages
 available on PyPi, SimDec is also made available
-to practitioners through an online dashboard at https://simdec.io. The
-innovative methods of SimDec, the project relies on powerful methods
-from SALib [@Herman2017] and SciPy [@Virtanen2020; @Roy2023]-notably the
-QMC capabilities with `sp.stats.qmc` and sensitivity indices with
-`sp.stats.sensitivity_indices`. The dashboard is made possible thanks to Panel.
+to practitioners through an online dashboard at https://simdec.io. The project
+relies on powerful methods from SALib [@Herman2017] and
+SciPy [@Virtanen2020; @Roy2023]-notably the QMC capabilities with
+`sp.stats.qmc` and sensitivity indices with `sp.stats.sensitivity_indices`.
+The dashboard is made possible thanks to Panel.
 
 # Acknowledgements
 
-The authors thank ...
+The work on this open-source software was supported by grant #220177 from
+Finnish Foundation for Economic Foundation.
 
 # References
