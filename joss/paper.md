@@ -35,8 +35,6 @@ SimDec offers a novel visual way to understand the intricate role that
 uncertainties play. Thanks to a clear Python API and an interactive web
 dashboard, making uncertainty analysis accessible to everyone.
 
-![SimDec: explanation of output by most important inputs. See [@Kozlova2024].](simdec_presentation.png)
-
 # Statement of need
 
 From real life experiments to numerical simulations, uncertainties play a
@@ -56,9 +54,12 @@ dataset [@Kozlova2024]. It decomposes the distribution of the output
 (target variable) by the multivariable scenarios, formed out of the most
 influential input variables. The resulting visualization shows how different
 output ranges can be achieved and what kind of critical interactions affect
-the output. The method has shown value for various computational models from
-different fields, including business, environment, and engineering, as well as
-an emerging evidence of use for empirical data and AI.
+the output–as seen in \autoref{fig:simdec}. The method has shown value for
+various computational models from different fields, including business,
+environment, and engineering, as well as an emerging evidence of use for
+empirical data and AI.
+
+![SimDec: explanation of output by most important inputs.\label{fig:simdec}](simdec_presentation.png)
 
 Besides proposing a comprehensive yet simple API through a Python packages
 available on PyPi, SimDec is also made available
