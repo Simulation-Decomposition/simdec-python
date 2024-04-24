@@ -14,9 +14,9 @@ __all__ = ["visualization", "tableau", "palette"]
 
 
 SEQUENTIAL_PALETTES = [
+    "#26DCD1",
     "#DC267F",
     "#E8EA2F",
-    "#26DCD1",
     "#C552E4",
     "#3F45D0",
     "Oranges",
