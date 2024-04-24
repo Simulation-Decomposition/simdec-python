@@ -253,7 +253,7 @@ def tableau(
     table.insert(loc=0, column="N°", value=np.arange(1, stop=len(table) + 1)[::-1])
 
     # style the colour background with palette
-    cmap = mpl.colors.ListedColormap(palette[::-1])
+    cmap = mpl.colors.ListedColormap(palette)
     styler = table.style
     styler.format(precision=2)
     styler.background_gradient(subset=["colour"], cmap=cmap)
