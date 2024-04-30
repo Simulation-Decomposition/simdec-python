@@ -185,7 +185,7 @@ def create_color_pickers(states, colors):
 @pn.cache
 def palette(res, colors_picked):
     cmaps = [single_color_to_colormap(color_picked) for color_picked in colors_picked]
-    return sd.palette(res.states[::-1], cmaps=cmaps[::-1])
+    return sd.palette(res.states, cmaps=cmaps)
 
 
 @pn.cache
@@ -224,7 +224,7 @@ def tableau(res, states, palette):
         var_names=res.var_names,
         states=states,
         bins=res.bins,
-        palette=palette[::-1],
+        palette=palette,
     )
     return styler
 
