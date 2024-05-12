@@ -185,7 +185,7 @@ def create_color_pickers(states, colors):
 @pn.cache
 def palette(res, colors_picked):
     cmaps = [single_color_to_colormap(color_picked) for color_picked in colors_picked]
-    return sd.palette(res.states, cmaps=cmaps)
+    return sd.palette(res.states[::-1], cmaps=cmaps[::-1])
 
 
 @pn.cache
