@@ -125,7 +125,7 @@ def palette(
     # many levels
     n_shades = int(np.prod(states[1:]))
     for i in range(n_cmaps):
-        cmap = cmaps[i].resampled(n_shades + 1)
+        cmap = cmaps[i].resampled(n_shades)
         colors.append(cmap(np.linspace(0, 1, n_shades)))
 
     return np.concatenate(colors).tolist()
