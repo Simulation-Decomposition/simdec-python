@@ -185,6 +185,7 @@ def create_color_pickers(states, colors):
 @pn.cache
 def palette(res, colors_picked):
     cmaps = [single_color_to_colormap(color_picked) for color_picked in colors_picked]
+    # Reverse order as in figures high values take the first colors
     return sd.palette(res.states[::-1], cmaps=cmaps[::-1])
 
 
@@ -200,7 +201,12 @@ def display_n_bins(kind):
 
 
 @pn.cache
-def figure(res, palette, n_bins, kind, output_name):
+def xlim_auto(res):
+    return (np.min(res.bin_edges), np.max(res.bin_edges))
+
+
+@pn.cache
+def figure(res, palette, n_bins, xlim, kind, output_name):
     kind = "histogram" if kind == "Stacked histogram" else "boxplot"
     plt.close("all")
     fig, ax = plt.subplots()
@@ -208,6 +214,7 @@ def figure(res, palette, n_bins, kind, output_name):
         bins=res.bins, palette=palette, n_bins=n_bins, kind=kind, ax=ax
     )
     ax.set(xlabel=output_name)
+    ax.set_xlim(xlim)
     return fig
 
 
@@ -346,6 +353,15 @@ selector_n_bins = pn.widgets.EditableIntSlider(
     visible=show_n_bins,
 )
 
+interactive_xlim = pn.bind(xlim_auto, interactive_decomposition)
+selector_xlim = pn.widgets.EditableRangeSlider(
+    name="X-lim",
+    start=interactive_xlim.rx()[0],
+    end=interactive_xlim.rx()[1],
+    value=interactive_xlim,
+    step=0.1,
+)
+
 interactive_states = pn.bind(
     states_from_data, interactive_decomposition, interactive_inputs_decomposition
 )
@@ -377,6 +393,7 @@ interactive_figure = pn.bind(
     interactive_decomposition,
     interactive_palette,
     selector_n_bins,
+    selector_xlim,
     switch_histogram_boxplot,
     selector_output,
 )
@@ -402,6 +419,7 @@ sidebar_area = pn.layout.WidgetBox(
     pn.pane.Markdown("## Visualization", styles={"color": blue_color}),
     switch_histogram_boxplot,
     selector_n_bins,
+    selector_xlim,
     dummy_color_pickers_bind,
     color_pickers,
     sizing_mode="stretch_width",
