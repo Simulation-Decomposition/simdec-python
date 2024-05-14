@@ -359,6 +359,7 @@ selector_xlim = pn.widgets.EditableRangeSlider(
     start=interactive_xlim.rx()[0],
     end=interactive_xlim.rx()[1],
     value=interactive_xlim,
+    format="0.0[00]",
     step=0.1,
 )
 
