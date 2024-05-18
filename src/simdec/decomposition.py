@@ -137,9 +137,9 @@ def decomposition(
         states = [states] * n_var_dec
 
         # categorical for a given variable
-        for i in cat_cols_idx:
+        for i in range(n_var_dec):
             n_unique = np.unique(inputs[:, i]).size
-            states[i] = n_unique if n_unique < 5 else states[i]
+            states[i] = n_unique if n_unique <= 5 else states[i]
 
     if auto_ordering:
         var_names = var_names[var_order[:n_var_dec]].tolist()
