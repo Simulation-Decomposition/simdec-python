@@ -109,11 +109,9 @@ def decomposition(
     var_names = inputs.columns
 
     cat_cols = inputs.select_dtypes(exclude=["number"])
-    cat_cols_idx = []
     for cat_col in cat_cols:
         codes, cat_states_ = pd.factorize(inputs[cat_col])
         inputs[cat_col] = codes
-        cat_cols_idx.append(inputs.columns.get_loc(cat_col))
 
     inputs = inputs.to_numpy()
     output = output.to_numpy()
@@ -136,7 +134,6 @@ def decomposition(
         states = 3 if n_var_dec < 3 else 2
         states = [states] * n_var_dec
 
-        # categorical for a given variable
         for i in range(n_var_dec):
             n_unique = np.unique(inputs[:, i]).size
             states[i] = n_unique if n_unique <= 5 else states[i]
