@@ -163,8 +163,18 @@ def decomposition(
         bins.append(inputs)
         return statistic_method(inputs)
 
+    # make bins with equal number of samples for a given dimension
+    # sort and then split in n-state
+    sorted_inputs = np.sort(inputs, axis=0)
+    bin_edges = []
+    for i, states_ in enumerate(states):
+        splits = np.array_split(sorted_inputs[:, i], states_)
+        bin_edges_ = [splits_[0] for splits_ in splits]
+        bin_edges_.append(splits[-1][-1])  # last point to close the edges
+        bin_edges.append(bin_edges_)
+
     res = stats.binned_statistic_dd(
-        inputs, values=output, statistic=statistic_, bins=states
+        inputs, values=output, statistic=statistic_, bins=bin_edges
     )
 
     bins = pd.DataFrame(bins[1:]).T
