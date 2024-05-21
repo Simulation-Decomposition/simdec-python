@@ -168,6 +168,8 @@ def decomposition(
         splits = np.array_split(sorted_inputs[:, i], states_)
         bin_edges_ = [splits_[0] for splits_ in splits]
         bin_edges_.append(splits[-1][-1])  # last point to close the edges
+        # bin_edges_ = np.unique(bin_edges_)  # remove duplicate points, sorted
+        bin_edges_ += 1e-10 * np.linspace(0, 1, len(bin_edges_))
         bin_edges.append(bin_edges_)
 
     res = stats.binned_statistic_dd(

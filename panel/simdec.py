@@ -202,7 +202,8 @@ def display_n_bins(kind):
 
 @pn.cache
 def xlim_auto(res):
-    return (np.min(res.bin_edges), np.max(res.bin_edges))
+    bins = np.concatenate(res.bin_edges)
+    return (np.min(bins), np.max(bins))
 
 
 @pn.cache
