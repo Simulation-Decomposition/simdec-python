@@ -1,3 +1,4 @@
+import copy
 import functools
 import itertools
 from typing import Literal
@@ -227,16 +228,17 @@ def tableau(
     table.rename(columns={"index": "colour"}, inplace=True)
 
     # Default states for 2 or 3
-    for i, state in enumerate(states):
+    states_ = copy.deepcopy(states)
+    for i, state in enumerate(states_):
         if isinstance(state, int):
-            states: list
+            states_: list
             if state == 2:
-                states[i] = ["low", "high"]
+                states_[i] = ["low", "high"]
             elif state == 3:
-                states[i] = ["low", "medium", "high"]
+                states_[i] = ["low", "medium", "high"]
 
     # get the list of states
-    gen_states = [range(x) if isinstance(x, int) else x for x in states]
+    gen_states = [range(x) if isinstance(x, int) else x for x in states_]
     states_ = np.asarray(list(itertools.product(*gen_states)))
     for i, var_name in enumerate(var_names):
         table.insert(loc=i + 1, column=var_name, value=states_[:, i])
