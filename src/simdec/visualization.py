@@ -202,6 +202,8 @@ def tableau(
     ----------
     var_names : list of str
         Variables name.
+    statistic : ndarray of shape (n_factors, 1)
+        Statistic in each bin.
     states : list of int or list of str
         For each variable, number of states. Can either be a scalar or a list.
 
