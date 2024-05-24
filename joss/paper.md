@@ -26,27 +26,27 @@ bibliography: paper.bib
 
 # Summary
 
-Uncertainties are everywhere. Whether you are developing a new AI system,
+Uncertainties are everywhere. Whether you are developing a new Artificial Intelligence (AI) system,
 running complex simulations or making an experiment in a lab, uncertainties
 influence the system. And you need a way to understand how these impact your
 results.
 
 SimDec offers a novel visual way to understand the intricate role that
-uncertainties play. Thanks to a clear Python API and an interactive web
+uncertainties play. Thanks to a clear Python Application Programming Interface (API) and an interactive web
 dashboard, making uncertainty analysis accessible to everyone.
 
 # Statement of need
 
 From real life experiments to numerical simulations, uncertainties play a
 crucial role in the system under study. With the advent of Artificial
-Intelligence and new regulations such as the AI Act or the
-*Better Regulation Guideline*, there is a growing need for explainability and
+Intelligence and new regulations such as the [AI Act](https://artificialintelligenceact.eu) or the
+*Better Regulation Guideline* [@europeancommission2021], there is a growing need for explainability and
 impact assessments of systems under uncertainties.
 
 Traditional methods to analyse the uncertainties focus on quantitative methods
 to compare the importance of factors, there is a large body of literature and
-the field is known as: Sensitivity Analysis (SA). The indices of Sobol' are a
-prominent example of such methods.
+the field is known as: Sensitivity Analysis (SA) [@Saltelli2007]. The indices of Sobol' are a
+prominent example of such methods [@sobol1993].
 
 Simulation Decomposition is a hybrid uncertainty-sensitivity analysis approach
 that reveals the critical behavior of a computational model or an empirical
@@ -61,13 +61,13 @@ empirical data and AI.
 
 ![SimDec: explanation of output by most important inputs.\label{fig:simdec}](simdec_presentation.png)
 
-Besides proposing a comprehensive yet simple API through a Python packages
+Besides proposing a comprehensive yet simple API through a Python package
 available on PyPi, SimDec is also made available
-to practitioners through an online dashboard at https://simdec.io. The project
+to practitioners through an online dashboard at [https://simdec.io](https://simdec.io). The project
 relies on powerful methods from SALib [@Herman2017] and
-SciPy [@Virtanen2020; @Roy2023]-notably the QMC capabilities with
-`sp.stats.qmc` and sensitivity indices with `sp.stats.sensitivity_indices`.
-The dashboard is made possible thanks to Panel.
+SciPy [@Virtanen2020; @Roy2023]&mdash;notably the Quasi-Monte Carlo capabilities with
+`sp.stats.qmc` and in the future sensitivity indices with `sp.stats.sensitivity_indices`.
+The dashboard is made possible thanks to Panel [@panel].
 
 # Acknowledgements
 
