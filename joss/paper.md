@@ -37,8 +37,8 @@ dashboard make uncertainty analysis with SimDec accessible to everyone.
 # Statement of need
 
 From real life experiments to numerical simulations, uncertainties play a
-crucial role in the system under study. With the advent of Artificial
-Intelligence and new regulations such as the [AI Act](https://artificialintelligenceact.eu) or the
+crucial role in the system under study. With the advent of AI
+and new regulations such as the [AI Act](https://artificialintelligenceact.eu) or the
 *Better Regulation Guideline* [@europeancommission2021], there is a growing need for explainability and
 impact assessments of systems under uncertainties.
 
@@ -53,7 +53,7 @@ that reveals the critical behavior of a computational model or an empirical
 dataset. It decomposes the distribution of the output
 (target variable) by automatically forming scenarios that reveal the most critical behavior of the system. The scenarios are formed out of the most influential input variables (defined with variance-based sensitivity indices) by breaking down their numeric ranges into states (e.g. _low_ and _high_) and creating an exhaustive list of their combinations (e.g. (i) _low_ _**A**_ & _low_ _**B**_, (ii) _low_ _**A**_ & _high_ _**B**_, (iii) _high_ **_A_** & _low_ **_B_**, and (iv) _high_ **_A_** and _high_ **_B_**). The resulting visualization shows how different
 output ranges can be achieved and what kind of critical interactions affect
-the output–as seen in \autoref{fig:simdec}. The method has shown value for
+the output—as seen in \autoref{fig:simdec}. The method has shown value for
 various computational models from different fields, including business,
 environment, and engineering, as well as an emerging evidence of use for
 empirical data and AI.
