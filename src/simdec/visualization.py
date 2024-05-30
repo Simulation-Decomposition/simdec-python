@@ -1,3 +1,4 @@
+import copy
 import functools
 import itertools
 from typing import Literal
@@ -125,7 +126,7 @@ def palette(
     # many levels
     n_shades = int(np.prod(states[1:]))
     for i in range(n_cmaps):
-        cmap = cmaps[i].resampled(n_shades + 1)
+        cmap = cmaps[i].resampled(n_shades)
         colors.append(cmap(np.linspace(0, 1, n_shades)))
 
     return np.concatenate(colors).tolist()
@@ -202,6 +203,8 @@ def tableau(
     ----------
     var_names : list of str
         Variables name.
+    statistic : ndarray of shape (n_factors, 1)
+        Statistic in each bin.
     states : list of int or list of str
         For each variable, number of states. Can either be a scalar or a list.
 
@@ -225,16 +228,17 @@ def tableau(
     table.rename(columns={"index": "colour"}, inplace=True)
 
     # Default states for 2 or 3
-    for i, state in enumerate(states):
+    states_ = copy.deepcopy(states)
+    for i, state in enumerate(states_):
         if isinstance(state, int):
-            states: list
+            states_: list
             if state == 2:
-                states[i] = ["low", "high"]
+                states_[i] = ["low", "high"]
             elif state == 3:
-                states[i] = ["low", "medium", "high"]
+                states_[i] = ["low", "medium", "high"]
 
     # get the list of states
-    gen_states = [range(x) if isinstance(x, int) else x for x in states]
+    gen_states = [range(x) if isinstance(x, int) else x for x in states_]
     states_ = np.asarray(list(itertools.product(*gen_states)))
     for i, var_name in enumerate(var_names):
         table.insert(loc=i + 1, column=var_name, value=states_[:, i])
@@ -253,7 +257,7 @@ def tableau(
     table.insert(loc=0, column="N°", value=np.arange(1, stop=len(table) + 1)[::-1])
 
     # style the colour background with palette
-    cmap = mpl.colors.ListedColormap(palette[::-1])
+    cmap = mpl.colors.ListedColormap(palette)
     styler = table.style
     styler.format(precision=2)
     styler.background_gradient(subset=["colour"], cmap=cmap)

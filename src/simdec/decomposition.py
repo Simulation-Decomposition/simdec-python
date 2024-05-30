@@ -109,11 +109,9 @@ def decomposition(
     var_names = inputs.columns
 
     cat_cols = inputs.select_dtypes(exclude=["number"])
-    cat_cols_idx = []
     for cat_col in cat_cols:
         codes, cat_states_ = pd.factorize(inputs[cat_col])
         inputs[cat_col] = codes
-        cat_cols_idx.append(inputs.columns.get_loc(cat_col))
 
     inputs = inputs.to_numpy()
     output = output.to_numpy()
@@ -136,10 +134,9 @@ def decomposition(
         states = 3 if n_var_dec < 3 else 2
         states = [states] * n_var_dec
 
-        # categorical for a given variable
-        for i in cat_cols_idx:
+        for i in range(n_var_dec):
             n_unique = np.unique(inputs[:, i]).size
-            states[i] = n_unique if n_unique < 5 else states[i]
+            states[i] = n_unique if n_unique <= 5 else states[i]
 
     if auto_ordering:
         var_names = var_names[var_order[:n_var_dec]].tolist()
@@ -163,8 +160,20 @@ def decomposition(
         bins.append(inputs)
         return statistic_method(inputs)
 
+    # make bins with equal number of samples for a given dimension
+    # sort and then split in n-state
+    sorted_inputs = np.sort(inputs, axis=0)
+    bin_edges = []
+    for i, states_ in enumerate(states):
+        splits = np.array_split(sorted_inputs[:, i], states_)
+        bin_edges_ = [splits_[0] for splits_ in splits]
+        bin_edges_.append(splits[-1][-1])  # last point to close the edges
+        # bin_edges_ = np.unique(bin_edges_)  # remove duplicate points, sorted
+        bin_edges_ += 1e-10 * np.linspace(0, 1, len(bin_edges_))
+        bin_edges.append(bin_edges_)
+
     res = stats.binned_statistic_dd(
-        inputs, values=output, statistic=statistic_, bins=states
+        inputs, values=output, statistic=statistic_, bins=bin_edges
     )
 
     bins = pd.DataFrame(bins[1:]).T
