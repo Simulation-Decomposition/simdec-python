@@ -18,13 +18,4 @@ See our `publications <https://www.simdec.fi/publications>`_ and join our
 
    getting-started
    API <api>
-
-Executable tutorials
---------------------
-
-Below you can also find tutorials.
-
-.. toctree::
-   :maxdepth: 1
-
-   notebooks/structural_reliability
+   Tutorials <tutorials>
