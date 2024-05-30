@@ -28,12 +28,11 @@ bibliography: paper.bib
 
 Uncertainties are everywhere. Whether you are developing a new Artificial Intelligence (AI) system,
 running complex simulations or making an experiment in a lab, uncertainties
-influence the system. And you need a way to understand how these impact your
-results.
+influence the system. Therefore, an approach is needed to understand how these uncertainties impact the system's performance.
 
 SimDec offers a novel visual way to understand the intricate role that
-uncertainties play. Thanks to a clear Python Application Programming Interface (API) and an interactive web
-dashboard, making uncertainty analysis accessible to everyone.
+uncertainties play. A clear Python Application Programming Interface (API) and a no-code interactive web
+dashboard make uncertainty analysis with SimDec accessible to everyone.
 
 # Statement of need
 
@@ -48,9 +47,10 @@ to compare the importance of factors, there is a large body of literature and
 the field is known as: Sensitivity Analysis (SA) [@Saltelli2007]. The indices of Sobol' are a
 prominent example of such methods [@sobol1993].
 
-Simulation Decomposition is a hybrid uncertainty-sensitivity analysis approach
+Simulation Decomposition or SimDec moves the field of SA forward by supplementing the computation of sensitivity indices with the visualization of the type of interactions involved, which proves critical for understanding the system's behavior and decision-making [@Kozlova2024]. 
+In short, SimDec is a hybrid uncertainty-sensitivity analysis approach
 that reveals the critical behavior of a computational model or an empirical
-dataset [@Kozlova2024]. It decomposes the distribution of the output
+dataset. It decomposes the distribution of the output
 (target variable) by the multivariable scenarios, formed out of the most
 influential input variables. The resulting visualization shows how different
 output ranges can be achieved and what kind of critical interactions affect
@@ -59,12 +59,12 @@ various computational models from different fields, including business,
 environment, and engineering, as well as an emerging evidence of use for
 empirical data and AI.
 
-![SimDec: explanation of output by most important inputs.\label{fig:simdec}](simdec_presentation.png)
+![SimDec: explanation of output by most important inputs. A simulation dataset of a structural reliability model with one key output variable and four input variables is used for this case. Inputs 3 and 1 have the highest sensitivity indices and thus are automatically chosen for decomposition. The most influential input 3 divides the distribution of the output into three main states with distinct colors. Input 1 further subdivides them into shades. From the graph, it becomes obvious that input 1 influences the output when input 3 is low, but has a negligible effect when input 3 is medium or high.\label{fig:simdec}](simdec_presentation.png)
 
 Besides proposing a comprehensive yet simple API through a Python package
 available on PyPi, SimDec is also made available
 to practitioners through an online dashboard at [https://simdec.io](https://simdec.io). The project
-relies on powerful methods from SALib [@Herman2017] and
+relies on powerful variance-based sensitivity analysis methods from SALib [@Herman2017] and
 SciPy [@Virtanen2020; @Roy2023]&mdash;notably the Quasi-Monte Carlo capabilities with
 `sp.stats.qmc` and in the future sensitivity indices with `sp.stats.sensitivity_indices`.
 The dashboard is made possible thanks to Panel [@panel].
