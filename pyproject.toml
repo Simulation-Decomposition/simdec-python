@@ -51,6 +51,7 @@ doc = [
     "pydata-sphinx-theme",
     "accessible-pygments",
     "numpydoc",
+    "myst-nb",
 ]
 
 dev = [
