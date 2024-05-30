@@ -47,7 +47,7 @@ to compare the importance of factors, there is a large body of literature and
 the field is known as: Sensitivity Analysis (SA) [@Saltelli2007]. The indices of Sobol' are a
 prominent example of such methods [@sobol1993].
 
-Simulation Decomposition or SimDec moves the field of SA forward by supplementing the computation of sensitivity indices with the visualization of the type of interactions involved, which proves critical for understanding the system's behavior and decision-making [@Kozlova2024]. 
+Simulation Decomposition or SimDec moves the field of SA forward by supplementing the computation of sensitivity indices with the visualization of the type of interactions involved, which proves critical for understanding the system's behavior and decision-making [@Kozlova2024].
 In short, SimDec is a hybrid uncertainty-sensitivity analysis approach
 that reveals the critical behavior of a computational model or an empirical
 dataset. It decomposes the distribution of the output
