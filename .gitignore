@@ -32,5 +32,6 @@ htmlcov/*
 build/*
 dist/*
 sdist/*
-docs/_build
+docs/html
+docs/jupyter_execute
 app.html

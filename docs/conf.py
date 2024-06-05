@@ -12,6 +12,7 @@ extensions = [
     "sphinx.ext.autosummary",
     "sphinx.ext.viewcode",
     "numpydoc",
+    "myst_nb",
 ]
 
 templates_path = ["_templates"]
@@ -20,6 +21,10 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 # -- autosummary -------------------------------------------------------------
 
 autosummary_generate = True
+
+# -- Notebook tutorials with MyST-NB ------------------------------------------
+
+nb_execution_mode = "auto"
 
 # -- Version matching --------------------------------------------------------
 

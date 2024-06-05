@@ -18,3 +18,4 @@ See our `publications <https://www.simdec.fi/publications>`_ and join our
 
    getting-started
    API <api>
+   Tutorials <tutorials>

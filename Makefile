@@ -29,8 +29,11 @@ prepare:  ## Install dependencies and pre-commit hook
 
 # Doc and tests
 
-doc:  ## Build Sphinx documentation
-	sphinx-build -b html docs docs/html
+clean-doc:
+	rm -rf docs/html docs/jupyter_execute
+
+doc: clean-doc  ## Build Sphinx documentation
+	sphinx-build -b html docs docs/html;open docs/html/index.html
 
 test:  ## Run tests with coverage
 	pytest --cov simdec --cov-report term-missing
