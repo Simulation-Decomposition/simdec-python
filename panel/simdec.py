@@ -354,15 +354,22 @@ selector_n_bins = pn.widgets.EditableIntSlider(
     visible=show_n_bins,
 )
 
-interactive_xlim = pn.bind(xlim_auto, interactive_decomposition)
+interactive_xlim = pn.rx(xlim_auto)(interactive_decomposition)
 selector_xlim = pn.widgets.EditableRangeSlider(
     name="X-lim",
     start=interactive_xlim.rx()[0],
     end=interactive_xlim.rx()[1],
-    value=interactive_xlim,
+    value=interactive_xlim.rx(),
     format="0.0[00]",
     step=0.1,
 )
+
+
+def callback_xlim(start, end):
+    selector_xlim.param.update(dict(value=(start, end)))
+
+
+selector_xlim.param.watch_values(fn=callback_xlim, parameter_names=["start", "end"])
 
 interactive_states = pn.bind(
     states_from_data, interactive_decomposition, interactive_inputs_decomposition
