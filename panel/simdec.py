@@ -201,9 +201,8 @@ def display_n_bins(kind):
 
 
 @pn.cache
-def xlim_auto(res):
-    bins = np.concatenate(res.bin_edges)
-    return (np.min(bins), np.max(bins))
+def xlim_auto(output):
+    return (np.nanmin(output) * 0.95, np.nanmax(output) * 1.05)
 
 
 @pn.cache
@@ -354,7 +353,7 @@ selector_n_bins = pn.widgets.EditableIntSlider(
     visible=show_n_bins,
 )
 
-interactive_xlim = pn.rx(xlim_auto)(interactive_decomposition)
+interactive_xlim = pn.rx(xlim_auto)(interactive_output)
 selector_xlim = pn.widgets.EditableRangeSlider(
     name="X-lim",
     start=interactive_xlim.rx()[0],
