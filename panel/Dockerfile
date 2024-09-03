@@ -62,7 +62,7 @@ USER app
 WORKDIR /app
 
 # Run the web service on container startup.
-CMD ["panel", "serve", "panel/simdec.py", "panel/sampling.py", \
+CMD ["panel", "serve", "panel/simdec_app.py", "panel/sampling.py", \
      "--address", "0.0.0.0", "--port", "8080", \
      "--num-procs", "2", \
      "--allow-websocket-origin", "simdec.io", \

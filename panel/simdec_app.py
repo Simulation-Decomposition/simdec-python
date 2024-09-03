@@ -174,6 +174,7 @@ def update_colors_select(event):
 
 
 def create_color_pickers(states, colors):
+    print(states)
     color_picker_list = []
     for state, color in zip(states[0], colors):
         color_picker = pn.widgets.ColorPicker(name=state, value=color)
@@ -183,10 +184,11 @@ def create_color_pickers(states, colors):
 
 
 @pn.cache
-def palette(res, colors_picked):
+def palette_(states: list[list[str]], colors_picked: list[list[float]]):
     cmaps = [single_color_to_colormap(color_picked) for color_picked in colors_picked]
     # Reverse order as in figures high values take the first colors
-    return sd.palette(res.states[::-1], cmaps=cmaps[::-1])
+    states = [len(states_) for states_ in states]
+    return sd.palette(states[::-1], cmaps=cmaps[::-1])
 
 
 @pn.cache
@@ -206,7 +208,7 @@ def xlim_auto(output):
 
 
 @pn.cache
-def figure(res, palette, n_bins, xlim, kind, output_name):
+def figure_pn(res, palette, n_bins, xlim, kind, output_name):
     kind = "histogram" if kind == "Stacked histogram" else "boxplot"
     plt.close("all")
     fig, ax = plt.subplots()
@@ -224,12 +226,12 @@ def states_from_data(res, inputs):
 
 
 @pn.cache
-def tableau(res, states, palette):
+def tableau_pn(res, states, palette):
     # use a notebook to see the styling
     _, styler = sd.tableau(
         statistic=res.statistic,
         var_names=res.var_names,
-        states=states,
+        states=res.states,
         bins=res.bins,
         palette=palette,
     )
@@ -392,12 +394,10 @@ dummy_color_pickers_bind = pn.bind(
     colors_select.param.value,
 )
 
-interactive_palette = pn.bind(
-    palette, interactive_decomposition, colors_select.param.value
-)
+interactive_palette = pn.bind(palette_, interactive_states, colors_select.param.value)
 
 interactive_figure = pn.bind(
-    figure,
+    figure_pn,
     interactive_decomposition,
     interactive_palette,
     selector_n_bins,
@@ -407,7 +407,7 @@ interactive_figure = pn.bind(
 )
 
 interactive_tableau = pn.bind(
-    tableau, interactive_decomposition, interactive_states, interactive_palette
+    tableau_pn, interactive_decomposition, interactive_states, interactive_palette
 )
 interactive_tableau_states = pn.bind(
     tableau_states, interactive_decomposition, interactive_states
