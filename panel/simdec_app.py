@@ -188,7 +188,7 @@ def palette_(states: list[list[str]], colors_picked: list[list[float]]):
     cmaps = [single_color_to_colormap(color_picked) for color_picked in colors_picked]
     # Reverse order as in figures high values take the first colors
     states = [len(states_) for states_ in states]
-    return sd.palette(states[::-1], cmaps=cmaps[::-1])
+    return sd.palette(states, cmaps=cmaps[::-1])
 
 
 @pn.cache

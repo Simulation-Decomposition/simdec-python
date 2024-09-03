@@ -22,6 +22,8 @@ def states_expansion(states: list[int], inputs: pd.DataFrame) -> list[list[str]]
                 expanded_states.append(["low", "high"])
             elif state == 3:
                 expanded_states.append(["low", "medium", "high"])
+            else:
+                expanded_states.append([i for i in range(state)])
         else:
             expanded_states.append(state)
 
