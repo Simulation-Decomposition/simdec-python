@@ -174,10 +174,9 @@ def update_colors_select(event):
 
 
 def create_color_pickers(states, colors):
-    print(states)
     color_picker_list = []
     for state, color in zip(states[0], colors):
-        color_picker = pn.widgets.ColorPicker(name=state, value=color)
+        color_picker = pn.widgets.ColorPicker(name=str(state), value=color)
         color_picker.param.watch(update_colors_select, "value")
         color_picker_list.append(color_picker)
     color_pickers[:] = color_picker_list
