@@ -230,7 +230,7 @@ def figure_pn(
         ax.set(xlabel=output_name)
         ax.set_xlim(xlim)
     else:
-        fig, axs = plt.subplots(2, 2, sharex="col", sharey="row")
+        fig, axs = plt.subplots(2, 2, sharex="col", sharey="row", figsize=(8, 8))
 
         axs[0][1].axison = False
 
@@ -270,7 +270,7 @@ def figure_pn(
         axs[1][1].set_ylim(ylim)
         axs[1][1].set_box_aspect(aspect=1)
 
-    fig.tight_layout()
+    fig.subplots_adjust(wspace=0, hspace=0)
     return fig
 
 
