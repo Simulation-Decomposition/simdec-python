@@ -242,6 +242,7 @@ def figure_pn(
             ax=axs[0][0],
         )
         axs[0][0].set_xlim(xlim)
+        axs[0][0].set_box_aspect(aspect=1)
 
         data = pd.concat([pd.melt(res.bins), pd.melt(res2.bins)["value"]], axis=1)
         data.columns = ["c", "x", "y"]
@@ -251,6 +252,7 @@ def figure_pn(
         )
         axs[1][0].set(xlabel=output_name)
         axs[1][0].set(ylabel=output_2_name)
+        axs[1][0].set_box_aspect(aspect=1)
 
         _ = sns.histplot(
             data,
@@ -266,7 +268,9 @@ def figure_pn(
             ax=axs[1][1],
         )
         axs[1][1].set_ylim(ylim)
+        axs[1][1].set_box_aspect(aspect=1)
 
+    fig.tight_layout()
     return fig
 
 
