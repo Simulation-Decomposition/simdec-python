@@ -245,14 +245,20 @@ def figure_pn(res, res2, palette, n_bins, xlim, ylim, r_scatter, kind, output_na
             data, x="x", y="y", hue="c", palette=palette, ax=axs[1][0], legend=False
         )
 
-        _ = sd.visualization(
-            bins=res2.bins,
+        _ = sns.histplot(
+            data,
+            y="y",
+            hue="c",
+            multiple="stack",
+            stat="probability",
             palette=palette,
-            n_bins=n_bins,
-            kind="histogram",
+            common_bins=True,
+            common_norm=True,
+            bins=40,
+            legend=False,
             ax=axs[1][1],
         )
-        axs[1][1].set_xlim(ylim)
+        axs[1][1].set_ylim(ylim)
 
     return fig
 
