@@ -225,7 +225,7 @@ def figure_pn(res, res2, palette, n_bins, xlim, ylim, r_scatter, kind, output_na
         ax.set(xlabel=output_name)
         ax.set_xlim(xlim)
     else:
-        fig, axs = plt.subplots(2, 2)
+        fig, axs = plt.subplots(2, 2, sharex="col", sharey="row")
 
         axs[0][1].axison = False
 
