@@ -243,6 +243,7 @@ def figure_pn(
         )
         axs[0][0].set_xlim(xlim)
         axs[0][0].set_box_aspect(aspect=1)
+        axs[0][0].axis("off")
 
         data = pd.concat([pd.melt(res.bins), pd.melt(res2.bins)["value"]], axis=1)
         data.columns = ["c", "x", "y"]
@@ -269,6 +270,7 @@ def figure_pn(
         )
         axs[1][1].set_ylim(ylim)
         axs[1][1].set_box_aspect(aspect=1)
+        axs[1][1].axis("off")
 
     fig.subplots_adjust(wspace=0, hspace=0)
     return fig
