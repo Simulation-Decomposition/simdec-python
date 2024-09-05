@@ -272,7 +272,7 @@ def figure_pn(
         axs[1][1].set_box_aspect(aspect=1)
         axs[1][1].axis("off")
 
-    fig.subplots_adjust(wspace=0, hspace=0)
+    fig.subplots_adjust(wspace=-0.015, hspace=0)
     return fig
 
 
