@@ -9,6 +9,7 @@ import numpy as np
 import pandas as pd
 from pandas.io.formats.style import Styler
 import panel as pn
+import seaborn as sns
 
 import simdec as sd
 from simdec.visualization import sequential_cmaps, single_color_to_colormap
@@ -143,7 +144,7 @@ def explained_variance_80(sensitivity_indices_table):
 
 
 @pn.cache
-def decomposition(dec_limit, si, inputs, output):
+def decomposition_(dec_limit, si, inputs, output):
     return sd.decomposition(
         inputs=inputs,
         output=output,
@@ -198,7 +199,11 @@ def n_bins_auto(res):
 
 
 def display_n_bins(kind):
-    return False if kind != "Stacked histogram" else True
+    return False if kind not in ("Stacked histogram", "2 outputs") else True
+
+
+def display_2_output(kind):
+    return False if kind != "2 outputs" else True
 
 
 @pn.cache
@@ -207,15 +212,48 @@ def xlim_auto(output):
 
 
 @pn.cache
-def figure_pn(res, palette, n_bins, xlim, kind, output_name):
-    kind = "histogram" if kind == "Stacked histogram" else "boxplot"
+def figure_pn(res, res2, palette, n_bins, xlim, ylim, r_scatter, kind, output_name):
     plt.close("all")
-    fig, ax = plt.subplots()
-    _ = sd.visualization(
-        bins=res.bins, palette=palette, n_bins=n_bins, kind=kind, ax=ax
-    )
-    ax.set(xlabel=output_name)
-    ax.set_xlim(xlim)
+
+    if kind != "2 outputs":
+        fig, ax = plt.subplots()
+
+        kind = "histogram" if kind == "Stacked histogram" else "boxplot"
+        _ = sd.visualization(
+            bins=res.bins, palette=palette, n_bins=n_bins, kind=kind, ax=ax
+        )
+        ax.set(xlabel=output_name)
+        ax.set_xlim(xlim)
+    else:
+        fig, axs = plt.subplots(2, 2)
+
+        axs[0][1].axison = False
+
+        _ = sd.visualization(
+            bins=res.bins,
+            palette=palette,
+            n_bins=n_bins,
+            kind="histogram",
+            ax=axs[0][0],
+        )
+        axs[0][0].set_xlim(xlim)
+
+        data = pd.concat([pd.melt(res.bins), pd.melt(res2.bins)["value"]], axis=1)
+        data.columns = ["c", "x", "y"]
+        data = data.sample(int(r_scatter * len(data)))
+        _ = sns.scatterplot(
+            data, x="x", y="y", hue="c", palette=palette, ax=axs[1][0], legend=False
+        )
+
+        _ = sd.visualization(
+            bins=res2.bins,
+            palette=palette,
+            n_bins=n_bins,
+            kind="histogram",
+            ax=axs[1][1],
+        )
+        axs[1][1].set_xlim(ylim)
+
     return fig
 
 
@@ -329,20 +367,62 @@ indicator_explained_variance = pn.indicators.Number(
 
 
 interactive_decomposition = pn.bind(
-    decomposition,
+    decomposition_,
     interactive_explained_variance,
     interactive_filtered_si,
     interactive_inputs_decomposition,
     interactive_output,
 )
 
-switch_histogram_boxplot = pn.widgets.RadioButtonGroup(
-    name="Switch histogram - boxplot",
-    options=["Stacked histogram", "Boxplot"],
+switch_type_visualization = pn.widgets.RadioButtonGroup(
+    name="Type of visualization",
+    options=["Stacked histogram", "Boxplot", "2 outputs"],
 )
-show_n_bins = pn.bind(display_n_bins, switch_histogram_boxplot)
+show_n_bins = pn.rx(display_n_bins)(switch_type_visualization)
+show_2_output = pn.rx(display_2_output)(switch_type_visualization)
 
-interactive_n_bins_auto = pn.bind(n_bins_auto, interactive_decomposition)
+selector_2_output = pn.widgets.Select(
+    name="Second output",
+    value=None,
+    options=interactive_column_output,
+    visible=show_2_output,
+)
+interactive_2_output = pn.bind(filtered_data, interactive_file, selector_2_output)
+
+interactive_sensitivity_indices_2 = pn.bind(
+    sensitivity_indices, interactive_inputs, interactive_2_output
+)
+interactive_explained_variance_2 = pn.bind(
+    explained_variance, interactive_sensitivity_indices_2
+)
+
+interactive_sensitivity_indices_table_2 = pn.bind(
+    sensitivity_indices_table, interactive_sensitivity_indices_2, interactive_inputs
+)
+
+interactive_filtered_si_2 = pn.bind(
+    filtered_si, interactive_sensitivity_indices_table_2, selector_inputs_decomposition
+)
+
+interactive_decomposition_2 = pn.bind(
+    decomposition_,
+    interactive_explained_variance_2,
+    interactive_filtered_si_2,
+    interactive_inputs_decomposition,
+    interactive_2_output,
+)
+
+selector_r_scatter = pn.widgets.EditableFloatSlider(
+    name="Share of data shown",
+    start=0.0,
+    end=1.0,
+    value=1.0,
+    step=0.1,
+    # bar_color="#FFFFFF",  # does not work
+    visible=show_2_output,
+)
+
+interactive_n_bins_auto = pn.rx(n_bins_auto)(interactive_decomposition)
 selector_n_bins = pn.widgets.EditableIntSlider(
     name="Number of bins",
     start=0,
@@ -364,12 +444,31 @@ selector_xlim = pn.widgets.EditableRangeSlider(
     step=0.1,
 )
 
+interactive_ylim = pn.rx(xlim_auto)(interactive_2_output)
+selector_ylim = pn.widgets.EditableRangeSlider(
+    name="Y-lim",
+    start=interactive_ylim.rx()[0],
+    end=interactive_ylim.rx()[1],
+    value=interactive_ylim.rx(),
+    format="0.0[00]",
+    step=0.1,
+    visible=show_2_output,
+)
+
 
 def callback_xlim(start, end):
     selector_xlim.param.update(dict(value=(start, end)))
 
 
 selector_xlim.param.watch_values(fn=callback_xlim, parameter_names=["start", "end"])
+
+
+def callback_ylim(start, end):
+    selector_ylim.param.update(dict(value=(start, end)))
+
+
+selector_ylim.param.watch_values(fn=callback_ylim, parameter_names=["start", "end"])
+
 
 interactive_states = pn.bind(
     states_from_data, interactive_decomposition, interactive_inputs_decomposition
@@ -398,10 +497,13 @@ interactive_palette = pn.bind(palette_, interactive_states, colors_select.param.
 interactive_figure = pn.bind(
     figure_pn,
     interactive_decomposition,
+    interactive_decomposition_2,
     interactive_palette,
     selector_n_bins,
     selector_xlim,
-    switch_histogram_boxplot,
+    selector_ylim,
+    selector_r_scatter,
+    switch_type_visualization,
     selector_output,
 )
 
@@ -424,9 +526,12 @@ sidebar_area = pn.layout.WidgetBox(
     selector_inputs_decomposition,
     indicator_explained_variance,
     pn.pane.Markdown("## Visualization", styles={"color": blue_color}),
-    switch_histogram_boxplot,
+    switch_type_visualization,
+    selector_2_output,
     selector_n_bins,
+    selector_r_scatter,
     selector_xlim,
+    selector_ylim,
     dummy_color_pickers_bind,
     color_pickers,
     sizing_mode="stretch_width",
