@@ -67,7 +67,10 @@ def column_output(data):
 
 @pn.cache
 def filtered_data(data, output_name):
-    return data[output_name]
+    try:
+        return data[output_name]
+    except KeyError:
+        return data.iloc[:, 0]
 
 
 @pn.cache
