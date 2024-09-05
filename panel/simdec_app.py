@@ -212,7 +212,9 @@ def xlim_auto(output):
 
 
 @pn.cache
-def figure_pn(res, res2, palette, n_bins, xlim, ylim, r_scatter, kind, output_name):
+def figure_pn(
+    res, res2, palette, n_bins, xlim, ylim, r_scatter, kind, output_name, output_2_name
+):
     plt.close("all")
 
     if kind != "2 outputs":
@@ -244,6 +246,8 @@ def figure_pn(res, res2, palette, n_bins, xlim, ylim, r_scatter, kind, output_na
         _ = sns.scatterplot(
             data, x="x", y="y", hue="c", palette=palette, ax=axs[1][0], legend=False
         )
+        axs[1][0].set(xlabel=output_name)
+        axs[1][0].set(ylabel=output_2_name)
 
         _ = sns.histplot(
             data,
@@ -511,6 +515,7 @@ interactive_figure = pn.bind(
     selector_r_scatter,
     switch_type_visualization,
     selector_output,
+    selector_2_output,
 )
 
 interactive_tableau = pn.bind(
