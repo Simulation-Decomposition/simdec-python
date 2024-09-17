@@ -49,7 +49,7 @@ def csv_data(sample: pd.DataFrame) -> io.StringIO:
 dim = pn.widgets.IntInput(
     name="Number of variables",
     start=1,
-    end=10,
+    end=15,
     value=2,
     step=1,
 )
