@@ -87,7 +87,7 @@ def create_variable(dim):
     variables_details[:] = variables_
 
 
-dummy_create_variable_bind = pn.bind(create_variable, dim)
+dummy_create_variable_bind = pn.rx(create_variable)(dim)
 
 
 n_samples = pn.widgets.IntInput(
@@ -146,14 +146,12 @@ def sample_to_dataframe(sample, variables_details):
     return df
 
 
-interactive_sample_dist = pn.bind(
-    sample_to_distributions,
+interactive_sample_dist = pn.rx(sample_to_distributions)(
     sample=interactive_sample,
     variables_details=variables_details,
 )
 
-interactive_dataframe = pn.bind(
-    sample_to_dataframe,
+interactive_dataframe = pn.rx(sample_to_dataframe)(
     sample=interactive_sample_dist,
     variables_details=variables_details,
 )
