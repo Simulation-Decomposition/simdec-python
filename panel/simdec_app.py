@@ -12,6 +12,7 @@ import panel as pn
 import seaborn as sns
 
 import simdec as sd
+from simdec.sensitivity_indices import SensitivityAnalysisResult
 from simdec.visualization import sequential_cmaps, single_color_to_colormap
 
 
@@ -74,12 +75,17 @@ def filtered_data(data, output_name):
 
 
 @pn.cache
-def sensitivity_indices(inputs, output):
-    sensitivity_indices = sd.sensitivity_indices(inputs=inputs, output=output)
-    if 0.01 < sum(sensitivity_indices.si) < 2.0:
-        indices = sensitivity_indices.si
+def sensitivity_indices_full(inputs, output):
+    sensitivity_indices_ = sd.sensitivity_indices(inputs=inputs, output=output)
+    return sensitivity_indices_
+
+
+@pn.cache
+def sensitivity_indices(sensitivity_indices_):
+    if 0.01 < sum(sensitivity_indices_.si) < 2.0:
+        indices = sensitivity_indices_.si
     else:
-        indices = sensitivity_indices.first_order
+        indices = sensitivity_indices_.first_order
     return indices
 
 
@@ -311,13 +317,25 @@ def tableau_states(res, states):
 
 
 def csv_data(
-    sensitivity_indices: pn.widgets.Tabulator, scenario: Styler, states: Styler
+    sensitivity_indices: SensitivityAnalysisResult,
+    inputs: pd.DataFrame,
+    scenario: Styler,
+    states: Styler,
 ) -> io.StringIO:
     sio = io.StringIO()
 
-    si_table = sensitivity_indices.value[["Inputs", ""]]
-    si_table.rename(columns={"": "Indices"}, inplace=True)
-    si_table.to_csv(sio, index=False)
+    si = pd.DataFrame(sensitivity_indices.si.reshape(1, -1), columns=inputs.columns)
+    first_order = pd.DataFrame(
+        sensitivity_indices.first_order.reshape(1, -1), columns=inputs.columns
+    )
+    second_order = pd.DataFrame(
+        sensitivity_indices.second_order, columns=inputs.columns
+    )
+
+    si.to_csv(sio, index=False)
+    first_order.to_csv(sio, index=False)
+    second_order.to_csv(sio, index=False)
+
     scenario.data.to_csv(sio)
     states.data.to_csv(sio)
 
@@ -346,8 +364,11 @@ interactive_inputs = pn.bind(
     filtered_data, interactive_file, selector_inputs_sensitivity
 )
 
+interactive_sensitivity_indices_full = pn.bind(
+    sensitivity_indices_full, interactive_inputs, interactive_output
+)
 interactive_sensitivity_indices = pn.bind(
-    sensitivity_indices, interactive_inputs, interactive_output
+    sensitivity_indices, interactive_sensitivity_indices_full
 )
 interactive_explained_variance = pn.bind(
     explained_variance, interactive_sensitivity_indices
@@ -408,8 +429,11 @@ selector_2_output = pn.widgets.Select(
 )
 interactive_2_output = pn.bind(filtered_data, interactive_file, selector_2_output)
 
+interactive_sensitivity_indices_full_2 = pn.bind(
+    sensitivity_indices_full, interactive_inputs, interactive_2_output
+)
 interactive_sensitivity_indices_2 = pn.bind(
-    sensitivity_indices, interactive_inputs, interactive_2_output
+    sensitivity_indices, interactive_sensitivity_indices_full_2
 )
 interactive_explained_variance_2 = pn.bind(
     explained_variance, interactive_sensitivity_indices_2
@@ -585,7 +609,8 @@ icon_size = "1.5em"
 download_file_button = pn.widgets.FileDownload(
     callback=pn.bind(
         csv_data,
-        interactive_sensitivity_indices_table,
+        interactive_sensitivity_indices_full,
+        interactive_inputs,
         interactive_tableau,
         interactive_tableau_states,
     ),
