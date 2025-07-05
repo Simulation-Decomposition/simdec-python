@@ -21,6 +21,7 @@ __pycache__
 .vscode
 .spyproject
 
+
 # Test, linter, coverage
 htmlcov/*
 .coverage
