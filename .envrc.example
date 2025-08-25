@@ -1,0 +1,5 @@
+export PANEL_OAUTH_REDIRECT_URI=http://localhost:5006/app
+export PANEL_OAUTH_KEY=
+export PANEL_OAUTH_SECRET=
+export PANEL_OAUTH_ENCRYPTION=
+export PANEL_TOKEN=

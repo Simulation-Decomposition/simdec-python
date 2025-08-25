@@ -48,13 +48,14 @@ serve-dev:  ## Serve Panel dashboard - Dev mode
  		--reuse-sessions --warm
 
 serve-oauth:  ## Serve Panel dashboard - Prod mode with OAuth2. Needs: PANEL_OAUTH_REDIRECT_URI, PANEL_OAUTH_KEY, PANEL_OAUTH_SECRET, PANEL_OAUTH_ENCRYPTION
-	PANEL_OAUTH_SCOPE=email panel serve panel/simdec_app.py panel/sampling.py \
+	panel serve panel/simdec_app.py panel/sampling.py \
 		--index panel/index.html \
 		--show \
 		--cookie-secret panel_cookie_secret_oauth \
 		--basic-login-template panel/login.html \
 		--logout-template panel/logout.html \
 		--oauth-provider custom_google \
+		--login-endpoint app \
 		--static-dirs _static=docs/_static \
 		--reuse-sessions --warm
 
@@ -73,7 +74,6 @@ run-local: build-local
 	--memory=1g \
 	--cpuset-cpus=0 \
 	-e ENV=development \
-	-e PANEL_OAUTH_SCOPE=email \
 	-e PANEL_OAUTH_REDIRECT_URI=$(PANEL_OAUTH_REDIRECT_URI) \
 	-e PANEL_OAUTH_SECRET=$(PANEL_OAUTH_SECRET) \
 	-e PANEL_OAUTH_KEY=$(PANEL_OAUTH_KEY) \
@@ -95,7 +95,6 @@ run: build
 	--memory=1g \
 	--cpuset-cpus=0 \
 	-e ENV=development \
-	-e PANEL_OAUTH_SCOPE=email \
 	-e PANEL_OAUTH_REDIRECT_URI=$(PANEL_OAUTH_REDIRECT_URI) \
 	-e PANEL_OAUTH_SECRET=$(PANEL_OAUTH_SECRET) \
 	-e PANEL_OAUTH_KEY=$(PANEL_OAUTH_KEY) \
@@ -120,7 +119,6 @@ deploy-production: publish-production  ## Deploy new revision to GCP
 	                  --region=$(region) \
 	                  --port=8080 \
 	                  --set-env-vars ENV=production \
-	                  --set-env-vars PANEL_OAUTH_SCOPE=email \
 	                  --set-secrets=PANEL_OAUTH_REDIRECT_URI=PANEL_OAUTH_REDIRECT_URI:latest \
 	                  --set-secrets=PANEL_OAUTH_KEY=PANEL_OAUTH_KEY:latest \
 	                  --set-secrets=PANEL_OAUTH_SECRET=PANEL_OAUTH_SECRET:latest \

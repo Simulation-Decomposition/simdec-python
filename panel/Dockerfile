@@ -72,6 +72,7 @@ CMD ["panel", "serve", "panel/simdec_app.py", "panel/sampling.py", \
      "--basic-login-template", "panel/login.html", \
      "--logout-template", "panel/logout.html", \
      "--oauth-provider", "custom_google", \
+     "--login-endpoint", "app", \
      "--index", "panel/index.html", \
      "--static-dirs", "_static=_static", \
      "--reuse-sessions", "--warm", \
