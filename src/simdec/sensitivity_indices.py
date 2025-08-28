@@ -164,7 +164,6 @@ def sensitivity_indices(
 
             soe[i, j] = (var_ij - var_i - var_j) / var_y
 
-        soe = np.clip(soe, a_min=0, a_max=None)
         soe = np.where(soe == 0, soe.T, soe)
         si[i] = foe[i] + soe[:, i].sum() / 2
 

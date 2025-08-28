@@ -678,7 +678,7 @@ header_area = pn.Row(
     pn.HSpacer(),
     download_file_button,
     docs,
-    docs_button,
+    # docs_button,
     info_button,
     issue_button,
     # logout_button,
