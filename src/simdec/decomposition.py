@@ -191,11 +191,11 @@ def decomposition(
                 gaps = np.diff(uniq)
                 margin = 0.1 * np.min(gaps)
     
-                bin_edges_ = np.concatenate(
+                edges = np.concatenate(
                     ([uniq[0] - margin], uniq[:-1] + margin, [uniq[-1] + margin])
                 ).astype(float)
     
-            bin_edges.append(bin_edges_)
+            bin_edges.append(edges)
             continue
 
     # Default: equal-number-of-samples bins
