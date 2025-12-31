@@ -167,10 +167,32 @@ def decomposition(
     sorted_inputs = np.sort(inputs, axis=0)
     bin_edges = []
     for i, states_ in enumerate(states):
+            col = inputs[:, i]
+    uniq = np.unique(col)
+
+    # If this input has only a few unique numeric values (categorical-like),
+    # build bin edges around unique values so we don't get empty states.
+    if uniq.size <= 5:
+        uniq = np.sort(uniq).astype(float)
+        if uniq.size == 1:
+            bin_edges_ = np.array([uniq[0] - 0.5, uniq[0] + 0.5], dtype=float)
+        else:
+            gaps = np.diff(uniq)
+            margin = 0.1 * np.min(gaps)  # fixing boundaries for categorical
+
+            # edges length = n_unique + 1
+            bin_edges_ = np.concatenate(
+                ([uniq[0] - margin], uniq[:-1] + margin, [uniq[-1] + margin])
+            ).astype(float)
+
+        bin_edges.append(bin_edges_)
+        continue
+      
         splits = np.array_split(sorted_inputs[:, i], states_)
+        
         bin_edges_ = [splits_[0] for splits_ in splits]
         bin_edges_.append(splits[-1][-1])  # last point to close the edges
-        # bin_edges_ = np.unique(bin_edges_)  # remove duplicate points, sorted
+        bin_edges_ = np.array(bin_edges_, dtype=float)
         bin_edges_ += 1e-10 * np.linspace(0, 1, len(bin_edges_))
         bin_edges.append(bin_edges_)
 
