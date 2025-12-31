@@ -20,7 +20,7 @@ jobs:
       run:
         shell: bash -l {0}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v5
 
       - name: Set up conda
         uses: conda-incubator/setup-miniconda@v3
@@ -28,9 +28,8 @@ jobs:
           activate-environment: simdec
           python-version: ${{ matrix.python-version }}
           channels: conda-forge
-          miniforge-variant: Mambaforge
           miniforge-version: latest
-          use-mamba: true
+          mamba-version: "*"
           channel-priority: true
 
       - name: Get Date
