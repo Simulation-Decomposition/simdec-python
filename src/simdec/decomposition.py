@@ -198,7 +198,6 @@ def decomposition(
         edges += 1e-10 * np.linspace(0, 1, len(edges))
         bin_edges.append(edges)
 
-
     res = stats.binned_statistic_dd(
         inputs, values=output, statistic=statistic_, bins=bin_edges
     )
