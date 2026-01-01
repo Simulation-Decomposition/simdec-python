@@ -162,41 +162,41 @@ def decomposition(
         bins.append(inputs)
         return statistic_method(inputs)
 
-    # If this input has only a few unique numeric values (categorical-like),
-    # build bin edges around unique values so we don't get empty states.
+    # make bins with equal number of samples for a given dimension
+    # sort and then split in n-state
     sorted_inputs = np.sort(inputs, axis=0)
     bin_edges = []
-    
+
     for i, states_ in enumerate(states):
         col = inputs[:, i]
         uniq = np.unique(col)
-    
-        # Categorical-like numeric inputs
+
+        # Categorical-like numeric inputs: if we have few unique numeric values,
+        # build edges around the unique values so we don't create empty states.
+        # We only apply this when the requested number of states matches the
+        # number of categories (uniq.size).
         if uniq.size <= 5 and states_ == uniq.size:
             uniq = np.sort(uniq).astype(float)
-    
+
             if uniq.size == 1:
-                bin_edges_ = np.array(
-                    [uniq[0] - 0.5, uniq[0] + 0.5], dtype=float
-                )
+                edges = np.array([uniq[0] - 0.5, uniq[0] + 0.5], dtype=float)
             else:
                 gaps = np.diff(uniq)
                 margin = 0.1 * np.min(gaps)
-    
                 edges = np.concatenate(
                     ([uniq[0] - margin], uniq[:-1] + margin, [uniq[-1] + margin])
                 ).astype(float)
-    
+
             bin_edges.append(edges)
             continue
 
-    # Default: equal-number-of-samples bins
-    splits = np.array_split(sorted_inputs[:, i], states_)
-    bin_edges_ = [splits_[0] for splits_ in splits]
-    bin_edges_.append(splits[-1][-1])  # last point to close the edges
-    bin_edges_ = np.array(bin_edges_, dtype=float)
-    bin_edges_ += 1e-10 * np.linspace(0, 1, len(bin_edges_))
-    bin_edges.append(bin_edges_)
+        # Default: equal-number-of-samples bins
+        splits = np.array_split(sorted_inputs[:, i], states_)
+        edges = [s[0] for s in splits]
+        edges.append(splits[-1][-1])  # last point to close the edges
+        edges = np.array(edges, dtype=float)
+        edges += 1e-10 * np.linspace(0, 1, len(edges))
+        bin_edges.append(edges)
 
 
     res = stats.binned_statistic_dd(
