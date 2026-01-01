@@ -162,14 +162,6 @@ def decomposition(
         bins.append(inputs)
         return statistic_method(inputs)
 
-    # make bins with equal number of samples for a given dimension
-    # sort and then split in n-state
-    sorted_inputs = np.sort(inputs, axis=0)
-    bin_edges = []
-    for i, states_ in enumerate(states):
-        col = inputs[:, i]
-        uniq = np.unique(col)
-
     # If this input has only a few unique numeric values (categorical-like),
     # build bin edges around unique values so we don't get empty states.
     sorted_inputs = np.sort(inputs, axis=0)
