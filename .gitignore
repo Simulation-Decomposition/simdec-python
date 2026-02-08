@@ -35,3 +35,6 @@ sdist/*
 docs/html
 docs/jupyter_execute
 app.html
+
+# Virtual environment
+venv/
