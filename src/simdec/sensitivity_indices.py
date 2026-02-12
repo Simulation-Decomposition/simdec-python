@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-import warnings
 
 import numpy as np
 import pandas as pd
@@ -61,7 +60,7 @@ def sensitivity_indices(
             Sensitivity indices, combined effect of each input.
         foe : ndarray of shape (n_factors, 1)
             First-order effects (also called 'main' or 'individual').
-        soe : ndarray of shape (n_factors, 1)
+        soe_full : ndarray of shape (n_factors, 1)
             Second-order effects (also called 'interaction').
 
     Examples
@@ -96,14 +95,20 @@ def sensitivity_indices(
     array([0.43157591, 0.44241433, 0.11767249])
 
     """
+    # Handle inputs conversion
     if isinstance(inputs, pd.DataFrame):
         cat_columns = inputs.select_dtypes(["category", "O"]).columns
         inputs[cat_columns] = inputs[cat_columns].apply(
             lambda x: x.astype("category").cat.codes
         )
         inputs = inputs.to_numpy()
-    if isinstance(output, pd.DataFrame):
+
+    # Handle output conversion first, then flatten
+    if isinstance(output, (pd.DataFrame, pd.Series)):
         output = output.to_numpy()
+
+    # Flatten output if it's (N, 1)
+    output = output.flatten()
 
     n_runs, n_factors = inputs.shape
     n_bins_foe, n_bins_soe = number_of_bins(n_runs, n_factors)
@@ -116,55 +121,64 @@ def sensitivity_indices(
     soe = np.zeros((n_factors, n_factors))
 
     for i in range(n_factors):
-        # first order
+        # 1. First-order effects (FOE)
         xi = inputs[:, i]
 
         bin_avg, _, binnumber = stats.binned_statistic(
-            x=xi, values=output, bins=n_bins_foe
+            x=xi, values=output, bins=n_bins_foe, statistic="mean"
         )
-        # can have NaN in the average but no corresponding binnumber
-        bin_avg = bin_avg[~np.isnan(bin_avg)]
-        bin_counts = np.unique(binnumber, return_counts=True)[1]
 
-        # weighted variance and divide by the overall variance of the output
-        foe[i] = _weighted_var(bin_avg, weights=bin_counts) / var_y
+        # Filter empty bins and get weights (counts)
+        mask_foe = ~np.isnan(bin_avg)
+        mean_i_foe = bin_avg[mask_foe]
+        # binnumber starts at 1; 0 is for values outside range
+        bin_counts_foe = np.unique(binnumber[binnumber > 0], return_counts=True)[1]
 
-        # second order
+        foe[i] = _weighted_var(mean_i_foe, weights=bin_counts_foe) / var_y
+
+        # 2. Second-order effects (SOE)
         for j in range(n_factors):
-            if i == j or j < i:
+            if j <= i:
                 continue
 
             xj = inputs[:, j]
 
-            bin_avg, *edges, binnumber = stats.binned_statistic_2d(
+            # 2D Binned Statistic for Var(E[Y|Xi, Xj])
+            bin_avg_ij, x_edges, y_edges, binnumber_ij = stats.binned_statistic_2d(
                 x=xi, y=xj, values=output, bins=n_bins_soe, expand_binnumbers=False
             )
 
-            mean_ij = bin_avg[~np.isnan(bin_avg)]
-            bin_counts = np.unique(binnumber, return_counts=True)[1]
-            var_ij = _weighted_var(mean_ij, weights=bin_counts)
+            mask_ij = ~np.isnan(bin_avg_ij)
+            mean_ij = bin_avg_ij[mask_ij]
+            counts_ij = np.unique(binnumber_ij[binnumber_ij > 0], return_counts=True)[1]
+            var_ij = _weighted_var(mean_ij, weights=counts_ij)
 
-            # expand_binnumbers here
-            nbin = np.array([len(edges_) + 1 for edges_ in edges])
-            binnumbers = np.asarray(np.unravel_index(binnumber, nbin))
+            # Marginal Var(E[Y|Xi]) using n_bins_soe to match MATLAB logic
+            bin_avg_i_soe, _, binnumber_i_soe = stats.binned_statistic(
+                x=xi, values=output, bins=n_bins_soe, statistic="mean"
+            )
+            mask_i = ~np.isnan(bin_avg_i_soe)
+            counts_i = np.unique(
+                binnumber_i_soe[binnumber_i_soe > 0], return_counts=True
+            )[1]
+            var_i_soe = _weighted_var(bin_avg_i_soe[mask_i], weights=counts_i)
 
-            bin_counts_i = np.unique(binnumbers[0], return_counts=True)[1]
-            bin_counts_j = np.unique(binnumbers[1], return_counts=True)[1]
+            # Marginal Var(E[Y|Xj]) using n_bins_soe to match MATLAB logic
+            bin_avg_j_soe, _, binnumber_j_soe = stats.binned_statistic(
+                x=xj, values=output, bins=n_bins_soe, statistic="mean"
+            )
+            mask_j = ~np.isnan(bin_avg_j_soe)
+            counts_j = np.unique(
+                binnumber_j_soe[binnumber_j_soe > 0], return_counts=True
+            )[1]
+            var_j_soe = _weighted_var(bin_avg_j_soe[mask_j], weights=counts_j)
 
-            # handle NaNs
-            with warnings.catch_warnings():
-                warnings.simplefilter("ignore", RuntimeWarning)
-                mean_i = np.nanmean(bin_avg, axis=1)
-                mean_i = mean_i[~np.isnan(mean_i)]
-                mean_j = np.nanmean(bin_avg, axis=0)
-                mean_j = mean_j[~np.isnan(mean_j)]
+            soe[i, j] = (var_ij - var_i_soe - var_j_soe) / var_y
 
-            var_i = _weighted_var(mean_i, weights=bin_counts_i)
-            var_j = _weighted_var(mean_j, weights=bin_counts_j)
+    # Mirror SOE and calculate Combined Effect (SI)
+    # SI is FOE + half of all interactions associated with that variable
+    soe_full = soe + soe.T
+    for k in range(n_factors):
+        si[k] = foe[k] + (soe_full[:, k].sum() / 2)
 
-            soe[i, j] = (var_ij - var_i - var_j) / var_y
-
-        soe = np.where(soe == 0, soe.T, soe)
-        si[i] = foe[i] + soe[:, i].sum() / 2
-
-    return SensitivityAnalysisResult(si, foe, soe)
+    return SensitivityAnalysisResult(si, foe, soe_full)
