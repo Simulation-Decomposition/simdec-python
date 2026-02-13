@@ -68,7 +68,7 @@ def decomposition(
     output: pd.DataFrame,
     *,
     sensitivity_indices: np.ndarray,
-    dec_limit: float = 1,
+    dec_limit: float | None = None,
     auto_ordering: bool = True,
     states: list[int] | None = None,
     statistic: Literal["mean", "median"] | None = "mean",
@@ -79,7 +79,7 @@ def decomposition(
     ----------
     inputs : DataFrame of shape (n_runs, n_factors)
         Input variables.
-    output : DataFrame of shape (n_runs, 1)
+    output : DataFrame of shape (n_runs, 1) or (n_runs,)
         Target variable.
     sensitivity_indices : ndarray of shape (n_factors, 1)
         Sensitivity indices, combined effect of each input.
@@ -116,7 +116,7 @@ def decomposition(
         inputs[cat_col] = codes
 
     inputs = inputs.to_numpy()
-    output = output.to_numpy()
+    output = output.to_numpy().flatten()
 
     # 1. variables for decomposition
     var_order = np.argsort(sensitivity_indices)[::-1]
@@ -125,26 +125,41 @@ def decomposition(
     sensitivity_indices = sensitivity_indices[var_order]
 
     if auto_ordering:
-        n_var_dec = np.where(np.cumsum(sensitivity_indices) < dec_limit)[0].size
+        # handle edge case where sensitivity indices don't sum exactly to 1.0
+        if dec_limit is None:
+            dec_limit = 0.8 * np.sum(sensitivity_indices)
+
+        cumulative_sum = np.cumsum(sensitivity_indices)
+        indices_over_limit = np.where(cumulative_sum >= dec_limit)[0]
+
+        if indices_over_limit.size > 0:
+            n_var_dec = indices_over_limit[0] + 1
+        else:
+            n_var_dec = sensitivity_indices.size
+
         n_var_dec = max(1, n_var_dec)  # keep at least one variable
         n_var_dec = min(5, n_var_dec)  # use at most 5 variables
     else:
         n_var_dec = inputs.shape[1]
 
-    # 2. states formation
+    # 2. variable selection and reordering
+    if auto_ordering:
+        var_names = var_names[var_order[:n_var_dec]].tolist()
+        inputs = inputs[:, var_order[:n_var_dec]]
+    else:
+        var_names = var_names[:n_var_dec].tolist()
+        inputs = inputs[:, :n_var_dec]
+
+    # 3. states formation (after reordering/selection)
     if states is None:
-        states = 3 if n_var_dec < 3 else 2
+        states = 3 if n_var_dec <= 2 else 2
         states = [states] * n_var_dec
 
         for i in range(n_var_dec):
             n_unique = np.unique(inputs[:, i]).size
             states[i] = n_unique if n_unique <= 5 else states[i]
 
-    if auto_ordering:
-        var_names = var_names[var_order[:n_var_dec]].tolist()
-        inputs = inputs[:, var_order[:n_var_dec]]
-
-    # 3. decomposition
+    # 4. decomposition
     bins = []
 
     statistic_methods = {
@@ -153,8 +168,8 @@ def decomposition(
     }
     try:
         statistic_method = statistic_methods[statistic]
-    except IndexError:
-        msg = f"'statistic' must be one of {statistic_methods.values()}"
+    except KeyError:
+        msg = f"'statistic' must be one of {statistic_methods.keys()}"
         raise ValueError(msg)
 
     def statistic_(inputs):
