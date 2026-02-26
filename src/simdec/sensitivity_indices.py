@@ -60,7 +60,7 @@ def sensitivity_indices(
             Sensitivity indices, combined effect of each input.
         foe : ndarray of shape (n_factors, 1)
             First-order effects (also called 'main' or 'individual').
-        soe_full : ndarray of shape (n_factors, 1)
+        soe : ndarray of shape (n_factors, n_factors)
             Second-order effects (also called 'interaction').
 
     Examples
@@ -177,8 +177,8 @@ def sensitivity_indices(
 
     # Mirror SOE and calculate Combined Effect (SI)
     # SI is FOE + half of all interactions associated with that variable
-    soe_full = soe + soe.T
+    soe = soe + soe.T
     for k in range(n_factors):
-        si[k] = foe[k] + (soe_full[:, k].sum() / 2)
+        si[k] = foe[k] + (soe[:, k].sum() / 2)
 
-    return SensitivityAnalysisResult(si, foe, soe_full)
+    return SensitivityAnalysisResult(si, foe, soe)
