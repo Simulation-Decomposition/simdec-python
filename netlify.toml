@@ -2,5 +2,17 @@
   command = "npm run build"
   publish = "dist/pyodide"
 
+[dev]
+  # Prevent Netlify from watching these folders for changes
+  ignore = ["dist", ".wasm-build-venv", "panel/data"]
+  # Force it to use a specific port to avoid EADDRINUSE
+  port = 8888
+
 [build.environment]
   PYTHON_VERSION = "3.11"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Cross-Origin-Embedder-Policy = "require-corp"
+    Cross-Origin-Opener-Policy = "same-origin"

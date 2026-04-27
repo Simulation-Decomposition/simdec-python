@@ -5,6 +5,14 @@ set -x
 
 # Setup paths and environment
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+OUT_DIR="${ROOT_DIR}/dist/pyodide"
+
+# Wipe old build before starting
+if [ -d "${OUT_DIR}" ]; then
+    echo "Cleaning old build..."
+    rm -rf "${OUT_DIR}"
+fi
+
 cd "${ROOT_DIR}"
 
 # Determine which Python interpreter to use
@@ -51,7 +59,6 @@ WHEEL_FILENAME=$(basename "${SIMDEC_WHEEL_PATH}")
 OUT_DIR="${ROOT_DIR}/dist/pyodide"
 mkdir -p "${OUT_DIR}/_static"
 mkdir -p "${OUT_DIR}/data"
-mkdir -p "${OUT_DIR}/panel/data"
 
 # Copy the wheel into the output directory so it's accessible via HTTP
 cp "${SIMDEC_WHEEL_PATH}" "${OUT_DIR}/"
@@ -89,6 +96,9 @@ if [[ ! -f "data/stress.csv" ]]; then
     fi
 fi
 
+# Copy stress.csv to output directory
+cp "data/stress.csv" "${OUT_DIR}/data/"
+
 # Run conversion
 "${PYTHON_BIN}" -m panel convert \
     simdec_app.py \
@@ -97,6 +107,8 @@ fi
     --out "${OUT_DIR}" \
     --requirements "${WHEEL_FILENAME}" numpy pandas matplotlib seaborn scipy SALib \
     --resources data/stress.csv
+
+cp "./${WHEEL_FILENAME}" "${OUT_DIR}/"
 
 # Clean up the copied wheel
 rm "${WHEEL_FILENAME}"

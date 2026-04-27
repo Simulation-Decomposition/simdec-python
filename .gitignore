@@ -40,3 +40,6 @@ app.html
 venv/
 .venv/
 .wasm-build-venv/
+
+# Local Netlify folder
+.netlify

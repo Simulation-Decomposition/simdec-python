@@ -11,7 +11,6 @@ import numpy as np
 import pandas as pd
 from pandas.io.formats.style import Styler
 import panel as pn
-import seaborn as sns
 
 import simdec as sd
 from simdec.sensitivity_indices import SensitivityAnalysisResult
@@ -43,10 +42,15 @@ template = pn.template.FastGridTemplate(
 )
 
 VALID_CHARACTERS = re.compile(r"[^A-Za-z0-9_ \-.]")
-try:
-    DEFAULT_STRESS_CSV = Path(__file__).resolve().parent / "data" / "stress.csv"
-except NameError:
+# try:
+#     DEFAULT_STRESS_CSV = Path(__file__).resolve().parent / "data" / "stress.csv"
+# except NameError:
+#     DEFAULT_STRESS_CSV = Path("data/stress.csv")
+if Path("data/stress.csv").exists():
     DEFAULT_STRESS_CSV = Path("data/stress.csv")
+else:
+    # Fallback for if the zip was flattened or file is in the root
+    DEFAULT_STRESS_CSV = Path("stress.csv")
 GENERIC_ERROR_MSG = (
     "Could not parse the CSV file. "
     "Please check that it uses commas ',' as the delimiter "
@@ -262,49 +266,18 @@ def figure_pn(
         ax.set(xlabel=output_name)
         ax.set_xlim(xlim)
     else:
-        fig, axs = plt.subplots(2, 2, sharex="col", sharey="row", figsize=(8, 8))
-
-        axs[0][1].axison = False
-
-        _ = sd.visualization(
+        fig, _ = sd.two_output_visualization(
             bins=res.bins,
+            bins2=res2.bins,
             palette=palette,
             n_bins=n_bins,
-            kind="histogram",
-            ax=axs[0][0],
+            output_name=output_name,
+            output_name2=output_2_name,
+            xlim=xlim,
+            ylim=ylim,
+            r_scatter=r_scatter,
         )
-        axs[0][0].set_xlim(xlim)
-        axs[0][0].set_box_aspect(aspect=1)
-        axs[0][0].axis("off")
 
-        data = pd.concat([pd.melt(res.bins), pd.melt(res2.bins)["value"]], axis=1)
-        data.columns = ["c", "x", "y"]
-        data = data.sample(int(r_scatter * len(data)))
-        _ = sns.scatterplot(
-            data, x="x", y="y", hue="c", palette=palette, ax=axs[1][0], legend=False
-        )
-        axs[1][0].set(xlabel=output_name)
-        axs[1][0].set(ylabel=output_2_name)
-        axs[1][0].set_box_aspect(aspect=1)
-
-        _ = sns.histplot(
-            data,
-            y="y",
-            hue="c",
-            multiple="stack",
-            stat="probability",
-            palette=palette,
-            common_bins=True,
-            common_norm=True,
-            bins=40,
-            legend=False,
-            ax=axs[1][1],
-        )
-        axs[1][1].set_ylim(ylim)
-        axs[1][1].set_box_aspect(aspect=1)
-        axs[1][1].axis("off")
-
-    fig.subplots_adjust(wspace=-0.015, hspace=0)
     return fig
 
 
