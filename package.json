@@ -1,0 +1,10 @@
+{
+  "name": "simdec-wasm-site",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Static Panel WASM build wrapper",
+  "scripts": {
+    "build": "bash ./scripts/build_wasm.sh",
+    "serve": "mkdir -p dist/pyodide && python3 -m http.server 8000 --directory dist/pyodide"
+  }
+}

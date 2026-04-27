@@ -1,5 +1,7 @@
 import bisect
 import io
+from pathlib import Path
+import re
 
 from bokeh.models import PrintfTickFormatter
 from bokeh.models.widgets.tables import NumberFormatter
@@ -9,16 +11,13 @@ import numpy as np
 import pandas as pd
 from pandas.io.formats.style import Styler
 import panel as pn
-import seaborn as sns
 
 import simdec as sd
 from simdec.sensitivity_indices import SensitivityAnalysisResult
 from simdec.visualization import sequential_cmaps, single_color_to_colormap
 
-
 # panel app
-pn.extension("tabulator")
-pn.extension("floatpanel")
+pn.extension("tabulator", "floatpanel", notifications=True)
 
 pn.config.sizing_mode = "stretch_width"
 pn.config.throttled = True
@@ -42,36 +41,67 @@ template = pn.template.FastGridTemplate(
     # save_layout=True,
 )
 
+VALID_CHARACTERS = re.compile(r"[^A-Za-z0-9_ \-.]")
+# try:
+#     DEFAULT_STRESS_CSV = Path(__file__).resolve().parent / "data" / "stress.csv"
+# except NameError:
+#     DEFAULT_STRESS_CSV = Path("data/stress.csv")
+if Path("data/stress.csv").exists():
+    DEFAULT_STRESS_CSV = Path("data/stress.csv")
+else:
+    # Fallback for if the zip was flattened or file is in the root
+    DEFAULT_STRESS_CSV = Path("stress.csv")
+GENERIC_ERROR_MSG = (
+    "Could not parse the CSV file. "
+    "Please check that it uses commas ',' as the delimiter "
+    "and that column names contain no special characters."
+)
+
 
 @pn.cache
 def load_data(text_fname):
     if text_fname is None:
-        text_fname = "tests/data/stress.csv"
-    else:
-        text_fname = io.BytesIO(text_fname)
-
-    data = pd.read_csv(text_fname)
-    return data
+        return pd.read_csv(DEFAULT_STRESS_CSV)
+    try:
+        raw = bytes(text_fname)
+        first_line = raw.decode("utf-8").split("\n")[0].strip()
+        if "," not in first_line:
+            raise ValueError("No comma delimiter")
+        col_names = [c.strip().strip('"').strip("'") for c in first_line.split(",")]
+        if any(VALID_CHARACTERS.search(c) for c in col_names):
+            raise ValueError("Bad column names")
+        return pd.read_csv(io.BytesIO(raw))
+    except Exception:
+        pn.state.notifications.error(GENERIC_ERROR_MSG, duration=0)
 
 
 @pn.cache
 def column_inputs(data, output):
+    if data is None:
+        return []
     inputs = list(data.columns)
-    inputs.remove(output)
+    if output in inputs:
+        inputs.remove(output)
     return inputs
 
 
 @pn.cache
 def column_output(data):
+    if data is None:
+        return []
     return list(data.columns)
 
 
 @pn.cache
 def filtered_data(data, output_name):
+    if data is None or not output_name:
+        return pd.DataFrame()
     try:
+        if isinstance(output_name, str):
+            return data[[output_name]]
         return data[output_name]
     except KeyError:
-        return data.iloc[:, 0]
+        return data.iloc[:, [0]]
 
 
 @pn.cache
@@ -236,49 +266,18 @@ def figure_pn(
         ax.set(xlabel=output_name)
         ax.set_xlim(xlim)
     else:
-        fig, axs = plt.subplots(2, 2, sharex="col", sharey="row", figsize=(8, 8))
-
-        axs[0][1].axison = False
-
-        _ = sd.visualization(
+        fig, _ = sd.two_output_visualization(
             bins=res.bins,
+            bins2=res2.bins,
             palette=palette,
             n_bins=n_bins,
-            kind="histogram",
-            ax=axs[0][0],
+            output_name=output_name,
+            output_name2=output_2_name,
+            xlim=xlim,
+            ylim=ylim,
+            r_scatter=r_scatter,
         )
-        axs[0][0].set_xlim(xlim)
-        axs[0][0].set_box_aspect(aspect=1)
-        axs[0][0].axis("off")
 
-        data = pd.concat([pd.melt(res.bins), pd.melt(res2.bins)["value"]], axis=1)
-        data.columns = ["c", "x", "y"]
-        data = data.sample(int(r_scatter * len(data)))
-        _ = sns.scatterplot(
-            data, x="x", y="y", hue="c", palette=palette, ax=axs[1][0], legend=False
-        )
-        axs[1][0].set(xlabel=output_name)
-        axs[1][0].set(ylabel=output_2_name)
-        axs[1][0].set_box_aspect(aspect=1)
-
-        _ = sns.histplot(
-            data,
-            y="y",
-            hue="c",
-            multiple="stack",
-            stat="probability",
-            palette=palette,
-            common_bins=True,
-            common_norm=True,
-            bins=40,
-            legend=False,
-            ax=axs[1][1],
-        )
-        axs[1][1].set_ylim(ylim)
-        axs[1][1].set_box_aspect(aspect=1)
-        axs[1][1].axis("off")
-
-    fig.subplots_adjust(wspace=-0.015, hspace=0)
     return fig
 
 
@@ -350,7 +349,7 @@ interactive_file = pn.bind(load_data, text_fname)
 
 interactive_column_output = pn.bind(column_output, interactive_file)
 # hack to make the default selection faster
-interactive_output_ = pn.bind(lambda x: x[0], interactive_column_output)
+interactive_output_ = pn.bind(lambda x: x[0] if x else None, interactive_column_output)
 selector_output = pn.widgets.Select(
     name="Output", value=interactive_output_, options=interactive_column_output
 )

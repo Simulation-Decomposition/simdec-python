@@ -38,3 +38,8 @@ app.html
 
 # Virtual environment
 venv/
+.venv/
+.wasm-build-venv/
+
+# Local Netlify folder
+.netlify

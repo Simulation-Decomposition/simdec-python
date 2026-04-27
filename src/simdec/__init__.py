@@ -8,6 +8,7 @@ __all__ = [
     "states_expansion",
     "decomposition",
     "visualization",
+    "two_output_visualization",
     "tableau",
     "palette",
 ]

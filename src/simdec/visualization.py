@@ -11,7 +11,7 @@ import seaborn as sns
 import pandas as pd
 from pandas.io.formats.style import Styler
 
-__all__ = ["visualization", "tableau", "palette"]
+__all__ = ["visualization", "two_output_visualization", "tableau", "palette"]
 
 
 SEQUENTIAL_PALETTES = [
@@ -187,6 +187,106 @@ def visualization(
     else:
         raise ValueError("'kind' can only be 'histogram' or 'boxplot'")
     return ax
+
+
+def two_output_visualization(
+    *,
+    bins: pd.DataFrame,
+    bins2: pd.DataFrame,
+    palette: list[list[float]],
+    n_bins: str | int = "auto",
+    output_name: str = "Output 1",
+    output_name2: str = "Output 2",
+    xlim: tuple[float, float] | None = None,
+    ylim: tuple[float, float] | None = None,
+    r_scatter: float = 1.0,
+) -> tuple[plt.Figure, np.ndarray]:
+    """Two-output visualization.
+
+    Produces a 2x2 figure
+    * top-left    : stacked histogram for *output 1* (axes hidden)
+    * bottom-left : scatter of output 1 vs output 2, coloured by scenario
+    * bottom-right: rotated stacked histogram for *output 2* (axes hidden)
+    * top-right   : empty
+
+    Parameters
+    ----------
+    bins : DataFrame
+        Multidimensional bins for the primary output.
+    bins2 : DataFrame
+        Multidimensional bins for the secondary output.
+    palette : list of int of size (n, 4)
+        List of colours corresponding to scenarios.
+    n_bins : str or int
+        Number of bins for the histograms.
+    output_name : str, default "Output 1"
+        Axis label for the primary output.
+    output_name2 : str, default "Output 2"
+        Axis label for the secondary output.
+    xlim : tuple of float, optional
+        Limits for the primary output axis (scatter x / top histogram).
+    ylim : tuple of float, optional
+        Limits for the secondary output axis (scatter y / right histogram).
+    r_scatter : float, default 1.0
+        Fraction of data points shown in the scatter plot.
+
+    Returns
+    -------
+    fig : Figure
+    axs : ndarray of shape (2, 2)
+
+    """
+    fig, axs = plt.subplots(2, 2, sharex="col", sharey="row", figsize=(8, 8))
+
+    axs[0, 1].axis("off")
+
+    visualization(bins=bins.copy(), palette=palette, n_bins=n_bins, ax=axs[0, 0])
+    if xlim is not None:
+        axs[0, 0].set_xlim(xlim)
+    axs[0, 0].set_box_aspect(1)
+    axs[0, 0].axis("off")
+
+    data = pd.concat([pd.melt(bins), pd.melt(bins2)["value"]], axis=1)
+    data.columns = ["c", "x", "y"]
+    if r_scatter < 1.0:
+        data = data.sample(frac=r_scatter)
+
+    sns.scatterplot(
+        data=data,
+        x="x",
+        y="y",
+        hue="c",
+        palette=palette,
+        ax=axs[1, 0],
+        legend=False,
+    )
+    axs[1, 0].set(xlabel=output_name, ylabel=output_name2)
+    if xlim is not None:
+        axs[1, 0].set_xlim(xlim)
+    if ylim is not None:
+        axs[1, 0].set_ylim(ylim)
+    axs[1, 0].set_box_aspect(1)
+
+    sns.histplot(
+        data,
+        y="y",
+        hue="c",
+        multiple="stack",
+        stat="probability",
+        palette=palette,
+        common_bins=True,
+        common_norm=True,
+        bins=40,
+        legend=False,
+        ax=axs[1, 1],
+    )
+    if ylim is not None:
+        axs[1, 1].set_ylim(ylim)
+    axs[1, 1].set_box_aspect(1)
+    axs[1, 1].axis("off")
+
+    fig.subplots_adjust(wspace=-0.015, hspace=0)
+    return fig, axs
 
 
 def tableau(
