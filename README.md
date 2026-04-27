@@ -42,5 +42,6 @@ Foundation, and Finnish Foundation for Economic Education.
 If you use SimDec in your research we would appreciate a citation to the
 following publications:
 
+- Kozlova, M., Ahola, A., Roy, P., & Yeomans, J. S. (2025). Simple Binning Algorithm and SimDec Visualization for Comprehensive Sensitivity Analysis of Complex Computational Models. _Journal of Environmental Informatics Letters_, 13(1), 38-56. [https://arxiv.org/pdf/2310.13446](https://arxiv.org/pdf/2310.13446)
 - Kozlova, M., Moss, R. J., Yeomans, J. S., & Caers, J. (2024). Uncovering Heterogeneous Effects in Computational Models for Sustainable Decision-making. _Environmental Modelling & Software_, 171, 105898. [https://doi.org/10.1016/j.envsoft.2023.105898](https://doi.org/10.1016/j.envsoft.2023.105898)
 - Kozlova, M., Moss, R. J., Roy, P., Alam, A., & Yeomans, J. S. (2024). SimDec algorithm and guidelines for its usage and interpretation. In M. Kozlova & J. S. Yeomans (Eds.), _Sensitivity Analysis for Business, Technology, and Policymaking. Made Easy with Simulation Decomposition_. Routledge. [Available here](https://github.com/Simulation-Decomposition/SimDec-book/blob/74ce72c1d3dda650eba1c59e3b215a4bb35c6be0/chapters/02_SimDec_algorithm_and_instructions/Ch2.pdf).
