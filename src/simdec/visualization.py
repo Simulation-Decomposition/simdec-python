@@ -139,6 +139,8 @@ def visualization(
     n_bins: str | int = "auto",
     kind: Literal["histogram", "boxplot"] = "histogram",
     ax=None,
+    print_legend: bool = False,
+    decomposition=None,
 ) -> plt.Axes:
     """Histogram plot of scenarios.
 
@@ -154,6 +156,10 @@ def visualization(
         Histogram or Box Plot.
     ax : Axes, optional
         Matplotlib axis.
+    print_legend: Boolean, optional
+        Prints plot legend.
+    decomposition: Object, optional
+        Required for print_legend.
 
     Returns
     -------
@@ -186,6 +192,28 @@ def visualization(
         )
     else:
         raise ValueError("'kind' can only be 'histogram' or 'boxplot'")
+
+    if print_legend:
+        from IPython.display import display
+
+        if decomposition is None:
+            import warnings
+
+            warnings.warn(
+                "print_legend=True requires the decomposition object. Table skipped."
+            )
+        else:
+            try:
+                _, styler = tableau(
+                    var_names=decomposition.var_names,
+                    statistic=decomposition.statistic,
+                    states=decomposition.states,
+                    bins=decomposition.bins,
+                    palette=palette,
+                )
+                display(styler)
+            except ImportError:
+                pass
     return ax
 
 
@@ -200,6 +228,8 @@ def two_output_visualization(
     xlim: tuple[float, float] | None = None,
     ylim: tuple[float, float] | None = None,
     r_scatter: float = 1.0,
+    print_legend: bool = False,
+    decomposition=None,
 ) -> tuple[plt.Figure, np.ndarray]:
     """Two-output visualization.
 
@@ -229,6 +259,10 @@ def two_output_visualization(
         Limits for the secondary output axis (scatter y / right histogram).
     r_scatter : float, default 1.0
         Fraction of data points shown in the scatter plot.
+    print_legend: Boolean, optional
+        Prints plot legend.
+    decomposition: Object, optional
+        Required for print_legend.
 
     Returns
     -------
@@ -286,6 +320,28 @@ def two_output_visualization(
     axs[1, 1].axis("off")
 
     fig.subplots_adjust(wspace=-0.015, hspace=0)
+
+    if print_legend:
+        from IPython.display import display
+
+        if decomposition is None:
+            import warnings
+
+            warnings.warn(
+                "print_legend=True requires the decomposition object. Table skipped."
+            )
+        else:
+            try:
+                _, styler = tableau(
+                    var_names=decomposition.var_names,
+                    statistic=decomposition.statistic,
+                    states=decomposition.states,
+                    bins=decomposition.bins,
+                    palette=palette,
+                )
+                display(styler)
+            except ImportError:
+                pass
     return fig, axs
 
 

@@ -37,7 +37,9 @@ class SensitivityAnalysisResult:
 
 
 def sensitivity_indices(
-    inputs: pd.DataFrame | np.ndarray, output: pd.DataFrame | np.ndarray
+    inputs: pd.DataFrame | np.ndarray,
+    output: pd.DataFrame | np.ndarray,
+    print_indices: bool = False,
 ) -> SensitivityAnalysisResult:
     """Sensitivity indices.
 
@@ -50,6 +52,8 @@ def sensitivity_indices(
         Input variables.
     output : ndarray or DataFrame of shape (n_runs, 1)
         Target variable.
+    print_indices : bool, default False
+        If True, displays computed indices.
 
     Returns
     -------
@@ -97,11 +101,18 @@ def sensitivity_indices(
     """
     # Handle inputs conversion
     if isinstance(inputs, pd.DataFrame):
-        cat_columns = inputs.select_dtypes(["category", "O"]).columns
-        inputs[cat_columns] = inputs[cat_columns].apply(
-            lambda x: x.astype("category").cat.codes
-        )
+        var_names = inputs.columns.tolist()
+        cat_cols = inputs.select_dtypes(["category", "O"]).columns
+        if not cat_cols.empty:
+            inputs = inputs.copy()  # Avoid SettingWithCopyWarning
+            inputs[cat_cols] = inputs[cat_cols].apply(
+                lambda x: x.astype("category").cat.codes
+            )
         inputs = inputs.to_numpy()
+    else:
+        inputs = np.asarray(inputs)
+        # Fallback names if it's just a numpy array
+        var_names = [f"x{i}" for i in range(inputs.shape[1])]
 
     # Handle output conversion first, then flatten
     if isinstance(output, (pd.DataFrame, pd.Series)):
@@ -180,5 +191,15 @@ def sensitivity_indices(
     soe = soe + soe.T
     for k in range(n_factors):
         si[k] = foe[k] + (soe[:, k].sum() / 2)
+
+    if print_indices:
+        df_foe = pd.DataFrame(foe, index=var_names, columns=["First-order effect"])
+        df_soe = pd.DataFrame(soe, index=var_names, columns=var_names)
+        df_si = pd.DataFrame(si, index=var_names, columns=["Combined effect"])
+
+        df_indices = pd.concat([df_foe, df_soe, df_si], axis=1)
+        print(f"{'-'*69}")
+        print(df_indices)
+        print(f"{'-'*69}")
 
     return SensitivityAnalysisResult(si, foe, soe)

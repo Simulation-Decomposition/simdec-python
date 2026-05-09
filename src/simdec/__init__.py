@@ -2,6 +2,7 @@
 from simdec.decomposition import *
 from simdec.sensitivity_indices import *
 from simdec.visualization import *
+from simdec.heterogeneity_indices import *
 
 __all__ = [
     "sensitivity_indices",
@@ -11,4 +12,5 @@ __all__ = [
     "two_output_visualization",
     "tableau",
     "palette",
+    "heterogeneity_indices",
 ]
