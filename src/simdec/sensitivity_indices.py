@@ -102,7 +102,7 @@ def sensitivity_indices(
     # Handle inputs conversion
     if isinstance(inputs, pd.DataFrame):
         var_names = inputs.columns.tolist()
-        cat_cols = inputs.select_dtypes(["category", "O"]).columns
+        cat_cols = inputs.select_dtypes(include=["category", "O", "string"]).columns
         if not cat_cols.empty:
             inputs = inputs.copy()  # Avoid SettingWithCopyWarning
             inputs[cat_cols] = inputs[cat_cols].apply(
@@ -198,8 +198,6 @@ def sensitivity_indices(
         df_si = pd.DataFrame(si, index=var_names, columns=["Combined effect"])
 
         df_indices = pd.concat([df_foe, df_soe, df_si], axis=1)
-        print(f"{'-'*69}")
-        print(df_indices)
-        print(f"{'-'*69}")
+        print(f"\n{df_indices}\n")
 
     return SensitivityAnalysisResult(si, foe, soe)

@@ -130,5 +130,5 @@ def test_visualization_missing_decomposition_warning():
     bins = pd.DataFrame({"s1": [1, 2]})
     pal = [[1, 0, 0, 1]]
 
-    with pytest.warns(UserWarning, match="requires the decomposition object"):
+    with pytest.warns(UserWarning, match="requires the decomposition parameter"):
         sd.visualization(bins=bins, palette=pal, print_legend=True, decomposition=None)

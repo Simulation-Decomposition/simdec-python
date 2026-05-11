@@ -10,9 +10,18 @@ import numpy as np
 import seaborn as sns
 import pandas as pd
 from pandas.io.formats.style import Styler
+import warnings
+
+from simdec.decomposition import DecompositionResult
 
 __all__ = ["visualization", "two_output_visualization", "tableau", "palette"]
 
+try:
+    from IPython.display import display
+
+    HAS_IPYTHON = True
+except ImportError:
+    HAS_IPYTHON = False
 
 SEQUENTIAL_PALETTES = [
     "#DC267F",
@@ -140,7 +149,7 @@ def visualization(
     kind: Literal["histogram", "boxplot"] = "histogram",
     ax=None,
     print_legend: bool = False,
-    decomposition=None,
+    decomposition: DecompositionResult | None = None,
 ) -> plt.Axes:
     """Histogram plot of scenarios.
 
@@ -158,7 +167,7 @@ def visualization(
         Matplotlib axis.
     print_legend: Boolean, optional
         Prints plot legend.
-    decomposition: Object, optional
+    decomposition: DecompositionResult, optional
         Required for print_legend.
 
     Returns
@@ -194,13 +203,16 @@ def visualization(
         raise ValueError("'kind' can only be 'histogram' or 'boxplot'")
 
     if print_legend:
-        from IPython.display import display
-
-        if decomposition is None:
-            import warnings
-
+        if not HAS_IPYTHON:
             warnings.warn(
-                "print_legend=True requires the decomposition object. Table skipped."
+                "print_legend=True requires ipython to be installed. "
+                "Install it with: pip install simdec[ipython]",
+                stacklevel=2,
+            )
+        elif decomposition is None:
+            warnings.warn(
+                "print_legend=True requires the decomposition parameter. Table skipped.",
+                stacklevel=2,
             )
         else:
             try:
@@ -229,7 +241,7 @@ def two_output_visualization(
     ylim: tuple[float, float] | None = None,
     r_scatter: float = 1.0,
     print_legend: bool = False,
-    decomposition=None,
+    decomposition: DecompositionResult | None = None,
 ) -> tuple[plt.Figure, np.ndarray]:
     """Two-output visualization.
 
@@ -261,7 +273,7 @@ def two_output_visualization(
         Fraction of data points shown in the scatter plot.
     print_legend: Boolean, optional
         Prints plot legend.
-    decomposition: Object, optional
+    decomposition: DecompositionResult, optional
         Required for print_legend.
 
     Returns
@@ -322,13 +334,16 @@ def two_output_visualization(
     fig.subplots_adjust(wspace=-0.015, hspace=0)
 
     if print_legend:
-        from IPython.display import display
-
-        if decomposition is None:
-            import warnings
-
+        if not HAS_IPYTHON:
             warnings.warn(
-                "print_legend=True requires the decomposition object. Table skipped."
+                "print_legend=True requires ipython to be installed. "
+                "Install it with: pip install simdec[ipython]",
+                stacklevel=2,
+            )
+        elif decomposition is None:
+            warnings.warn(
+                "print_legend=True requires the decomposition parameter. Table skipped.",
+                stacklevel=2,
             )
         else:
             try:

@@ -1,9 +1,22 @@
-from .sensitivity_indices import sensitivity_indices
+from dataclasses import dataclass
+import logging
+
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 
-__all__ = ["heterogeneity_indices"]
+import simdec as sd
+
+logger = logging.getLogger(__name__)
+
+__all__ = ["heterogeneity_indices", "plot_heterogeneity"]
+
+
+@dataclass
+class HeterogeneityResult:
+    summary: pd.DataFrame
+    regional_profiles: pd.DataFrame
+    split_name: str
 
 
 def heterogeneity_indices(
@@ -12,9 +25,11 @@ def heterogeneity_indices(
     split_variable: str | pd.Series,
     n_subdivisions: int | None = None,
     plot: bool = False,
-) -> pd.DataFrame:
-    """
-    Compute sensitivity-based heterogeneity across subdivisions of a variable.
+) -> HeterogeneityResult:
+    """Heterogeneity indices.
+
+    Compute sensitivity-based heterogeneity across subdivisions
+    of a variable.
 
     Parameters
     ----------
@@ -27,12 +42,25 @@ def heterogeneity_indices(
     n_subdivisions : int, optional
         Number of regions for continuous variables. Defaults to 4.
     plot : bool, default False
-        If True, displays a stacked bar chart of regional sensitivities.
+        If True, displays a stacked bar chart of regional sensitivity profiles
+        by calling :func:`plot_heterogeneity`. The chart shows variance
+        contributions of each input across subdivisions of ``split_variable``,
+        ranked by global sensitivity indices. To capture the returned
+        ``matplotlib.axes.Axes`` object, call :func:`plot_heterogeneity`
+        directly on the result instead.
 
     Returns
-    ----------
-    summary : pd.Dataframe
-        A summary of calculated heterogeneity indices.
+    -------
+    res : HeterogeneityResult
+        An object with attributes:
+
+        summary : DataFrame
+            A summary of calculated heterogeneity indices.
+        regional_profiles : DataFrame
+            Regional sensitivity indices for each input across subdivisions.
+        split_name : str
+            The name of the variable used to split the data.
+
     """
     y = pd.Series(output).reset_index(drop=True)
     X = pd.DataFrame(inputs).reset_index(drop=True)
@@ -51,8 +79,9 @@ def heterogeneity_indices(
 
     # Determine if variable is categorical/binary
     is_categorical = (
-        pd.api.types.is_categorical_dtype(z)
+        isinstance(z.dtype, pd.CategoricalDtype)
         or pd.api.types.is_object_dtype(z)
+        or pd.api.types.is_string_dtype(z)
         or pd.api.types.is_bool_dtype(z)
         or n_unique <= 2
     )
@@ -89,7 +118,7 @@ def heterogeneity_indices(
             continue
 
         try:
-            res = sensitivity_indices(inputs=X_sub, output=y_sub)
+            res = sd.sensitivity_indices(inputs=X_sub, output=y_sub)
             si_vals = np.asarray(res.si).ravel()
 
             # Guard against NaN/Inf from degenerate sensitivity computation
@@ -105,11 +134,9 @@ def heterogeneity_indices(
             continue
 
     if skipped:
-        print(
-            f"[heterogeneity_indices] Skipped {len(skipped)} region(s) of '{split_name}':"
-        )
+        logger.info("Skipped %d region(s) of '%s':", len(skipped), split_name)
         for reg, n, reason in skipped:
-            print(f"  - region={reg!r}, n={n}, reason={reason}")
+            logger.info("  - region=%r, n=%d, reason=%s", reg, n, reason)
 
     if len(regional_profiles) < 2:
         total_regions = len(regions.cat.categories)
@@ -118,15 +145,15 @@ def heterogeneity_indices(
             f"Not enough valid subdivisions to compute heterogeneity: "
             f"{valid}/{total_regions} regions passed all checks for '{split_name}'.\n"
             f"Skipped regions:\n"
-            + "\n".join(f"  {r!r}: n={n}, {reason}" for r, n, reason in skipped)
-            + "\n\nTry: (1) reducing n_subdivisions, "
+            "\n".join(f"  {r!r}: n={n}, {reason} " for r, n, reason in skipped),
+            "\n\nTry: (1) reducing n_subdivisions, "
             "(2) using a different split_variable, or "
-            "(3) ensuring more samples per region."
+            "(3) ensuring more samples per region.",
         )
 
     regional_si = pd.concat(regional_profiles, axis=1)
 
-    res_global = sensitivity_indices(inputs=X, output=y)
+    res_global = sd.sensitivity_indices(inputs=X, output=y)
     overall_si = pd.Series(
         np.asarray(res_global.si).ravel(),
         index=X.columns,
@@ -143,29 +170,70 @@ def heterogeneity_indices(
     ).sort_values(by=hetero_col_name, ascending=False)
     summary.loc["SUM / TOTAL"] = [overall_si.sum(), total_hetero]
 
+    result = HeterogeneityResult(summary, regional_si, split_name)
+
     if plot:
-        plot_order = summary.index[:-1]
-        data_to_plot = regional_si.loc[plot_order].T
+        plot_heterogeneity(result)
 
-        cmap = plt.get_cmap("terrain")
-        colors = [cmap(i) for i in np.linspace(0.05, 0.95, len(plot_order))]
+    return result
 
-        _ = data_to_plot.plot(
-            kind="bar",
-            stacked=True,
-            figsize=(10, 6),
-            color=colors,
-            edgecolor="white",
-            width=0.8,
-        )
 
-        plt.title(f"Sensitivity Profiles across {split_name}", fontsize=14)
-        plt.ylabel("Variance Contribution", fontsize=12)
-        plt.xlabel(f"Regions of {split_name}", fontsize=12)
-        plt.legend(title="Input Variables", bbox_to_anchor=(1.05, 1), loc="upper left")
-        plt.xticks(rotation=45)
-        plt.grid(axis="y", linestyle="--", alpha=0.7)
+def plot_heterogeneity(result: HeterogeneityResult, ax: plt.Axes = None) -> plt.Axes:
+    """Plot regional sensitivity profiles.
+
+    Parameters
+    ----------
+    result : HeterogeneityResult
+        The result object from heterogeneity_indices.
+    ax : matplotlib.axes.Axes, optional
+        Existing axes to plot on.
+
+    Returns
+    -------
+    ax : matplotlib.axes.Axes
+        The axes with the plot.
+
+    """
+    summary = result.summary
+    regional_si = result.regional_profiles
+    split_name = result.split_name
+
+    plot_order = summary.index[summary.index != "SUM / TOTAL"]
+    plot_order = (
+        summary.loc[plot_order].sort_values(by="Overall_SI", ascending=False).index
+    )
+
+    cmap = plt.colormaps["terrain"]
+    colors = [cmap(i) for i in np.linspace(0.05, 0.95, len(regional_si.index))]
+
+    data_to_plot = regional_si.loc[plot_order].T
+
+    if ax is None:
+        _, ax = plt.subplots(figsize=(10, 6))
+
+    data_to_plot.plot(
+        kind="bar",
+        stacked=True,
+        ax=ax,
+        color=colors,
+        edgecolor="white",
+        width=0.8,
+    )
+
+    ax.set_title(f"Sensitivity Profiles across {split_name}", fontsize=14)
+    ax.set_ylabel("Variance Contribution", fontsize=12)
+    ax.set_xlabel(f"Regions of {split_name}", fontsize=12)
+
+    ax.legend(
+        title="Inputs (Ranked by Global SI)",
+        bbox_to_anchor=(1.05, 1),
+        loc="upper left",
+    )
+
+    ax.tick_params(axis="x", labelrotation=45)
+    ax.grid(axis="y", linestyle="--", alpha=0.7)
+
+    if plt.get_backend().lower() != "agg":
         plt.tight_layout()
-        plt.show()
 
-    return summary
+    return ax

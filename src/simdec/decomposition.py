@@ -65,7 +65,7 @@ class DecompositionResult:
 
 def decomposition(
     inputs: pd.DataFrame,
-    output: pd.DataFrame | np.ndarray,
+    output: pd.DataFrame,
     *,
     sensitivity_indices: np.ndarray,
     dec_limit: float | None = None,
@@ -116,11 +116,7 @@ def decomposition(
         inputs[cat_col] = codes
 
     inputs = inputs.to_numpy()
-
-    if hasattr(output, "to_numpy"):
-        output = output.to_numpy().flatten()
-    else:
-        output = np.asarray(output).flatten()
+    output = output.to_numpy().flatten()
 
     # 1. variables for decomposition
     var_order = np.argsort(sensitivity_indices)[::-1]
