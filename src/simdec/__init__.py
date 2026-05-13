@@ -1,8 +1,8 @@
 """SimDec main namespace."""
 from simdec.decomposition import *
+from simdec.heterogeneity_indices import *
 from simdec.sensitivity_indices import *
 from simdec.visualization import *
-from simdec.heterogeneity_indices import *
 
 __all__ = [
     "sensitivity_indices",

@@ -1,8 +1,10 @@
-import pytest
 import pathlib
+import pytest
+
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
+
 import simdec as sd
 
 
@@ -132,3 +134,15 @@ def test_visualization_missing_decomposition_warning():
 
     with pytest.warns(UserWarning, match="requires the decomposition parameter"):
         sd.visualization(bins=bins, palette=pal, print_legend=True, decomposition=None)
+
+
+def test_two_output_visualization_missing_decomposition_warning():
+    """Verify that omitting the decomposition object triggers a warning in two_output."""
+    bins = pd.DataFrame({"s1": [1, 2]})
+    bins2 = pd.DataFrame({"s1": [5, 6]})
+    pal = [[1, 0, 0, 1]]
+
+    with pytest.warns(UserWarning, match="requires the decomposition parameter"):
+        sd.two_output_visualization(
+            bins=bins, bins2=bins2, palette=pal, print_legend=True, decomposition=None
+        )

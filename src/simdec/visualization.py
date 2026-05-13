@@ -203,29 +203,29 @@ def visualization(
         raise ValueError("'kind' can only be 'histogram' or 'boxplot'")
 
     if print_legend:
-        if not HAS_IPYTHON:
+        if not HAS_IPYTHON or decomposition is None:
+            missing_requirements = []
+            if not HAS_IPYTHON:
+                missing_requirements.append(
+                    "ipython needs to be installed. "
+                    "Install it with: pip install simdec[display]"
+                )
+            if decomposition is None:
+                missing_requirements.append("the decomposition parameter")
             warnings.warn(
-                "print_legend=True requires ipython to be installed. "
-                "Install it with: pip install simdec[ipython]",
-                stacklevel=2,
-            )
-        elif decomposition is None:
-            warnings.warn(
-                "print_legend=True requires the decomposition parameter. Table skipped.",
+                f"print_legend=True requires {' and '.join(missing_requirements)}. Table skipped.",
                 stacklevel=2,
             )
         else:
-            try:
-                _, styler = tableau(
-                    var_names=decomposition.var_names,
-                    statistic=decomposition.statistic,
-                    states=decomposition.states,
-                    bins=decomposition.bins,
-                    palette=palette,
-                )
-                display(styler)
-            except ImportError:
-                pass
+            _, styler = tableau(
+                var_names=decomposition.var_names,
+                statistic=decomposition.statistic,
+                states=decomposition.states,
+                bins=decomposition.bins,
+                palette=palette,
+            )
+            display(styler)
+
     return ax
 
 
@@ -334,29 +334,29 @@ def two_output_visualization(
     fig.subplots_adjust(wspace=-0.015, hspace=0)
 
     if print_legend:
-        if not HAS_IPYTHON:
+        if not HAS_IPYTHON or decomposition is None:
+            missing_requirements = []
+            if not HAS_IPYTHON:
+                missing_requirements.append(
+                    "ipython needs to be installed. "
+                    "Install it with: pip install simdec[display]"
+                )
+            if decomposition is None:
+                missing_requirements.append("the decomposition parameter")
             warnings.warn(
-                "print_legend=True requires ipython to be installed. "
-                "Install it with: pip install simdec[ipython]",
-                stacklevel=2,
-            )
-        elif decomposition is None:
-            warnings.warn(
-                "print_legend=True requires the decomposition parameter. Table skipped.",
+                f"print_legend=True requires {' and '.join(missing_requirements)}. Table skipped.",
                 stacklevel=2,
             )
         else:
-            try:
-                _, styler = tableau(
-                    var_names=decomposition.var_names,
-                    statistic=decomposition.statistic,
-                    states=decomposition.states,
-                    bins=decomposition.bins,
-                    palette=palette,
-                )
-                display(styler)
-            except ImportError:
-                pass
+            _, styler = tableau(
+                var_names=decomposition.var_names,
+                statistic=decomposition.statistic,
+                states=decomposition.states,
+                bins=decomposition.bins,
+                palette=palette,
+            )
+            display(styler)
+
     return fig, axs
 
 

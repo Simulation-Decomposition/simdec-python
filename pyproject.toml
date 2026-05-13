@@ -41,8 +41,8 @@ dashboard = [
     "cryptography",
 ]
 
-ipython = [
-    "ipython"
+display = [
+    "ipython>=9.1"
 ]
 
 test = [
