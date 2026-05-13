@@ -59,7 +59,7 @@ doc = [
 ]
 
 dev = [
-    "simdec[doc,test,dashboard, ipython]",
+    "simdec[doc,test,dashboard, display]",
     "watchfiles",
     "pre-commit",
 ]
