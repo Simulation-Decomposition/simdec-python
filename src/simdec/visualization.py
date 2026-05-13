@@ -10,9 +10,18 @@ import numpy as np
 import seaborn as sns
 import pandas as pd
 from pandas.io.formats.style import Styler
+import warnings
+
+from simdec.decomposition import DecompositionResult
 
 __all__ = ["visualization", "two_output_visualization", "tableau", "palette"]
 
+try:
+    from IPython.display import display
+
+    HAS_IPYTHON = True
+except ImportError:
+    HAS_IPYTHON = False
 
 SEQUENTIAL_PALETTES = [
     "#DC267F",
@@ -139,6 +148,8 @@ def visualization(
     n_bins: str | int = "auto",
     kind: Literal["histogram", "boxplot"] = "histogram",
     ax=None,
+    print_legend: bool = False,
+    decomposition: DecompositionResult | None = None,
 ) -> plt.Axes:
     """Histogram plot of scenarios.
 
@@ -154,6 +165,10 @@ def visualization(
         Histogram or Box Plot.
     ax : Axes, optional
         Matplotlib axis.
+    print_legend: Boolean, optional
+        Prints plot legend.
+    decomposition: DecompositionResult, optional
+        Required for print_legend.
 
     Returns
     -------
@@ -186,6 +201,31 @@ def visualization(
         )
     else:
         raise ValueError("'kind' can only be 'histogram' or 'boxplot'")
+
+    if print_legend:
+        if not HAS_IPYTHON or decomposition is None:
+            missing_requirements = []
+            if not HAS_IPYTHON:
+                missing_requirements.append(
+                    "ipython needs to be installed. "
+                    "Install it with: pip install simdec[display]"
+                )
+            if decomposition is None:
+                missing_requirements.append("the decomposition parameter")
+            warnings.warn(
+                f"print_legend=True requires {' and '.join(missing_requirements)}. Table skipped.",
+                stacklevel=2,
+            )
+        else:
+            _, styler = tableau(
+                var_names=decomposition.var_names,
+                statistic=decomposition.statistic,
+                states=decomposition.states,
+                bins=decomposition.bins,
+                palette=palette,
+            )
+            display(styler)
+
     return ax
 
 
@@ -200,6 +240,8 @@ def two_output_visualization(
     xlim: tuple[float, float] | None = None,
     ylim: tuple[float, float] | None = None,
     r_scatter: float = 1.0,
+    print_legend: bool = False,
+    decomposition: DecompositionResult | None = None,
 ) -> tuple[plt.Figure, np.ndarray]:
     """Two-output visualization.
 
@@ -229,6 +271,10 @@ def two_output_visualization(
         Limits for the secondary output axis (scatter y / right histogram).
     r_scatter : float, default 1.0
         Fraction of data points shown in the scatter plot.
+    print_legend: Boolean, optional
+        Prints plot legend.
+    decomposition: DecompositionResult, optional
+        Required for print_legend.
 
     Returns
     -------
@@ -286,6 +332,31 @@ def two_output_visualization(
     axs[1, 1].axis("off")
 
     fig.subplots_adjust(wspace=-0.015, hspace=0)
+
+    if print_legend:
+        if not HAS_IPYTHON or decomposition is None:
+            missing_requirements = []
+            if not HAS_IPYTHON:
+                missing_requirements.append(
+                    "ipython needs to be installed. "
+                    "Install it with: pip install simdec[display]"
+                )
+            if decomposition is None:
+                missing_requirements.append("the decomposition parameter")
+            warnings.warn(
+                f"print_legend=True requires {' and '.join(missing_requirements)}. Table skipped.",
+                stacklevel=2,
+            )
+        else:
+            _, styler = tableau(
+                var_names=decomposition.var_names,
+                statistic=decomposition.statistic,
+                states=decomposition.states,
+                bins=decomposition.bins,
+                palette=palette,
+            )
+            display(styler)
+
     return fig, axs
 
 

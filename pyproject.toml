@@ -41,6 +41,10 @@ dashboard = [
     "cryptography",
 ]
 
+display = [
+    "ipython>=9.1"
+]
+
 test = [
     "pytest",
     "pytest-cov",
@@ -55,7 +59,7 @@ doc = [
 ]
 
 dev = [
-    "simdec[doc,test,dashboard]",
+    "simdec[doc,test,dashboard, display]",
     "watchfiles",
     "pre-commit",
 ]
