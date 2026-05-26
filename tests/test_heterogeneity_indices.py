@@ -109,7 +109,16 @@ def test_plot_heterogeneity(dummy_data):
     ax = sd.plot_heterogeneity(res)
 
     assert isinstance(ax, plt.Axes)
-    assert ax.get_title() == "Sensitivity Profiles across cat_var"
+
+    # Calculate the expected title format
+    hetero_col_name = [c for c in res.summary.columns if "Heterogeneity" in c][0]
+    total_hetero = res.summary.loc["SUM / TOTAL", hetero_col_name]
+    expected_title = (
+        f"Sensitivity Profiles across cat_var\n"
+        f"(Total Heterogeneity: {total_hetero:.3f})"
+    )
+
+    assert ax.get_title() == expected_title
     assert ax.get_ylabel() == "Variance Contribution"
     assert ax.get_xlabel() == "Regions of cat_var"
 

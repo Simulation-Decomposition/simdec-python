@@ -292,16 +292,24 @@ def two_output_visualization(
     axs[0, 0].set_box_aspect(1)
     axs[0, 0].axis("off")
 
+    # Match the ordering visualization() uses
+    bins_plot = bins.copy()
+    bins_plot.columns = pd.RangeIndex(start=len(bins_plot.columns), stop=0, step=-1)
+    bins2_plot = bins2.copy()
+    bins2_plot.columns = pd.RangeIndex(start=len(bins2_plot.columns), stop=0, step=-1)
+
     data = pd.concat([pd.melt(bins), pd.melt(bins2)["value"]], axis=1)
     data.columns = ["c", "x", "y"]
     if r_scatter < 1.0:
         data = data.sample(frac=r_scatter)
 
+    hue_order = sorted(data["c"].unique(), reverse=True)
     sns.scatterplot(
         data=data,
         x="x",
         y="y",
         hue="c",
+        hue_order=hue_order,
         palette=palette,
         ax=axs[1, 0],
         legend=False,
@@ -317,6 +325,7 @@ def two_output_visualization(
         data,
         y="y",
         hue="c",
+        hue_order=hue_order,
         multiple="stack",
         stat="probability",
         palette=palette,

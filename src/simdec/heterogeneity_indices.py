@@ -198,6 +198,9 @@ def plot_heterogeneity(result: HeterogeneityResult, ax: plt.Axes = None) -> plt.
     regional_si = result.regional_profiles
     split_name = result.split_name
 
+    hetero_col_name = [c for c in summary.columns if "Heterogeneity" in c][0]
+    total_hetero = summary.loc["SUM / TOTAL", hetero_col_name]
+
     plot_order = summary.index[summary.index != "SUM / TOTAL"]
     plot_order = (
         summary.loc[plot_order].sort_values(by="Overall_SI", ascending=False).index
@@ -220,9 +223,14 @@ def plot_heterogeneity(result: HeterogeneityResult, ax: plt.Axes = None) -> plt.
         width=0.8,
     )
 
-    ax.set_title(f"Sensitivity Profiles across {split_name}", fontsize=14)
-    ax.set_ylabel("Variance Contribution", fontsize=12)
-    ax.set_xlabel(f"Regions of {split_name}", fontsize=12)
+    ax.set_title(
+        f"Sensitivity Profiles across {split_name}\n"
+        f"(Total Heterogeneity: {total_hetero:.3f})",
+        fontsize=10,
+    )
+
+    ax.set_ylabel("Variance Contribution", fontsize=8)
+    ax.set_xlabel(f"Regions of {split_name}", fontsize=8)
 
     ax.legend(
         title="Inputs (Ranked by Global SI)",
