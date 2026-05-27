@@ -170,8 +170,11 @@ def filtered_si(sensitivity_indices_table, input_names):
 
 
 def explained_variance_80(sensitivity_indices_table):
-    si = sensitivity_indices_table.value["Indices"]
-    pos_80 = bisect.bisect_right(np.cumsum(si), 0.8)
+    df = sensitivity_indices_table.value
+    df = df[df["Inputs"] != "Sum of Indices"]
+    si = df["Indices"].values
+    target = 0.8 * np.sum(si)
+    pos_80 = bisect.bisect_right(np.cumsum(si), target)
 
     # pos_80 = max(2, pos_80)
     # pos_80 = min(len(si), pos_80)
@@ -225,9 +228,8 @@ def create_color_pickers(states, colors):
 @pn.cache
 def palette_(states: list[list[str]], colors_picked: list[list[float]]):
     cmaps = [single_color_to_colormap(color_picked) for color_picked in colors_picked]
-    # Reverse order as in figures high values take the first colors
     states = [len(states_) for states_ in states]
-    return sd.palette(states, cmaps=cmaps[::-1])
+    return sd.palette(states, cmaps=cmaps)
 
 
 @pn.cache

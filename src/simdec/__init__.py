@@ -1,5 +1,6 @@
 """SimDec main namespace."""
 from simdec.decomposition import *
+from simdec.heterogeneity_indices import *
 from simdec.sensitivity_indices import *
 from simdec.visualization import *
 
@@ -11,4 +12,5 @@ __all__ = [
     "two_output_visualization",
     "tableau",
     "palette",
+    "heterogeneity_indices",
 ]
