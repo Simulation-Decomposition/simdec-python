@@ -42,10 +42,7 @@ template = pn.template.FastGridTemplate(
 )
 
 VALID_CHARACTERS = re.compile(r"[^A-Za-z0-9_ \-.]")
-# try:
-#     DEFAULT_STRESS_CSV = Path(__file__).resolve().parent / "data" / "stress.csv"
-# except NameError:
-#     DEFAULT_STRESS_CSV = Path("data/stress.csv")
+
 if Path("data/stress.csv").exists():
     DEFAULT_STRESS_CSV = Path("data/stress.csv")
 else:
@@ -98,7 +95,7 @@ def filtered_data(data, output_name):
         return pd.DataFrame()
     try:
         if isinstance(output_name, str):
-            return data[[output_name]]
+            return data[output_name]
         return data[output_name]
     except KeyError:
         return data.iloc[:, [0]]
@@ -128,31 +125,40 @@ def sensitivity_indices_table(si, inputs):
     si = list(si[var_order])
     sum_si = sum(si)
 
-    var_names.append("Sum of Indices")
-    si_numerics = si.copy()
-    si.append(0)
-    si_numerics.append(sum_si)
+    # Insert labels and values at the top (index 0)
+    var_names.insert(0, "Sum of Indices")
 
-    d = {"Inputs": var_names, "Indices": si, "": si_numerics}
+    si_numerics = si.copy()
+    si.insert(0, 0)
+    si_numerics.insert(0, sum_si)
+
+    d = {"Inputs": var_names, "Indices": si, "Value": si_numerics}
     df = pd.DataFrame(data=d)
+
     formatters = {
         "Indices": {"type": "progress", "max": sum_si, "color": "#007eff"},
-        "": NumberFormatter(format="0.00"),
+        "Value": NumberFormatter(format="0.00"),
     }
+
     widget = pn.widgets.Tabulator(
         df,
         show_index=False,
         formatters=formatters,
         theme="bulma",
-        frozen_rows=[-1],
-        # page_size=5,
-        # pagination='local',
         layout="fit_columns",
     )
+
     widget.style.apply(
-        lambda x: ["font-style: italic"] * 3, axis=1, subset=df.index[-1]
+        lambda x: (
+            [
+                "font-size: 11pt; font-style: italic; font-weight: bold; border-bottom: 2px solid #b5b5b5"
+            ]
+            * len(x)
+            if x.name == 0
+            else ["font-size: 11pt"] * len(x)
+        ),
+        axis=1,
     )
-    widget.style.apply(lambda x: ["font-size: 11pt"] * len(si))
     return widget
 
 
@@ -165,23 +171,20 @@ def filtered_si(sensitivity_indices_table, input_names):
     df = sensitivity_indices_table.value
     si = []
     for input_name in input_names:
-        si.append(df.loc[df["Inputs"] == input_name, "Indices"])
+        # Pull from "Value" explicit column
+        si.append(df.loc[df["Inputs"] == input_name, "Value"])
     return np.asarray(si).flatten()
 
 
 def explained_variance_80(sensitivity_indices_table):
     df = sensitivity_indices_table.value
-    df = df[df["Inputs"] != "Sum of Indices"]
-    si = df["Indices"].values
-    target = 0.8 * np.sum(si)
-    pos_80 = bisect.bisect_right(np.cumsum(si), target)
 
-    # pos_80 = max(2, pos_80)
-    # pos_80 = min(len(si), pos_80)
+    # Slice [1:] to skip the 'Sum of Indices' row at the top
+    si_values = df["Value"].tolist()[1:]
+    input_names = df["Inputs"].tolist()[1:]
 
-    input_names = sensitivity_indices_table.value["Inputs"]
-    input_names = input_names.to_list()
-    input_names.remove("Sum of Indices")
+    pos_80 = bisect.bisect_right(np.cumsum(si_values), 0.8)
+
     return input_names[: pos_80 + 1]
 
 
@@ -229,7 +232,7 @@ def create_color_pickers(states, colors):
 def palette_(states: list[list[str]], colors_picked: list[list[float]]):
     cmaps = [single_color_to_colormap(color_picked) for color_picked in colors_picked]
     states = [len(states_) for states_ in states]
-    return sd.palette(states, cmaps=cmaps)
+    return sd.palette(states, cmaps=cmaps)[::-1]
 
 
 @pn.cache
@@ -263,10 +266,11 @@ def figure_pn(
 
         kind = "histogram" if kind == "Stacked histogram" else "boxplot"
         _ = sd.visualization(
-            bins=res.bins, palette=palette, n_bins=n_bins, kind=kind, ax=ax
+            bins=res.bins.copy(), palette=palette, n_bins=n_bins, kind=kind, ax=ax
         )
         ax.set(xlabel=output_name)
-        ax.set_xlim(xlim)
+        if xlim is not None:
+            ax.set_xlim(xlim)
     else:
         fig, _ = sd.two_output_visualization(
             bins=res.bins,
@@ -296,7 +300,7 @@ def tableau_pn(res, states, palette):
         var_names=res.var_names,
         states=res.states,
         bins=res.bins,
-        palette=palette,
+        palette=palette[::-1],
     )
     return styler
 
