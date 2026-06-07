@@ -39,7 +39,7 @@ PYTHON_BIN="${VENV_DIR}/bin/python"
 
 # Install build dependencies and build the wheel
 echo "Installing build tools and generating local wheel..."
-"${PYTHON_BIN}" -m pip install --upgrade pip build "panel==1.9.3" matplotlib seaborn scipy SALib
+"${PYTHON_BIN}" -m pip install --upgrade pip build panel matplotlib seaborn scipy SALib
 
 # Clean old builds to avoid picking up the wrong wheel
 rm -rf dist/*.whl
@@ -105,7 +105,7 @@ cp "data/stress.csv" "${OUT_DIR}/data/"
     sampling.py \
     --to pyodide-worker \
     --out "${OUT_DIR}" \
-    --requirements "${WHEEL_FILENAME}" pyodide-http numpy pandas matplotlib seaborn scipy SALib \
+    --requirements "${WHEEL_FILENAME}" numpy pandas matplotlib seaborn scipy SALib \
     --resources data/stress.csv
 
 cp "./${WHEEL_FILENAME}" "${OUT_DIR}/"
