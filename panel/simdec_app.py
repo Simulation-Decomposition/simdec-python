@@ -183,7 +183,9 @@ def explained_variance_80(sensitivity_indices_table):
     si_values = df["Value"].tolist()[1:]
     input_names = df["Inputs"].tolist()[1:]
 
-    pos_80 = bisect.bisect_right(np.cumsum(si_values), 0.8)
+    # Ensuring explained variance is at least 80% of the total
+    target = 0.8 * sum(si_values)
+    pos_80 = bisect.bisect_right(np.cumsum(si_values), target)
 
     return input_names[: pos_80 + 1]
 
@@ -300,7 +302,7 @@ def tableau_pn(res, states, palette):
         var_names=res.var_names,
         states=res.states,
         bins=res.bins,
-        palette=palette[::-1],
+        palette=palette[::-1],  # reverse to match the order in the figure
     )
     return styler
 
