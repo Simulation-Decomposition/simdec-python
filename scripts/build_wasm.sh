@@ -105,7 +105,7 @@ cp "data/stress.csv" "${OUT_DIR}/data/"
     sampling.py \
     --to pyodide-worker \
     --out "${OUT_DIR}" \
-    --requirements "${WHEEL_FILENAME}" numpy pandas matplotlib seaborn scipy SALib \
+    --requirements "./${WHEEL_FILENAME}" panel numpy pandas matplotlib seaborn scipy SALib \
     --resources data/stress.csv
 
 cp "./${WHEEL_FILENAME}" "${OUT_DIR}/"
