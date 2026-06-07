@@ -136,7 +136,8 @@ def palette(
     n_shades = int(np.prod(states[1:]))
     for i in range(n_cmaps):
         cmap = cmaps[i].resampled(n_shades)
-        colors.append(cmap(np.linspace(0, 1, n_shades)))
+        # colors.append(cmap(np.linspace(0, 1, n_shades)))
+        colors.append(cmap(np.linspace(1, 0, n_shades)))
 
     return np.concatenate(colors).tolist()
 
@@ -298,12 +299,12 @@ def two_output_visualization(
     bins2_plot = bins2.copy()
     bins2_plot.columns = pd.RangeIndex(start=len(bins2_plot.columns), stop=0, step=-1)
 
-    data = pd.concat([pd.melt(bins), pd.melt(bins2)["value"]], axis=1)
+    data = pd.concat([pd.melt(bins_plot), pd.melt(bins2_plot)["value"]], axis=1)
     data.columns = ["c", "x", "y"]
     if r_scatter < 1.0:
         data = data.sample(frac=r_scatter)
 
-    hue_order = sorted(data["c"].unique(), reverse=True)
+    hue_order = sorted(data["c"].unique())
     sns.scatterplot(
         data=data,
         x="x",
@@ -362,7 +363,7 @@ def two_output_visualization(
                 statistic=decomposition.statistic,
                 states=decomposition.states,
                 bins=decomposition.bins,
-                palette=palette,
+                palette=palette[::-1],
             )
             display(styler)
 
