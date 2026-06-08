@@ -39,8 +39,13 @@ PYTHON_BIN="${VENV_DIR}/bin/python"
 
 # Install build dependencies and build the wheel
 echo "Installing build tools and generating local wheel..."
-"${PYTHON_BIN}" -m pip install --upgrade pip build panel matplotlib seaborn scipy SALib
-
+"${PYTHON_BIN}" -m pip install --upgrade pip build \
+    "panel==1.8.10" \
+    "bokeh==3.8.0" \
+    "matplotlib==3.10.8" \
+    "seaborn==0.13.2" \
+    "scipy==1.17.1" \
+    "SALib==1.5.2"
 # Clean old builds to avoid picking up the wrong wheel
 rm -rf dist/*.whl
 "${PYTHON_BIN}" -m build --wheel .
