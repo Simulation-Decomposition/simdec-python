@@ -16,3 +16,9 @@
   [headers.values]
     Cross-Origin-Embedder-Policy = "require-corp"
     Cross-Origin-Opener-Policy = "same-origin"
+
+[[headers]]
+  for = "/*.whl"
+  [headers.values]
+    Content-Type = "application/zip"
+    Access-Control-Allow-Origin = "*"
