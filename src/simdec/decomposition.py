@@ -138,7 +138,7 @@ def decomposition(
             n_var_dec = sensitivity_indices.size
 
         n_var_dec = max(1, n_var_dec)  # keep at least one variable
-        n_var_dec = min(5, n_var_dec)  # use at most 5 variables
+        n_var_dec = min(4, n_var_dec)  # use at most 4 variables
     else:
         n_var_dec = inputs.shape[1]
 

@@ -70,6 +70,7 @@ def load_data(text_fname):
         return pd.read_csv(io.BytesIO(raw))
     except Exception:
         pn.state.notifications.error(GENERIC_ERROR_MSG, duration=0)
+        return pd.read_csv(DEFAULT_STRESS_CSV)
 
 
 @pn.cache
@@ -183,11 +184,11 @@ def explained_variance_80(sensitivity_indices_table):
     si_values = df["Value"].tolist()[1:]
     input_names = df["Inputs"].tolist()[1:]
 
-    # Ensuring explained variance is at least 80% of the total
-    target = 0.8 * sum(si_values)
-    pos_80 = bisect.bisect_right(np.cumsum(si_values), target)
-
-    return input_names[: pos_80 + 1]
+    # Find the variables needed to reach 80% of explained variance
+    total = sum(si_values)
+    pos = bisect.bisect_left(np.cumsum(si_values), 0.8 * total)
+    n_vars = min(pos + 1, 4)
+    return input_names[:n_vars]
 
 
 @pn.cache
