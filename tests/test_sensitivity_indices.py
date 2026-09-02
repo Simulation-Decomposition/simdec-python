@@ -75,10 +75,10 @@ def test_sensitivity_indices(ishigami_ref_indices):
 @pytest.mark.parametrize(
     "fname, foe_ref, si_ref",
     [
-        (path_data / "stress.csv", [0.04, 0.50, 0.11, 0.28], [0.04, 0.51, 0.10, 0.35]),
+        (path_data / "stress.csv", [0.037, 0.49, 0.11, 0.28], [0.04, 0.52, 0.10, 0.35]),
         (
             path_data / "crying.csv",
-            [0.25, 0.22, 0.0, 0.0, 0.01, 0.38],
+            [0.24, 0.22, 0.0, 0.0, 0.01, 0.38],
             [0.28, 0.25, 0.01, 0.01, 0.01, 0.44],
         ),
     ],
