@@ -603,7 +603,7 @@ def _plot_heterogeneity(
         axis.grid(axis="y", linestyle=":", alpha=0.30)
         axis.set_axisbelow(True)
 
-    for axis in axes[len(names):]:
+    for axis in axes[len(names) :]:
         axis.remove()
 
     handles = [

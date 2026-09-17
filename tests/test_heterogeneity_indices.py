@@ -85,9 +85,7 @@ def test_standard_call_computes_y_and_all_inputs(monkeypatch, example_data):
     assert H["x1"] == pytest.approx(H.indices["x1"])
 
 
-def test_profiles_are_normalized_and_contributions_sum_to_h(
-    monkeypatch, example_data
-):
+def test_profiles_are_normalized_and_contributions_sum_to_h(monkeypatch, example_data):
     monkeypatch.setattr(hi, "sensitivity_indices", _fake_sensitivity_indices)
     y, X = example_data
 
@@ -99,9 +97,7 @@ def test_profiles_are_normalized_and_contributions_sum_to_h(
         assert detail.regional_sums.index.equals(detail.region_counts.index)
 
 
-def test_categorical_input_is_removed_from_its_own_profiles(
-    monkeypatch, example_data
-):
+def test_categorical_input_is_removed_from_its_own_profiles(monkeypatch, example_data):
     monkeypatch.setattr(hi, "sensitivity_indices", _fake_sensitivity_indices)
     y, X = example_data
 
