@@ -1,11 +1,11 @@
 import importlib
 
-import matplotlib
-matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import pytest
+
+plt.switch_backend("Agg")
 
 hi = importlib.import_module("simdec.heterogeneity_indices")
 
