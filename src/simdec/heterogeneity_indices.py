@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from .sensitivity_indices import sensitivity_indices
+import simdec
 
 __all__ = [
     "HeterogeneityDetail",
@@ -263,7 +263,7 @@ def _compute_partition(
             )
 
         try:
-            result = sensitivity_indices(inputs=X_sub, output=y_sub)
+            result = simdec.sensitivity_indices(inputs=X_sub, output=y_sub)
             si_values = np.asarray(result.si, dtype=float).ravel()
         except Exception as exc:
             raise ValueError(
