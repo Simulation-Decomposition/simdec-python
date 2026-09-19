@@ -1,140 +1,235 @@
-import pathlib
-import pytest
+import importlib
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
+import pytest
 
-import simdec as sd
+plt.switch_backend("Agg")
+
+hi = importlib.import_module("simdec.heterogeneity_indices")
 
 
-path_data = pathlib.Path(__file__).parent / "data"
+class _SensitivityResult:
+    def __init__(self, si):
+        self.si = np.asarray(si, dtype=float)
 
 
-@pytest.fixture(autouse=True)
-def close_plots():
-    yield
-    plt.close("all")
+def _fake_sensitivity_indices(*, inputs, output):
+    """Deterministic stand-in for API and result-structure tests."""
+    X = pd.DataFrame(inputs).reset_index(drop=True)
+    y = pd.Series(output).reset_index(drop=True)
+    yy = pd.to_numeric(y, errors="raise").to_numpy(dtype=float)
+
+    scores = []
+    for column in X.columns:
+        x = X[column]
+        if not pd.api.types.is_numeric_dtype(x):
+            xx = pd.factorize(x)[0].astype(float)
+        else:
+            xx = pd.to_numeric(x, errors="raise").to_numpy(dtype=float)
+
+        if np.std(xx) < 1e-12 or np.std(yy) < 1e-12:
+            score = 0.0
+        else:
+            score = float(np.corrcoef(xx, yy)[0, 1] ** 2)
+            if not np.isfinite(score):
+                score = 0.0
+
+        # Positive floor keeps profiles normalizable in deliberately simple tests.
+        scores.append(score + 0.02)
+
+    return _SensitivityResult(scores)
 
 
 @pytest.fixture
-def dummy_data():
-    rng = np.random.default_rng(42)
-    n = 200
-
-    inputs = pd.DataFrame(
+def example_data():
+    rng = np.random.default_rng(123)
+    n = 1000
+    category = pd.Series(
+        np.where(np.arange(n) % 2 == 0, "A", "B"),
+        dtype="category",
+        name="category",
+    )
+    X = pd.DataFrame(
         {
-            "x1": rng.random(n),
-            "x2": rng.random(n),
-            "x3": rng.random(n),
-            "cat_var": rng.choice(["A", "B", "C"], size=n),
+            "x1": rng.normal(size=n),
+            "category": category,
+            "x3": rng.normal(size=n),
         }
     )
-
-    # Create a dummy output dependent on x1 and x2
-    y = 2.0 * inputs["x1"] + 0.5 * inputs["x2"] + rng.normal(0, 0.1, n)
-    return inputs, y
-
-
-def test_heterogeneity_categorical_str(dummy_data):
-    """Test splitting by a string column name (categorical)."""
-    inputs, y = dummy_data
-
-    res = sd.heterogeneity_indices(output=y, inputs=inputs, split_variable="cat_var")
-
-    # Check object structure
-    assert hasattr(res, "summary")
-    assert hasattr(res, "regional_profiles")
-    assert res.split_name == "cat_var"
-
-    # Check DataFrame structures
-    assert "Overall_SI" in res.summary.columns
-    assert "Heterogeneity (across cat_var)" in res.summary.columns
-    assert "SUM / TOTAL" in res.summary.index
-
-    # 3 categories
-    assert res.regional_profiles.shape[1] == 3
-    assert list(res.regional_profiles.index) == ["x1", "x2", "x3", "cat_var"]
+    y = pd.Series(
+        X["x1"]
+        + (category == "B").astype(float) * 2.0 * X["x3"]
+        + rng.normal(scale=0.2, size=n),
+        name="Y",
+    )
+    return y, X
 
 
-def test_heterogeneity_continuous_series(dummy_data):
-    """Test splitting by passing a pandas Series (continuous)."""
-    inputs, y = dummy_data
-    split_series = inputs["x1"]
+def test_public_package_export():
+    import simdec
 
-    res = sd.heterogeneity_indices(
-        output=y, inputs=inputs, split_variable=split_series, n_subdivisions=4
+    assert callable(simdec.heterogeneity_indices)
+
+
+def test_standard_call_computes_y_and_all_inputs(monkeypatch, example_data):
+    monkeypatch.setattr(hi.simdec, "sensitivity_indices", _fake_sensitivity_indices)
+    y, X = example_data
+
+    H = hi.heterogeneity_indices(output=y, inputs=X)
+
+    assert list(H.indices.index) == ["Y", "x1", "category", "x3"]
+    assert H.indices.notna().all()
+    assert set(H.details) == set(H.indices.index)
+    assert H["x1"] == pytest.approx(H.indices["x1"])
+
+
+def test_profiles_are_normalized_and_contributions_sum_to_h(monkeypatch, example_data):
+    monkeypatch.setattr(hi.simdec, "sensitivity_indices", _fake_sensitivity_indices)
+    y, X = example_data
+
+    H = hi.heterogeneity_indices(output=y, inputs=X)
+
+    for name, detail in H.details.items():
+        assert np.allclose(detail.normalized_profiles.sum(axis=1), 1.0)
+        assert np.isclose(detail.individual_contributions.sum(), H.indices[name])
+        assert detail.regional_sums.index.equals(detail.region_counts.index)
+
+
+def test_categorical_input_is_removed_from_its_own_profiles(monkeypatch, example_data):
+    monkeypatch.setattr(hi.simdec, "sensitivity_indices", _fake_sensitivity_indices)
+    y, X = example_data
+
+    H = hi.heterogeneity_indices(output=y, inputs=X)
+
+    detail = H.details["category"]
+    assert "category" not in detail.raw_profiles.columns
+    assert "category" not in detail.normalized_profiles.columns
+    assert "category" not in detail.individual_contributions.index
+
+    # The same categorical input remains available in profiles for other partitions.
+    assert "category" in H.details["Y"].raw_profiles.columns
+    assert "category" in H.details["x1"].raw_profiles.columns
+
+
+def test_categorical_output_skips_h_y_but_continues(monkeypatch, example_data):
+    monkeypatch.setattr(hi.simdec, "sensitivity_indices", _fake_sensitivity_indices)
+    y, X = example_data
+    y_binary = (y > y.median()).astype(int)
+
+    with pytest.warns(UserWarning, match="output is categorical"):
+        H = hi.heterogeneity_indices(output=y_binary, inputs=X)
+
+    assert "Y" not in H.indices.index
+    assert "Y" not in H.details
+    assert list(H.indices.index) == ["x1", "category", "x3"]
+    assert H.indices.notna().all()
+
+
+def test_continuous_custom_partition_uses_n_regions(monkeypatch, example_data):
+    monkeypatch.setattr(hi.simdec, "sensitivity_indices", _fake_sensitivity_indices)
+    y, X = example_data
+    z = pd.Series(np.linspace(0.0, 1.0, len(y)), name="temperature")
+
+    H = hi.heterogeneity_indices(
+        output=y,
+        inputs=X,
+        n_regions=5,
+        custom_partition=z,
     )
 
-    assert res.split_name == "x1"
-    assert res.regional_profiles.shape[1] == 4  # 4 quantiles
+    assert list(H.indices.index) == ["temperature"]
+    detail = H.details["temperature"]
+    assert len(detail.region_counts) == 5
+    assert detail.region_counts.sum() == len(y)
+    assert (detail.region_counts >= 100).all()
 
 
-def test_heterogeneity_missing_column(dummy_data):
-    """Test that a ValueError is raised when split_variable is not in inputs."""
-    inputs, y = dummy_data
-
-    with pytest.raises(ValueError, match="'missing_col' not found in inputs"):
-        sd.heterogeneity_indices(output=y, inputs=inputs, split_variable="missing_col")
-
-
-def test_heterogeneity_too_few_regions():
-    """Test that a ValueError is raised when there are not enough valid subdivisions."""
-    inputs = pd.DataFrame({"x1": [1, 2, 3, 4, 5], "cat": ["A", "B", "C", "D", "E"]})
-    y = pd.Series([1.0, 2.0, 3.0, 4.0, 5.0])
-
-    with pytest.raises(ValueError, match="Not enough valid subdivisions"):
-        sd.heterogeneity_indices(output=y, inputs=inputs, split_variable="cat")
-
-
-def test_heterogeneity_plot_argument(dummy_data):
-    """Test that setting plot=True works without throwing an error."""
-    inputs, y = dummy_data
-
-    res = sd.heterogeneity_indices(
-        output=y, inputs=inputs, split_variable="cat_var", plot=True
+def test_categorical_custom_partition_uses_categories_and_warns_if_n_regions_changed(
+    monkeypatch, example_data
+):
+    monkeypatch.setattr(hi.simdec, "sensitivity_indices", _fake_sensitivity_indices)
+    y, X = example_data
+    z = pd.Series(
+        np.where(np.arange(len(y)) % 2 == 0, "OK", "Flood"),
+        dtype="category",
+        name="Flood regime",
     )
 
-    assert res is not None
-    # Figure exists in the active pyplot state
-    assert len(plt.get_fignums()) > 0
+    with pytest.warns(UserWarning, match="n_regions.*ignored"):
+        H = hi.heterogeneity_indices(
+            output=y,
+            inputs=X,
+            n_regions=10,
+            custom_partition=z,
+        )
+
+    assert list(H.indices.index) == ["Flood regime"]
+    detail = H.details["Flood regime"]
+    assert set(detail.region_counts.index.astype(str)) == {"OK", "Flood"}
+    assert sorted(detail.region_counts.tolist()) == [500, 500]
 
 
-def test_plot_heterogeneity(dummy_data):
-    """Test the independent plot_heterogeneity function."""
-    inputs, y = dummy_data
-
-    res = sd.heterogeneity_indices(output=y, inputs=inputs, split_variable="cat_var")
-
-    ax = sd.plot_heterogeneity(res)
-
-    assert isinstance(ax, plt.Axes)
-
-    # Calculate the expected title format
-    hetero_col_name = [c for c in res.summary.columns if "Heterogeneity" in c][0]
-    total_hetero = res.summary.loc["SUM / TOTAL", hetero_col_name]
-    expected_title = (
-        f"Sensitivity Profiles across cat_var\n"
-        f"(Total Heterogeneity: {total_hetero:.3f})"
+def test_minimum_region_size_is_100(monkeypatch, example_data):
+    monkeypatch.setattr(hi.simdec, "sensitivity_indices", _fake_sensitivity_indices)
+    y, X = example_data
+    z = pd.Series(
+        ["rare"] * 99 + ["common"] * (len(y) - 99),
+        dtype="category",
+        name="regime",
     )
 
-    assert ax.get_title() == expected_title
-    assert ax.get_ylabel() == "Variance Contribution"
-    assert ax.get_xlabel() == "Regions of cat_var"
+    with pytest.raises(ValueError, match="at least 100"):
+        hi.heterogeneity_indices(
+            output=y,
+            inputs=X,
+            custom_partition=z,
+        )
 
 
-def test_heterogeneity_real_data():
-    """Integration test using the real stress.csv dataset from the project."""
-    fname = path_data / "stress.csv"
-    data = pd.read_csv(fname)
-    output_name, *v_names = list(data.columns)
+def test_region_counts_are_exposed(monkeypatch, example_data):
+    monkeypatch.setattr(hi.simdec, "sensitivity_indices", _fake_sensitivity_indices)
+    y, X = example_data
 
-    inputs, output = data[v_names], data[output_name]
+    H = hi.heterogeneity_indices(output=y, inputs=X, n_regions=5)
 
-    res = sd.heterogeneity_indices(
-        output=output, inputs=inputs, split_variable="R", n_subdivisions=2
+    for name, detail in H.details.items():
+        assert detail.region_counts.sum() == len(y)
+        assert len(detail.region_counts) >= 2
+
+
+def test_binary_analytical_tv_reference():
+    # Controlled-model a=4 reference used in the manuscript: H_K = 6/13.
+    profiles = pd.DataFrame(
+        [
+            [0.5, 0.5],
+            [1.0 / 26.0, 25.0 / 26.0],
+        ],
+        index=["K=0", "K=1"],
+        columns=["A", "B"],
     )
 
-    assert res.split_name == "R"
-    assert not res.summary.empty
-    assert res.regional_profiles.shape[1] == 2
+    H, contributions = hi._mean_pairwise_tv(profiles)
+
+    assert H == pytest.approx(6.0 / 13.0)
+    assert contributions.sum() == pytest.approx(H)
+
+
+def test_plot_uses_stored_results_without_recalculation(monkeypatch, example_data):
+    monkeypatch.setattr(hi.simdec, "sensitivity_indices", _fake_sensitivity_indices)
+    y, X = example_data
+    H = hi.heterogeneity_indices(output=y, inputs=X)
+
+    def _should_not_run(*args, **kwargs):
+        raise AssertionError("sensitivity_indices should not be called by plot()")
+
+    monkeypatch.setattr(hi.simdec, "sensitivity_indices", _should_not_run)
+
+    ax = H.plot("x1")
+    assert ax is not None
+    plt.close(ax.figure)
+
+    axes = H.plot(["Y", "x1"])
+    assert len(np.ravel(axes)) >= 2
+    plt.close(np.ravel(axes)[0].figure)
