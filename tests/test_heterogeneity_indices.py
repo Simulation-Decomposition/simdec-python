@@ -74,7 +74,7 @@ def test_public_package_export():
 
 
 def test_standard_call_computes_y_and_all_inputs(monkeypatch, example_data):
-    monkeypatch.setattr(hi, "sensitivity_indices", _fake_sensitivity_indices)
+    monkeypatch.setattr(hi.simdec, "sensitivity_indices", _fake_sensitivity_indices)
     y, X = example_data
 
     H = hi.heterogeneity_indices(output=y, inputs=X)
@@ -86,7 +86,7 @@ def test_standard_call_computes_y_and_all_inputs(monkeypatch, example_data):
 
 
 def test_profiles_are_normalized_and_contributions_sum_to_h(monkeypatch, example_data):
-    monkeypatch.setattr(hi, "sensitivity_indices", _fake_sensitivity_indices)
+    monkeypatch.setattr(hi.simdec, "sensitivity_indices", _fake_sensitivity_indices)
     y, X = example_data
 
     H = hi.heterogeneity_indices(output=y, inputs=X)
@@ -98,7 +98,7 @@ def test_profiles_are_normalized_and_contributions_sum_to_h(monkeypatch, example
 
 
 def test_categorical_input_is_removed_from_its_own_profiles(monkeypatch, example_data):
-    monkeypatch.setattr(hi, "sensitivity_indices", _fake_sensitivity_indices)
+    monkeypatch.setattr(hi.simdec, "sensitivity_indices", _fake_sensitivity_indices)
     y, X = example_data
 
     H = hi.heterogeneity_indices(output=y, inputs=X)
@@ -114,7 +114,7 @@ def test_categorical_input_is_removed_from_its_own_profiles(monkeypatch, example
 
 
 def test_categorical_output_skips_h_y_but_continues(monkeypatch, example_data):
-    monkeypatch.setattr(hi, "sensitivity_indices", _fake_sensitivity_indices)
+    monkeypatch.setattr(hi.simdec, "sensitivity_indices", _fake_sensitivity_indices)
     y, X = example_data
     y_binary = (y > y.median()).astype(int)
 
@@ -128,7 +128,7 @@ def test_categorical_output_skips_h_y_but_continues(monkeypatch, example_data):
 
 
 def test_continuous_custom_partition_uses_n_regions(monkeypatch, example_data):
-    monkeypatch.setattr(hi, "sensitivity_indices", _fake_sensitivity_indices)
+    monkeypatch.setattr(hi.simdec, "sensitivity_indices", _fake_sensitivity_indices)
     y, X = example_data
     z = pd.Series(np.linspace(0.0, 1.0, len(y)), name="temperature")
 
@@ -149,7 +149,7 @@ def test_continuous_custom_partition_uses_n_regions(monkeypatch, example_data):
 def test_categorical_custom_partition_uses_categories_and_warns_if_n_regions_changed(
     monkeypatch, example_data
 ):
-    monkeypatch.setattr(hi, "sensitivity_indices", _fake_sensitivity_indices)
+    monkeypatch.setattr(hi.simdec, "sensitivity_indices", _fake_sensitivity_indices)
     y, X = example_data
     z = pd.Series(
         np.where(np.arange(len(y)) % 2 == 0, "OK", "Flood"),
@@ -172,7 +172,7 @@ def test_categorical_custom_partition_uses_categories_and_warns_if_n_regions_cha
 
 
 def test_minimum_region_size_is_100(monkeypatch, example_data):
-    monkeypatch.setattr(hi, "sensitivity_indices", _fake_sensitivity_indices)
+    monkeypatch.setattr(hi.simdec, "sensitivity_indices", _fake_sensitivity_indices)
     y, X = example_data
     z = pd.Series(
         ["rare"] * 99 + ["common"] * (len(y) - 99),
@@ -189,7 +189,7 @@ def test_minimum_region_size_is_100(monkeypatch, example_data):
 
 
 def test_region_counts_are_exposed(monkeypatch, example_data):
-    monkeypatch.setattr(hi, "sensitivity_indices", _fake_sensitivity_indices)
+    monkeypatch.setattr(hi.simdec, "sensitivity_indices", _fake_sensitivity_indices)
     y, X = example_data
 
     H = hi.heterogeneity_indices(output=y, inputs=X, n_regions=5)
@@ -217,14 +217,14 @@ def test_binary_analytical_tv_reference():
 
 
 def test_plot_uses_stored_results_without_recalculation(monkeypatch, example_data):
-    monkeypatch.setattr(hi, "sensitivity_indices", _fake_sensitivity_indices)
+    monkeypatch.setattr(hi.simdec, "sensitivity_indices", _fake_sensitivity_indices)
     y, X = example_data
     H = hi.heterogeneity_indices(output=y, inputs=X)
 
     def _should_not_run(*args, **kwargs):
         raise AssertionError("sensitivity_indices should not be called by plot()")
 
-    monkeypatch.setattr(hi, "sensitivity_indices", _should_not_run)
+    monkeypatch.setattr(hi.simdec, "sensitivity_indices", _should_not_run)
 
     ax = H.plot("x1")
     assert ax is not None
